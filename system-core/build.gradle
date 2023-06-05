@@ -1,0 +1,5 @@
+// Util, Type 같은 순수 Java Class 만 정의하고 가능하면 사용하지 않는다.
+
+war { enabled = true }
+
+bootWar { enabled = true }

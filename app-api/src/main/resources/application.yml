@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ddd-chulsi-api
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+  config:
+    import: "optional:configserver:http://config.jeffrey-oh.click/"
+  cloud:
+    config:
+      name: chulsi
+      profile: ${SPRING_PROFILES_ACTIVE}
+      username: ${CONFIG_SERVER_USERNAME}
+      password: ${CONFIG_SERVER_PASSWORD}
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+  jpa:
+    database: mysql # 데이터베이스
+    database-platform: org.hibernate.dialect.MySQLDialect # 데이터베이스 방언 설정, Hinbernate 가 MySQL에 맞게 쿼리문 생성
+    show-sql: true # 하이버네이트 쿼리문 콘솔 표시 여부
+    generate-ddl: false # DDL 생성 여부
+    open-in-view: false # jpa 성닝이슈 때문에 false로 권장. true일 경우 영속성 컨텍스트가 트랜잭션 범위를 넘어선 레이어까지 살아있다.
+    hibernate:
+      connection:
+        provider_class: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+      ddl-auto: validate # create update validate none
+      #use-new-id-generator-mappings: true # JPA 표준에 맞는 새로운 키 생성 전략을 사용함.
+    properties:
+      hibernate.connection.provider_disables_autocommit: false # ID 관련되어서 하이버네이트 속성에 따른 생성
+      hibernate:
+        dialect: com.ddd.chulsi.infrastructure.config.datasource.CustomMysql8Dialect # 내장함수 사용을 위해 커스텀 파일로 등록
+        enable_lazy_load_no_trans: true
+        format_sql: true # 하이버네이트 sql문 포맷 정렬 여부
+      jdbc:
+        order_updates: true
+        batch_versioned_data: false
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  web:
+    resources:
+      add-mappings: false
+
+encrypt:
+  key: ${CONFIG_SERVER_ENCRYPT_KEY}
+
+jwt:
+  access-expires-time: 7200 # 2 시간
+  refresh-expires-time: 1209600 # 2 주

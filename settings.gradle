@@ -1,0 +1,4 @@
+rootProject.name = 'chulsi'
+include 'app-api'
+include 'domain-core'
+include 'system-core'

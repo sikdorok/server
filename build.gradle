@@ -1,0 +1,61 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.springframework.boot' version '3.0.5'
+}
+
+subprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'war'
+
+    // build.gradle에서 api() 를 사용하려면 java-library 사용
+    apply plugin: 'java-library'
+
+    apply plugin: 'org.springframework.boot'
+
+    // spring boot dependency를 사용하여 사용중인 부트 버전에서 자동으로 의존성을 가져온다.
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'com.ddd'
+    version = ''
+    sourceCompatibility = '17'
+
+    repositories {
+        mavenCentral()
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    dependencies {
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+
+        // log4j
+        implementation 'org.apache.logging.log4j:log4j-api'
+        implementation 'org.apache.logging.log4j:log4j-to-slf4j'
+
+        // cloud-config
+        implementation 'org.springframework.security:spring-security-rsa:1.0.11.RELEASE'
+        implementation group: 'org.springframework.cloud', name: 'spring-cloud-config-client', version: '4.0.2'
+
+        // actuator
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+        // mapstruct
+        implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+        annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+        annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+}

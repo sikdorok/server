@@ -1,0 +1,120 @@
+pipeline {
+  agent any
+
+  tools {
+    jdk("java-17-amazon-corretto")
+  }
+
+  environment {
+    SLACK_CHANNEL = "#chulsi-jenkins-deploy"
+    SLACK_SUCCESS_COLOR = "#2C953C";
+    SLACK_FAIL_COLOR = "#FF3232";
+  }
+
+  stages {
+
+    stage('Set Environment') {
+      post {
+        success {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: "==================================================================\n배포 파이프라인이 시작되었습니다.\n${JOB_NAME}(${BUILD_NUMBER})\n${GIT_COMMIT_AUTHOR} - ${GIT_COMMIT_MESSAGE}\n${BUILD_URL}")
+        }
+      }
+      steps {
+        script {
+          switch(BRANCH_NAME) {
+            case 'dev' :
+              env.IMAGE_NAME = 'chulsi-api'
+              env.IMAGE_STORAGE = 'chulsi-dev.ncr.gov-ntruss.com'
+              env.IMAGE_STORAGE_CREDENTIAL = 'ncp-chulsi-container-registry'
+              env.SSH_CONNECTION = 'ncloud@118.67.150.203'
+              env.SSH_CONNECTION_CREDENTIAL = 'ncp-chulsi-api-ssh'
+              break
+            //case 'prod' :
+            //  env.IMAGE_NAME = 'chulsi-api'
+            //  env.IMAGE_STORAGE = 'chulsi-prod.ncr.gov-ntruss.com'
+            //  env.IMAGE_STORAGE_CREDENTIAL = 'ncp-chulsi-container-registry'
+            //  env.SSH_CONNECTION = 'ncloud@175.106.95.110'
+            //  env.SSH_CONNECTION_CREDENTIAL = 'ncp-chulsi-api-ssh'
+            //  break
+          }
+          GIT_COMMIT_AUTHOR = sh(script: "git --no-pager show -s --format=%an ${GIT_COMMIT}", returnStdout: true).trim();
+          GIT_COMMIT_MESSAGE = sh(script: "git --no-pager show -s --format=%B ${GIT_COMMIT}", returnStdout: true).trim();
+        }
+      }
+    }
+
+    stage('Clean Build Test') {
+      post {
+        success {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: 'Build Test에 성공하였습니다.')
+        }
+        failure {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: 'Build Test에 실패하였습니다.\n==================================================================')
+        }
+      }
+      steps {
+        sh "SPRING_PROFILES_ACTIVE=${BRANCH_NAME} ./gradlew :app-api:clean :app-api:build :app-api:test"
+      }
+    }
+
+    stage('Build Container Image') {
+      post {
+        success {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: 'Container Image Build에 성공하였습니다.')
+        }
+        failure {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: 'Container Image Build에 실패하였습니다.\n==================================================================')
+        }
+      }
+      steps {
+        script {
+          image = docker.build("${IMAGE_STORAGE}/${IMAGE_NAME}", "--build-arg SPRING_PROFILES_ACTIVE=${BRANCH_NAME} --build-arg CONFIG_SERVER_ENCRYPT_KEY=${CONFIG_SERVER_ENCRYPT_KEY} --build-arg CONFIG_SERVER_USERNAME=${CONFIG_SERVER_USERNAME} --build-arg CONFIG_SERVER_PASSWORD=${CONFIG_SERVER_PASSWORD} ./app-api")
+        }
+      }
+    }
+
+    stage('Push Container Image') {
+      post {
+        success {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: 'Container Image Push에 성공하였습니다.')
+        }
+        failure {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: 'Container Image Push에 실패하였습니다.\n==================================================================')
+        }
+      }
+      steps {
+        script {
+          docker.withRegistry("https://${IMAGE_STORAGE}", IMAGE_STORAGE_CREDENTIAL) {
+            image.push("${BUILD_NUMBER}")
+            image.push("latest")
+          }
+        }
+      }
+    }
+
+    stage('Remove Container Image') {
+      steps {
+        sh "docker image rm ${IMAGE_STORAGE}/${IMAGE_NAME}:latest"
+        sh "docker image rm ${IMAGE_STORAGE}/${IMAGE_NAME}:${BUILD_NUMBER}"
+        sh "docker system prune -a --volumes -f" // 사용 안하는 것 전부 삭제
+      }
+    }
+
+    stage('Server Run') {
+      post {
+        success {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: '배포에 성공하였습니다.\n==================================================================')
+        }
+        failure {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: '배포에 실패하였습니다.\n==================================================================')
+        }
+      }
+      steps {
+        sshagent(credentials: [SSH_CONNECTION_CREDENTIAL]) {
+            sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} IMAGE_STORAGE=${IMAGE_STORAGE} BUILD_NUMBER=${BUILD_NUMBER} ./deploy.sh'"
+        }
+      }
+    }
+  }
+
+}
