@@ -16,7 +16,7 @@ pipeline {
     stage('Set Environment') {
       post {
         success {
-          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: "==================================================================\n배포 파이프라인이 시작되었습니다.\n${JOB_NAME}(${BUILD_NUMBER})\n${GIT_COMMIT_AUTHOR} - ${GIT_COMMIT_MESSAGE}\n${BUILD_URL}")
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: "==================================================================\n배포 파이프라인이 시작되었습니다. \n${JOB_NAME}(${BUILD_NUMBER})\n${GIT_COMMIT_AUTHOR} - ${GIT_COMMIT_MESSAGE}\n${BUILD_URL}")
         }
       }
       steps {
