@@ -1,5 +1,5 @@
-FROM amazoncorretto:11-alpine-jdk
-MAINTAINER Jeffrey <jeffrey@kai-i.com>
+FROM amazoncorretto:17-alpine-jdk
+MAINTAINER Jeffrey <jeffreyoh121@gmail.com>
 
 EXPOSE 8080
 
