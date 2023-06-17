@@ -37,6 +37,7 @@ pipeline {
         }
       }
       steps {
+        sh "chmod +x gradlew"
         sh "SPRING_PROFILES_ACTIVE=${BRANCH_NAME} ./gradlew :app-api:clean :app-api:build :app-api:test"
       }
     }
