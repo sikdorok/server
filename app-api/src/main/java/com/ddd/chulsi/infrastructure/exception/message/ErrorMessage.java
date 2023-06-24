@@ -39,5 +39,9 @@ public class ErrorMessage {
     public static final String FILE_SAVE_FAILED = "파일 저장에 실패했습니다.";
 
     public static final String FILE_DELETE_FAILED = "파일 삭제에 실패했습니다.";
-    
+
+    public static final String OAUTH_RESPONSE_EMPTY = "{oauth} Oauth 결과가 없습니다.";
+
+    public static final String OAUTH_REQUEST_FAILED = "{oauth} Oauth 요청에 실패했습니다.";
+
 }

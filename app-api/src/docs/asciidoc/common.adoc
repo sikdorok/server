@@ -1,0 +1,105 @@
+[[common]]
+== 공통 사항
+API 에 관계없이 아래 사항을 지켜주셔야 합니다.
+
+=== 도메인
+|===
+| 환경 | 도메인 주소
+
+| 개발서버
+| http://chulsi-dev.com
+
+| 운영서버
+| https://chulsi.com
+|===
+
+=== 파일 도메인주소
+미정
+
+=== Method 규칙
+|===
+| GET | POST | PUT | DELETE
+
+| 조회
+| 생성, 확인
+| 수정
+| 삭제
+|===
+
+=== Result Code
+|===
+| Code | 메시지 | 설명
+
+| 200
+| API call successful
+| Api 호출 성공
+
+| 400
+| Bad request (or message)
+| 잘못된 요청
+|
+| Invalid JWT Token
+| 잘못된 토큰
+|
+| Password Not Matched
+| 비밀번호가 올바르지 않음
+
+| 401
+| Authentication failed
+| 인증 실패
+|
+| Token Expired Error
+| 토큰 만료
+
+| 403
+| Permission error
+| 권한 없음
+
+| 404
+| Not Found
+| 존재하지 않음
+
+| 409
+| Exists Data
+| 이미 존재하는 데이터
+
+| 417
+| {FieldName} is required
+| 유효성 검증 실패
+
+| 500
+| Internal Server Error
+| 알수없는 오류(서버 오류)
+
+| 700
+| Kakao Oauth 요청에 실패했습니다.
+| 카카오 - 서버 통신 실패
+
+| 701
+| Kakao Oauth 요청에 실패했습니다.
+| 카카오 - 필요 데이터 없음
+
+| 702
+| Kakao Oauth 결과가 없습니다.
+| 카카오 - Response Body Empty
+|===
+
+---
+
+= 공통 API
+---
+//[[api]]
+//== AccessToken 재발급
+//=== Http
+//include::{snippets}/login/access-token/http-request.adoc[]
+//=== Response
+//include::{snippets}/login/access-token/response-fields.adoc[]
+//include::{snippets}/login/access-token/response-body.adoc[]
+
+[[definedCode]]
+== 코드 정의
+정의된 ENUM 값을 사용해주세요.
+
+include::{snippets}/enum-code/defined-code/custom-response-fields-definedCode.adoc[]
+
+---

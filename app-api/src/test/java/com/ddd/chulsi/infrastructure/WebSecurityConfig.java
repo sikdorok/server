@@ -1,12 +1,7 @@
-package com.ddd.chulsi.infrastructure.config.common;
+package com.ddd.chulsi.infrastructure;
 
-import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import com.ddd.chulsi.infrastructure.exception.response.ErrorResponse;
-import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
-import com.ddd.chulsi.infrastructure.jwt.JwtAuthenticationFilter;
-import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -21,23 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class WebSecurityConfig {
-
-    private static final String[] MANAGER_WHITELIST = {
-
-    };
-
-    private static final String[] PERMIT_LIST = {
-        "/users/*/",
-    };
-
-    private final JwtTokenUtil jwtTokenUtil;
-    private final JWTProperties properties;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -61,13 +43,8 @@ public class WebSecurityConfig {
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 토큰 기반 인증이므로 세션 미사용
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(PERMIT_LIST).permitAll()
-                .requestMatchers(MANAGER_WHITELIST).hasAuthority(String.valueOf(DefinedCode.C000100001))
                 .anyRequest().permitAll() // 그외 나머지 요청은 누구나 접근 가능
             ) // 요청에 대한 사용권한 체크
-            .oauth2Login()
-            .and()
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil, properties), UsernamePasswordAuthenticationFilter.class)
             .build();
     }
 
@@ -76,6 +53,5 @@ public class WebSecurityConfig {
     private final AccessDeniedHandler accessDeniedHandler = (request, response, accessDeniedException) -> ErrorResponse.of(response, HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
 
     private final AuthenticationEntryPoint authenticationEntryPoint = (request, response, authException) -> ErrorResponse.of(response, HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
-
 
 }

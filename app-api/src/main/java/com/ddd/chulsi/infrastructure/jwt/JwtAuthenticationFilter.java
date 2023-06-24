@@ -38,24 +38,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String token = authorization.replace(JwtTokenUtil.PREFIX, "");
-            boolean isAccess = !request.getRequestURI().equals("/users/access-token");
+            if (!request.getRequestURI().contains("oauth")) {
+                String token = authorization.replace(JwtTokenUtil.PREFIX, "");
+                boolean isAccess = !request.getRequestURI().equals("/users/access-token");
 
-            try {
-                Authentication authentication = jwtTokenUtil.getAuthentication(token, properties, isAccess);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (TokenExpiredException e) {
-                if (!request.getRequestURI().equals("/users/auto-login") && !request.getRequestURI().equals("/users/access-token")) {
-                    ErrorResponse.of(response, HttpStatus.UNAUTHORIZED, ErrorMessage.TOKEN_EXPIRED_ERROR);
+                try {
+                    Authentication authentication = jwtTokenUtil.getAuthentication(token, properties, isAccess);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } catch (TokenExpiredException e) {
+                    if (!request.getRequestURI().equals("/users/auto-login") && !request.getRequestURI().equals("/users/access-token")) {
+                        ErrorResponse.of(response, HttpStatus.UNAUTHORIZED, ErrorMessage.TOKEN_EXPIRED_ERROR);
+                        return;
+                    }
+                } catch (Exception e) {
+                    log.error("================================================");
+                    log.error("JwtAuthenticationFilter - doFilterInternal() 오류발생");
+                    log.error("Exception Message : {}", e.getMessage());
+                    log.error("================================================");
+                    ErrorResponse.of(response, HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
                     return;
                 }
-            } catch (Exception e) {
-                log.error("================================================");
-                log.error("JwtAuthenticationFilter - doFilterInternal() 오류발생");
-                log.error("Exception Message : {}", e.getMessage());
-                log.error("================================================");
-                ErrorResponse.of(response, HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
-                return;
             }
 
         }
