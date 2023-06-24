@@ -1,0 +1,28 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlights
+:toc: left
+:toclevels: 3
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+ifndef::snippets-custom[]
+:snippets-custom: ../../../src/docs/custom
+
+=== link:index.html[Home]
+include::{docdir}/common.adoc[]
+
+[[title]]
+= DTMT API 문서 - 유저 API
+
+[[login]]
+== 카카오 로그인
+include::{snippets}/oauth/kakao/login/http-request.adoc[]
+=== Request
+include::{snippets}/oauth/kakao/login/request-fields.adoc[]
+=== Response
+include::{snippets}/oauth/kakao/login/response-fields.adoc[]
+include::{snippets}/oauth/kakao/login/response-body.adoc[]
