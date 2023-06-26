@@ -13,9 +13,6 @@ API 에 관계없이 아래 사항을 지켜주셔야 합니다.
 | https://chulsi.com
 |===
 
-=== 파일 도메인주소
-미정
-
 === Method 규칙
 |===
 | GET | POST | PUT | DELETE
