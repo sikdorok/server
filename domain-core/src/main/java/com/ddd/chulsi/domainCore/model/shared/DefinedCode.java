@@ -12,7 +12,10 @@ import java.util.stream.Collectors;
 public enum DefinedCode implements EnumType {
 
     C0001("C0001", "계정권한", "", ""),
-    C000100001("C0001", "계정권한", "00001", "슈퍼관리자");
+    C000100001("C0001", "계정권한", "00001", "슈퍼관리자"),
+    C000100002("C0001", "계정권한", "00002", "사용자"),
+    C0002("C0002", "Oauth 종류", "", ""),
+    C000200001("C0002", "Oauth 종류", "00001", "Kakao");
 
     private final String sectionCode;
     private final String sectionCodeName;

@@ -32,7 +32,7 @@ public class Users extends DateColumn {
     private UUID usersId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "oauthType", nullable = false, length = 10)
+    @Column(name = "oauthType", length = 10)
     private DefinedCode oauthType;
 
     @Column(name = "oauthId")
@@ -44,7 +44,7 @@ public class Users extends DateColumn {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "lastLoginAt")

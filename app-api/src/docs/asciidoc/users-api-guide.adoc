@@ -16,13 +16,13 @@ ifndef::snippets-custom[]
 include::{docdir}/common.adoc[]
 
 [[title]]
-= DTMT API 문서 - 유저 API
+= SDR API 문서 - 유저 API
 
 [[login]]
 == 카카오 로그인
-include::{snippets}/oauth/kakao/login/http-request.adoc[]
+include::{snippets}/users/oauth/kakao/login/http-request.adoc[]
 === Request
-include::{snippets}/oauth/kakao/login/request-fields.adoc[]
+include::{snippets}/users/oauth/kakao/login/request-fields.adoc[]
 === Response
-include::{snippets}/oauth/kakao/login/response-fields.adoc[]
-include::{snippets}/oauth/kakao/login/response-body.adoc[]
+include::{snippets}/users/oauth/kakao/login/response-fields.adoc[]
+include::{snippets}/users/oauth/kakao/login/response-body.adoc[]
