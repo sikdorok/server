@@ -20,16 +20,7 @@ public class OauthInfo {
         @JsonProperty("refresh_token_expires_in")
         Integer refreshTokenExpiresIn
     ) {
-        @Override
-        public String toString() {
-            return "{"
-                + "\"tokenType\":\"" + tokenType + "\""
-                + ", \"accessToken\":\"" + accessToken + "\""
-                + ", \"expiresIn\":" + expiresIn
-                + ", \"refreshToken\":\"" + refreshToken + "\""
-                + ", \"refreshTokenExpiresIn\":" + refreshTokenExpiresIn
-                + "}";
-        }
+
     }
 
     public record KakaoLogoutResponse(
@@ -39,4 +30,21 @@ public class OauthInfo {
 
     }
 
+    public record KakaoUserMe(
+        @JsonProperty("id")
+        Long id,
+
+        @JsonProperty("kakao_account")
+        KakaoAccount kakaoAccount
+    ) {
+        public record KakaoAccount(
+            @JsonProperty("profile")
+            KakaoProfile kakaoProfile
+        ) { }
+
+        public record KakaoProfile(
+            @JsonProperty("nickname")
+            String nickname
+        ) { }
+    }
 }
