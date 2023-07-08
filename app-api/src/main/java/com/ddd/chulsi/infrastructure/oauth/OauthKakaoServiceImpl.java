@@ -31,7 +31,7 @@ public class OauthKakaoServiceImpl implements OauthKakaoService {
     private String clientSecret;
 
     @Override
-    public String getAccessToken(String authorizationCode) {
+    public OauthInfo.KakaoInfoResponse getAccessToken(String authorizationCode) {
         String url = KAKAO_AUTH_URL + "/oauth/token";
 
         try {
@@ -58,7 +58,7 @@ public class OauthKakaoServiceImpl implements OauthKakaoService {
 
             log.info("accessToken : {}", response.accessToken());
 
-            return response.accessToken();
+            return response;
         } catch (HttpClientErrorException e) {
             throw new OauthException(701, ErrorMessage.OAUTH_REQUEST_FAILED.replace("{oauth}", "Kakao"));
         } catch (Exception e) {
@@ -90,6 +90,42 @@ public class OauthKakaoServiceImpl implements OauthKakaoService {
             if (response == null) throw new OauthException(702, ErrorMessage.OAUTH_RESPONSE_EMPTY.replace("{oauth}", "Kakao"));
 
             log.info("response : {}", response);
+        } catch (HttpClientErrorException e) {
+            e.printStackTrace();
+            throw new OauthException(701, ErrorMessage.OAUTH_REQUEST_FAILED.replace("{oauth}", "Kakao"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OauthException(700, ErrorMessage.OAUTH_REQUEST_FAILED.replace("{oauth}", "Kakao"));
+        }
+    }
+
+    @Override
+    public OauthInfo.KakaoUserMe getUserName(String accessToken) {
+        String url = KAKAO_API_URL + "/v2/user/me";
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            httpHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+            httpHeaders.set("Authorization", accessToken.startsWith(JwtTokenUtil.PREFIX) ? accessToken : JwtTokenUtil.PREFIX + accessToken);
+
+            MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+            requestBody.add("property_keys", "[\"kakao_account.profile\"]");
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(requestBody, httpHeaders);
+
+            OauthInfo.KakaoUserMe response = restTemplate.postForObject(
+                url,
+                request,
+                OauthInfo.KakaoUserMe.class
+            );
+
+            if (response == null) throw new OauthException(702, ErrorMessage.OAUTH_RESPONSE_EMPTY.replace("{oauth}", "Kakao"));
+
+            log.info("response : {}", response);
+
+            return response;
         } catch (HttpClientErrorException e) {
             e.printStackTrace();
             throw new OauthException(701, ErrorMessage.OAUTH_REQUEST_FAILED.replace("{oauth}", "Kakao"));
