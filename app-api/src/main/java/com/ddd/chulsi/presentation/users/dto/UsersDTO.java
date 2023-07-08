@@ -1,15 +1,16 @@
-package com.ddd.chulsi.presentation.oauth.dto;
+package com.ddd.chulsi.presentation.users.dto;
 
+import com.ddd.chulsi.domainCore.model.users.UsersInfo;
 import com.ddd.chulsi.infrastructure.oauth.OauthCommand;
 
 import java.util.Objects;
 
-public class OauthDTO {
+public class UsersDTO {
 
-    public record LoginRequest(
+    public record OauthLoginRequest(
         String authorizationCode
     ) {
-        public LoginRequest {
+        public OauthLoginRequest {
             Objects.requireNonNull(authorizationCode);
         }
         public OauthCommand.LoginCommand toCommand() {
@@ -18,7 +19,7 @@ public class OauthDTO {
     }
 
     public record LoginResponse(
-        String accessToken
+        UsersInfo.UsersInfoLogin usersInfoLogin
     ) {
 
     }

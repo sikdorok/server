@@ -45,7 +45,7 @@ public class JwtTokenUtil {
             .withIssuedAt(new Date())
             .withExpiresAt(new Date(new Date().getTime() + expiresAt * 1000))
             .withClaim("auth", claim.getAuth().toString())
-            .withClaim(USER_ID_KEY, claim.getUserId())
+            .withClaim(USER_ID_KEY, claim.getUserId().toString())
             .sign(Algorithm.HMAC256(secret));
     }
 
@@ -103,7 +103,7 @@ public class JwtTokenUtil {
 
         return JWTClaim.builder()
             .auth(DefinedCode.valueOf(auth.asString()))
-            .userId(userId.asLong())
+            .userId(UUID.fromString(userId.asString()))
             .build();
     }
 
