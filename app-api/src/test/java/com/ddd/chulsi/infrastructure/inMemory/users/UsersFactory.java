@@ -32,4 +32,20 @@ public class UsersFactory {
         return new UsersDTO.LoginResponse(usersInfoLogin);
     }
 
+    public static UsersDTO.LoginRequest givenLoginRequest() {
+        return new UsersDTO.LoginRequest(
+            "sikdorok@chulsi.com",
+            "비밀번호"
+        );
+    }
+
+    public static UsersDTO.Register givenRegisterRequest() {
+        return new UsersDTO.Register(
+            "닉네임",
+            "sikdorok@chulsi.com",
+            "비밀번호",
+            "비밀번호"
+        );
+    }
+
 }

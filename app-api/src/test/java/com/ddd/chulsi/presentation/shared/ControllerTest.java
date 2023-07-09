@@ -1,6 +1,7 @@
 package com.ddd.chulsi.presentation.shared;
 
 import com.ddd.chulsi.infrastructure.WebSecurityConfig;
+import com.ddd.chulsi.infrastructure.config.common.WebConfig;
 import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
 import com.ddd.chulsi.infrastructure.util.BCryptUtils;
@@ -20,7 +21,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith({SpringExtension.class, RestDocumentationExtension.class})
 @AutoConfigureRestDocs
 @MockBean(JpaMetamodelMappingContext.class) // @EnableJpaAuditing 사용으로 인해 추가
-@Import({BCryptUtils.class, WebSecurityConfig.class})
+@Import({BCryptUtils.class, WebConfig.class, WebSecurityConfig.class})
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class) // method _ 를 공백으로 치환
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ControllerTest { // 자식 클래스에서 상속 받아서 사용할 부모 클래스

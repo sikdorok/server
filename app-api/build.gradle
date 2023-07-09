@@ -91,6 +91,7 @@ dependencies {
 
     // Apache Commons Lang (StringUtils)
     implementation 'org.apache.commons:commons-lang3'
+    implementation 'commons-validator:commons-validator:1.7'
 
     // apache commons io
     implementation 'commons-io:commons-io:2.11.0'

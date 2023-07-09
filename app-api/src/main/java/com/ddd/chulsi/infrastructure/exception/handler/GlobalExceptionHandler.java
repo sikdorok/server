@@ -2,6 +2,7 @@ package com.ddd.chulsi.infrastructure.exception.handler;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.ddd.chulsi.infrastructure.exception.BadRequestException;
 import com.ddd.chulsi.infrastructure.exception.ServerException;
 import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import com.ddd.chulsi.infrastructure.exception.response.ErrorResponse;
@@ -71,7 +72,21 @@ public class GlobalExceptionHandler {
     public ErrorResponse methodArgumentNotValidException(HttpMessageNotReadableException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
 
-        return new ErrorResponse(400, ErrorMessage.BAD_REQUEST);
+        String message = ErrorMessage.BAD_REQUEST;
+        String field = null;
+
+        Throwable cause = exception.getCause();
+
+        while (cause != null) {
+            if (cause instanceof BadRequestException badRequestException) {
+                message = badRequestException.getMessage();
+                field = badRequestException.getField();
+                break;
+            }
+            cause = cause.getCause();
+        }
+
+        return new ErrorResponse(400, message, field);
     }
 
     @ExceptionHandler(MissingServletRequestPartException.class)

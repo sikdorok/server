@@ -33,3 +33,28 @@ include::{snippets}/users/logout/http-request.adoc[]
 === Response
 include::{snippets}/users/logout/response-fields.adoc[]
 include::{snippets}/users/logout/response-body.adoc[]
+
+[[회원가입]]
+== 회원가입
+include::{snippets}/users/register/http-request.adoc[]
+=== Request
+include::{snippets}/users/register/request-fields.adoc[]
+=== Response
+include::{snippets}/users/register/response-fields.adoc[]
+include::{snippets}/users/register/response-body.adoc[]
+
+[[로그인]]
+== 로그인
+include::{snippets}/users/login/http-request.adoc[]
+=== Request
+include::{snippets}/users/login/request-fields.adoc[]
+=== Response
+include::{snippets}/users/login/response-fields.adoc[]
+include::{snippets}/users/login/response-body.adoc[]
+
+[[자동_로그인]]
+== 자동 로그인
+include::{snippets}/users/auto-login/http-request.adoc[]
+=== Response
+include::{snippets}/users/auto-login/response-fields.adoc[]
+include::{snippets}/users/auto-login/response-body.adoc[]

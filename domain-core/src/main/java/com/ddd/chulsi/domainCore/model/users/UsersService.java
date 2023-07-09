@@ -13,5 +13,7 @@ public interface UsersService {
     Users findByUsersId(UUID usersId);
 
     Users findByEmailAndPassword(String email, String password);
-    
+
+    boolean duplicationCheckEmail(String email);
+
 }

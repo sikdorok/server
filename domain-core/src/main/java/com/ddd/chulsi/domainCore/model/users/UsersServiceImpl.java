@@ -33,4 +33,9 @@ public class UsersServiceImpl implements UsersService {
         return usersReader.findByEmailAndPassword(email, password);
     }
 
+    @Override
+    public boolean duplicationCheckEmail(String email) {
+        return usersReader.duplicationCheckEmail(email);
+    }
+
 }
