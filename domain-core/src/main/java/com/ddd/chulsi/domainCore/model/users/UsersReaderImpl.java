@@ -27,4 +27,9 @@ public class UsersReaderImpl implements UsersReader {
         return usersJpaRepository.findByEmailAndPassword(email, password).orElse(null);
     }
 
+    @Override
+    public boolean duplicationCheckEmail(String email) {
+        return usersJpaRepository.findFirstByEmail(email).isPresent();
+    }
+
 }

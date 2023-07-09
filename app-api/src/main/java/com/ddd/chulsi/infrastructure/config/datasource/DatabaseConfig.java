@@ -1,8 +1,7 @@
 package com.ddd.chulsi.infrastructure.config.datasource;
 
 import com.zaxxer.hikari.HikariDataSource;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -15,9 +14,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import java.util.HashMap;
 
 @Configuration
 public class DatabaseConfig {
@@ -34,28 +31,9 @@ public class DatabaseConfig {
         return DataSourceBuilder.create().type(HikariDataSource.class).build();
     }
 
-//    @Bean
-//    @ConfigurationProperties(prefix = "spring.datasource.slave")
-//    public DataSource slaveDataSource() {
-//        return DataSourceBuilder.create().type(HikariDataSource.class).build();
-//    }
-
-    @Bean
-    public DataSource routingDataSource() {
-        var routingDataSource = new ReplicationRoutingDataSource();
-
-        var dataSourceMap = new HashMap<>();
-        dataSourceMap.put("master", masterDataSource());
-//        dataSourceMap.put("slave", SlaveDataSource());
-        routingDataSource.setTargetDataSources(dataSourceMap);
-        routingDataSource.setDefaultTargetDataSource(masterDataSource());
-
-        return routingDataSource;
-    }
-
     @Bean
     public DataSource dataSource() {
-        return new LazyConnectionDataSourceProxy(routingDataSource());
+        return new LazyConnectionDataSourceProxy(masterDataSource());
     }
 
     // JPA에서 사용할 EntityManagerFactory와 TransactionManager를 설정해줍니다.

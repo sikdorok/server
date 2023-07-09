@@ -13,8 +13,8 @@ public class DocumentOptionalGenerator {
         return key("format").value(value);
     }
 
-    public static Attributes.Attribute revokeFormat() {
-        return setFormat("1 : 비활성화, 2 : 삭제");
+    public static Attributes.Attribute dateFormatFull() {
+        return setFormat("yyyy-MM-dd HH:mm:ss");
     }
 
 }

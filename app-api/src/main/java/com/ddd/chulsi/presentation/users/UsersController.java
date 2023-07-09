@@ -1,8 +1,8 @@
 package com.ddd.chulsi.presentation.users;
 
 import com.ddd.chulsi.application.users.UsersFacade;
+import com.ddd.chulsi.domainCore.model.users.UsersCommand;
 import com.ddd.chulsi.infrastructure.annotation.AuthToken;
-import com.ddd.chulsi.infrastructure.oauth.OauthCommand;
 import com.ddd.chulsi.presentation.shared.response.dto.BaseResponse;
 import com.ddd.chulsi.presentation.users.dto.UsersDTO;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,16 +28,42 @@ public class UsersController {
         @RequestBody @Valid UsersDTO.OauthLoginRequest loginRequest,
         HttpServletResponse response
     ) {
-        OauthCommand.LoginCommand loginCommand = loginRequest.toCommand();
+        UsersCommand.LoginCommand loginCommand = loginRequest.toCommand();
         return BaseResponse.ofSuccess(usersFacade.kakaoLogin(loginCommand, response));
     }
 
-    @PutMapping(value = "/logout", name = "로그아웃")
+    @PostMapping(value = "/logout", name = "로그아웃")
     public BaseResponse<Void> logout(
         @AuthToken String token
     ) {
         usersFacade.logout(token);
         return BaseResponse.ofSuccess();
+    }
+
+    @PostMapping(value = "/register", name = "회원가입")
+    public BaseResponse<UsersDTO.LoginResponse> register(
+        @RequestBody @Valid UsersDTO.Register register,
+        HttpServletResponse response
+    ) {
+        UsersCommand.RegisterCommand registerCommand = register.toCommand();
+        return BaseResponse.ofSuccess(usersFacade.register(registerCommand, response));
+    }
+
+    @PostMapping(value = "/login", name = "로그인")
+    public BaseResponse<UsersDTO.LoginResponse> login(
+        @RequestBody @Valid UsersDTO.LoginRequest loginRequest,
+        HttpServletResponse response
+    ) {
+        UsersCommand.UsersLogin loginCommand = loginRequest.toCommand();
+        return BaseResponse.ofSuccess(usersFacade.login(loginCommand, response));
+    }
+
+    @PostMapping(value = "/auto-login", name = "자동 로그인")
+    public BaseResponse<UsersDTO.LoginResponse> autoLogin(
+        @AuthToken String token,
+        HttpServletResponse response
+    ) {
+        return BaseResponse.ofSuccess(usersFacade.autoLogin(token, response));
     }
 
 }
