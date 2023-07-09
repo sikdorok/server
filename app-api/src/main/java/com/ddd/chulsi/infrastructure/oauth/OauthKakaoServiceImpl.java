@@ -81,21 +81,14 @@ public class OauthKakaoServiceImpl implements OauthKakaoService {
             MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(requestBody, httpHeaders);
 
-            OauthInfo.KakaoLogoutResponse response = restTemplate.postForObject(
+            restTemplate.postForObject(
                 url,
                 request,
                 OauthInfo.KakaoLogoutResponse.class
             );
 
-            if (response == null) throw new OauthException(702, ErrorMessage.OAUTH_RESPONSE_EMPTY.replace("{oauth}", "Kakao"));
+        } catch (Exception ignored) {
 
-            log.info("response : {}", response);
-        } catch (HttpClientErrorException e) {
-            e.printStackTrace();
-            throw new OauthException(701, ErrorMessage.OAUTH_REQUEST_FAILED.replace("{oauth}", "Kakao"));
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new OauthException(700, ErrorMessage.OAUTH_REQUEST_FAILED.replace("{oauth}", "Kakao"));
         }
     }
 
