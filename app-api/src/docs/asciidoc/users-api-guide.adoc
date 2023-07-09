@@ -18,11 +18,18 @@ include::{docdir}/common.adoc[]
 [[title]]
 = SDR API 문서 - 유저 API
 
-[[login]]
+[[카카오_로그인]]
 == 카카오 로그인
-include::{snippets}/users/oauth/kakao/login/http-request.adoc[]
+include::{snippets}/users/kakao/login/http-request.adoc[]
 === Request
-include::{snippets}/users/oauth/kakao/login/request-fields.adoc[]
+include::{snippets}/users/kakao/login/request-fields.adoc[]
 === Response
-include::{snippets}/users/oauth/kakao/login/response-fields.adoc[]
-include::{snippets}/users/oauth/kakao/login/response-body.adoc[]
+include::{snippets}/users/kakao/login/response-fields.adoc[]
+include::{snippets}/users/kakao/login/response-body.adoc[]
+
+[[로그아웃]]
+== 로그아웃
+include::{snippets}/users/logout/http-request.adoc[]
+=== Response
+include::{snippets}/users/logout/response-fields.adoc[]
+include::{snippets}/users/logout/response-body.adoc[]

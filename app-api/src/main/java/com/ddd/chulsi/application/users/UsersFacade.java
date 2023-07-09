@@ -129,8 +129,22 @@ public class UsersFacade {
         return usersLogin(new UsersInfo.UsersInfoLogin(users, kakaoInfoResponse.accessToken()), response, null);
     }
 
-    public void kakaoLogout(String token) {
-        oauthKakaoService.logout(token);
+    @Transactional(rollbackFor = Exception.class)
+    public void logout(String token) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+
+        Users users = usersService.findByUsersId(jwtClaim.getUserId());
+        if (users == null) throw new UserNotFoundException();
+
+        if (users.getOauthType() == DefinedCode.C000200001) {
+            OauthToken oauthToken = oauthTokenService.findByOauthTypeAndOauthId(users.getOauthType(), users.getOauthId());
+            if (oauthToken != null) {
+                oauthKakaoService.logout(oauthToken.getAccessToken());
+                oauthTokenService.delete(oauthToken);
+            }
+        }
+
+        users.logout();
     }
 
 }
