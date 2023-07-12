@@ -125,7 +125,12 @@ public class UsersFacade {
             );
         }
 
-        oauthTokenService.save(OauthToken.builder().oauthId(kakaoUserMe.id()).oauthType(DefinedCode.C000200001).accessToken(kakaoInfoResponse.accessToken()).build());
+        OauthToken oauthToken = oauthTokenService.findByOauthTypeAndOauthId(DefinedCode.C000200001, kakaoUserMe.id());
+        if (oauthToken == null) {
+            oauthTokenService.save(OauthToken.builder().oauthId(kakaoUserMe.id()).oauthType(DefinedCode.C000200001).accessToken(kakaoInfoResponse.accessToken()).build());
+        } else {
+            oauthToken.updateAccessToken(kakaoInfoResponse.accessToken());
+        }
 
         return usersLogin(new UsersInfo.UsersInfoLogin(users, kakaoInfoResponse.accessToken()), response);
     }

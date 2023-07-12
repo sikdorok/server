@@ -38,4 +38,7 @@ public class OauthToken {
     @Column(name = "accessToken")
     private String accessToken;
 
+    public void updateAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
 }
