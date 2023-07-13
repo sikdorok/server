@@ -66,4 +66,13 @@ public class UsersController {
         return BaseResponse.ofSuccess(usersFacade.autoLogin(token, response));
     }
 
+    @PostMapping(value = "/password-find", name = "비밀번호 찾기")
+    public BaseResponse<Void> passwordFind(
+        @RequestBody @Valid UsersDTO.PasswordFindRequest passwordFindRequest
+    ) {
+        UsersCommand.PasswordFind passwordFind = passwordFindRequest.toCommand();
+        usersFacade.passwordFind(passwordFind);
+        return BaseResponse.ofSuccess();
+    }
+
 }

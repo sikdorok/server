@@ -14,4 +14,6 @@ public interface UsersReader {
 
     boolean duplicationCheckEmail(String email);
 
+    Users findByEmail(String email);
+
 }
