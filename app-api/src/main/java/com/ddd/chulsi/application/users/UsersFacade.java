@@ -8,11 +8,14 @@ import com.ddd.chulsi.domainCore.model.users.Users;
 import com.ddd.chulsi.domainCore.model.users.UsersCommand;
 import com.ddd.chulsi.domainCore.model.users.UsersInfo;
 import com.ddd.chulsi.domainCore.model.users.UsersService;
+import com.ddd.chulsi.infrastructure.exception.EmailSendFailedException;
+import com.ddd.chulsi.infrastructure.exception.NotFoundException;
 import com.ddd.chulsi.infrastructure.exception.UserExistsException;
 import com.ddd.chulsi.infrastructure.exception.UserNotFoundException;
 import com.ddd.chulsi.infrastructure.jwt.JWTClaim;
 import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
+import com.ddd.chulsi.infrastructure.mail.MailService;
 import com.ddd.chulsi.infrastructure.oauth.OauthInfo;
 import com.ddd.chulsi.infrastructure.oauth.OauthKakaoService;
 import com.ddd.chulsi.presentation.users.dto.UsersDTO;
@@ -26,6 +29,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.UUID;
 
 @Slf4j
@@ -40,6 +44,7 @@ public class UsersFacade {
     private final UsersService usersService;
     private final OauthTokenService oauthTokenService;
     private final OauthKakaoService oauthKakaoService;
+    private final MailService mailService;
 
     @Transactional(rollbackFor = Exception.class)
     public UsersDTO.LoginResponse login(UsersCommand.UsersLogin usersLogin, HttpServletResponse response) {
@@ -165,5 +170,14 @@ public class UsersFacade {
 
         // 로그인 처리
         return usersLogin(new UsersInfo.UsersInfoLogin(users, null), response);
+    }
+
+    @Transactional(readOnly = true)
+    public void passwordFind(UsersCommand.PasswordFind passwordFind) {
+        Users users = usersService.findByEmail(passwordFind.email());
+        if (users == null) throw new NotFoundException();
+
+        boolean result = mailService.sendMail(Collections.singletonList(users));
+        if (!result) throw new EmailSendFailedException();
     }
 }

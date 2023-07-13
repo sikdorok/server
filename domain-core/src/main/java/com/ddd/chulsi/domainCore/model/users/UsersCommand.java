@@ -44,4 +44,11 @@ public class UsersCommand {
         }
     }
 
+    public record PasswordFind(
+        String email
+    ) {
+        public static PasswordFind nonState(String email) {
+            return new PasswordFind(email);
+        }
+    }
 }

@@ -206,4 +206,37 @@ class UsersControllerTest extends ControllerTest {
 
     }
 
+    @Test
+    void 비밀번호_찾기() throws Exception {
+
+        doNothing().when(usersFacade).passwordFind(any(UsersCommand.PasswordFind.class));
+
+        UsersDTO.PasswordFindRequest request = new UsersDTO.PasswordFindRequest("team.sikdorok@gmail.com");
+
+        mockMvc.perform(
+            post("/users/password-find")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("users/password-find",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
+                ),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
+                )
+            ));
+
+        verify(usersFacade).passwordFind(any(UsersCommand.PasswordFind.class));
+
+    }
+
 }

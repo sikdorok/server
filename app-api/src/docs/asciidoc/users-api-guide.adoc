@@ -58,3 +58,12 @@ include::{snippets}/users/auto-login/http-request.adoc[]
 === Response
 include::{snippets}/users/auto-login/response-fields.adoc[]
 include::{snippets}/users/auto-login/response-body.adoc[]
+
+[[비밀번호_찾기]]
+== 비밀번호 찾기
+include::{snippets}/users/password-find/http-request.adoc[]
+=== Request
+include::{snippets}/users/password-find/request-fields.adoc[]
+=== Response
+include::{snippets}/users/password-find/response-fields.adoc[]
+include::{snippets}/users/password-find/response-body.adoc[]

@@ -6,6 +6,9 @@ import com.ddd.chulsi.infrastructure.exception.BadRequestException;
 import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import com.ddd.chulsi.infrastructure.util.BCryptUtils;
 import io.micrometer.common.util.StringUtils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.Objects;
@@ -64,6 +67,18 @@ public class UsersDTO {
         }
         public UsersCommand.UsersLogin toCommand() {
             return UsersCommand.UsersLogin.nonState(email, BCryptUtils.hash(password));
+        }
+    }
+
+    public record PasswordFindRequest(
+        String email
+    ) {
+        public PasswordFindRequest {
+            if (StringUtils.isBlank(email) || !EmailValidator.getInstance().isValid(email))
+                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "email");
+        }
+        public UsersCommand.PasswordFind toCommand() {
+            return UsersCommand.PasswordFind.nonState(email);
         }
     }
 }

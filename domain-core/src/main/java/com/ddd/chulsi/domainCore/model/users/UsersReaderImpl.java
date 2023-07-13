@@ -32,4 +32,9 @@ public class UsersReaderImpl implements UsersReader {
         return usersJpaRepository.findFirstByEmail(email).isPresent();
     }
 
+    @Override
+    public Users findByEmail(String email) {
+        return usersJpaRepository.findByEmail(email).orElse(null);
+    }
+
 }
