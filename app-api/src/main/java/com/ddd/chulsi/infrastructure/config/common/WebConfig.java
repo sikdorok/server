@@ -46,12 +46,22 @@ public class WebConfig extends WebMvcConfigurationSupport {
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/docs/**")
+        registry.addResourceHandler(
+            "/docs/**",
+            "/resources/**",
+            "/favicon.ico"
+            )
             .addResourceLocations(
                 "classpath:/META-INF/resources/",
                 "classpath:/resources/",
                 "classpath:/static/",
                 "classpath:/public/"
+            );
+        registry.addResourceHandler(
+            "/assets/**"
+            )
+            .addResourceLocations(
+                "classpath:/assets/"
             );
     }
 

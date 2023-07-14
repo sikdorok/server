@@ -2,7 +2,7 @@ package com.ddd.chulsi.infrastructure.mail;
 
 import com.ddd.chulsi.domainCore.model.users.Users;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
 
-    private final ServletContext servletContext;
+    private final HttpServletRequest httpServletRequest;
     private final JavaMailSender javaMailSender;
 
     @Override
@@ -25,7 +25,7 @@ public class MailServiceImpl implements MailService {
 
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
-            String imagesDirectory = servletContext.getRealPath("/") + "resources/assets/images";
+            String imagesDirectory = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() +":" + httpServletRequest.getServerPort() + "/assets/images";
 
             for (Users users : receiveList) {
                 // 1. 메일 수신자 설정
@@ -95,7 +95,7 @@ public class MailServiceImpl implements MailService {
                     <body>
                     	<div class="container">
                     		<div class="header">
-                    			<img src="{images-directory}sikdorok_logo.png" alt="sikdorok">
+                    			<img src="{images-directory}/sikdorok_logo.png" alt="sikdorok">
                     			<div class="mc fs14 mt4">비밀번호 재설정</div>
                     		</div>
                     		<div class="mt20">
@@ -109,10 +109,10 @@ public class MailServiceImpl implements MailService {
                     			<span class="grey">(비밀번호 재설정 링크는 1시간 동안 유효합니다.)</span>
                     		</div>
                     		<div class="taco">
-                    			<img src="{images-directory}taco.png" alt="taco">
+                    			<img src="{images-directory}/taco.png" alt="taco">
                     		</div>
                     		<div class="mt40">
-                    			<img src="{images-directory}strap.png" alt="strap">
+                    			<img src="{images-directory}/strap.png" alt="strap">
                     		</div>
                     		<div class="mt14">
                     			<span class="grey">문의사항은 team.sikdorok@gmail.com으로 연락 주시기 바랍니다.</span><br />
