@@ -80,7 +80,7 @@ public class MailServiceImpl implements MailService {
                     			height: 360px;
                     		}
                     		.header {
-                    			width: 90px;
+                    			width: 120px;
                     		}
                     		.header > img {
                     			width: 100%;
@@ -122,8 +122,8 @@ public class MailServiceImpl implements MailService {
                     </body>
                     </html>
                     """;
-                content.replace("{images-directory}", imagesDirectory);
-                content.replace("{nickname}", users.getName());
+                content = content.replace("{images-directory}", imagesDirectory);
+                content = content.replace("{nickname}", users.getName());
                 messageHelper.setText(content,true);
 
                 // 4. 메일 전송
