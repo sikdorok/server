@@ -112,7 +112,7 @@ pipeline {
       }
       steps {
         sshagent(credentials: [SSH_CONNECTION_CREDENTIAL]) {
-            sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} AWS_REGISTRY_URL_SIKDOROK=${AWS_REGISTRY_URL_SIKDOROK} BUILD_NUMBER=${BUILD_NUMBER} ./deploy.sh'"
+            sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} IMAGE_STORAGE=${AWS_REGISTRY_URL_SIKDOROK} BUILD_NUMBER=${BUILD_NUMBER} ./deploy.sh'"
         }
       }
     }
