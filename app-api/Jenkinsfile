@@ -7,8 +7,12 @@ pipeline {
 
   environment {
     SLACK_CHANNEL = "#chulsi-jenkins-deploy"
-    SLACK_SUCCESS_COLOR = "#2C953C";
-    SLACK_FAIL_COLOR = "#FF3232";
+    SLACK_SUCCESS_COLOR = "#2C953C"
+    SLACK_FAIL_COLOR = "#FF3232"
+    IMAGE_NAME = 'sikdorok-api'
+    REGION = 'ap-northeast-2'
+    SSH_CONNECTION_CREDENTIAL = 'SIKDOROK_API_SSH'
+    AWS_CREDENTIALS = 'AWS_CREDENTIALS'
   }
 
   stages {
@@ -21,6 +25,14 @@ pipeline {
       }
       steps {
         script {
+          switch(BRANCH_NAME) {
+            case 'dev' :
+              env.SSH_CONNECTION = 'ubuntu@3.37.134.103'
+              break
+            //case 'prod' :
+            //  env.SSH_CONNECTION = 'ubuntu@3.37.134.103'
+            //  break
+          }
           GIT_COMMIT_AUTHOR = sh(script: "git --no-pager show -s --format=%an ${GIT_COMMIT}", returnStdout: true).trim();
           GIT_COMMIT_MESSAGE = sh(script: "git --no-pager show -s --format=%B ${GIT_COMMIT}", returnStdout: true).trim();
         }
@@ -41,65 +53,69 @@ pipeline {
         sh "SPRING_PROFILES_ACTIVE=${BRANCH_NAME} ./gradlew :app-api:clean :app-api:build :app-api:test"
       }
     }
-//
-//     stage('Build Container Image') {
-//       post {
-//         success {
-//           slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: 'Container Image Build에 성공하였습니다.')
-//         }
-//         failure {
-//           slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: 'Container Image Build에 실패하였습니다.\n==================================================================')
-//         }
-//       }
-//       steps {
-//         script {
-//           image = docker.build("${IMAGE_STORAGE}/${IMAGE_NAME}", "--build-arg SPRING_PROFILES_ACTIVE=${BRANCH_NAME} --build-arg CONFIG_SERVER_ENCRYPT_KEY=${CONFIG_SERVER_ENCRYPT_KEY} --build-arg CONFIG_SERVER_USERNAME=${CONFIG_SERVER_USERNAME} --build-arg CONFIG_SERVER_PASSWORD=${CONFIG_SERVER_PASSWORD} ./app-api")
-//         }
-//       }
-//     }
-//
-//     stage('Push Container Image') {
-//       post {
-//         success {
-//           slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: 'Container Image Push에 성공하였습니다.')
-//         }
-//         failure {
-//           slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: 'Container Image Push에 실패하였습니다.\n==================================================================')
-//         }
-//       }
-//       steps {
-//         script {
-//           docker.withRegistry("https://${IMAGE_STORAGE}", IMAGE_STORAGE_CREDENTIAL) {
-//             image.push("${BUILD_NUMBER}")
-//             image.push("latest")
-//           }
-//         }
-//       }
-//     }
-//
-//     stage('Remove Container Image') {
-//       steps {
-//         sh "docker image rm ${IMAGE_STORAGE}/${IMAGE_NAME}:latest"
-//         sh "docker image rm ${IMAGE_STORAGE}/${IMAGE_NAME}:${BUILD_NUMBER}"
-//         sh "docker system prune -a --volumes -f" // 사용 안하는 것 전부 삭제
-//       }
-//     }
-//
-//     stage('Server Run') {
-//       post {
-//         success {
-//           slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: '배포에 성공하였습니다.\n==================================================================')
-//         }
-//         failure {
-//           slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: '배포에 실패하였습니다.\n==================================================================')
-//         }
-//       }
-//       steps {
-//         sshagent(credentials: [SSH_CONNECTION_CREDENTIAL]) {
-//             sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} IMAGE_STORAGE=${IMAGE_STORAGE} BUILD_NUMBER=${BUILD_NUMBER} ./deploy.sh'"
-//         }
-//       }
-//     }
+
+    stage('Build Container Image') {
+      post {
+        success {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: 'Container Image Build에 성공하였습니다.')
+        }
+        failure {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: 'Container Image Build에 실패하였습니다.\n==================================================================')
+        }
+      }
+      steps {
+        script {
+          image = docker.build("${AWS_REGISTRY_URL_SIKDOROK}/${IMAGE_NAME}", "--build-arg SPRING_PROFILES_ACTIVE=${BRANCH_NAME} --build-arg CONFIG_SERVER_ENCRYPT_KEY=${CONFIG_SERVER_ENCRYPT_KEY} --build-arg CONFIG_SERVER_USERNAME=${CONFIG_SERVER_USERNAME} --build-arg CONFIG_SERVER_PASSWORD=${CONFIG_SERVER_PASSWORD} ./app-api")
+        }
+      }
+    }
+
+    stage('Push Container Image') {
+      post {
+        success {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: 'Container Image Push에 성공하였습니다.')
+        }
+        failure {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: 'Container Image Push에 실패하였습니다.\n==================================================================')
+        }
+      }
+      steps {
+        script {
+          // cleanup current user docker credentials
+          sh 'rm  ~/.dockercfg || true'
+          sh 'rm ~/.docker/config.json || true'
+
+          docker.withRegistry("https://${AWS_REGISTRY_URL_SIKDOROK}", "ecr:${REGION}:${AWS_CREDENTIALS}") {
+            image.push("${BUILD_NUMBER}")
+            image.push("latest")
+          }
+        }
+      }
+    }
+
+    stage('Remove Container Image') {
+      steps {
+        sh "docker image rm ${AWS_REGISTRY_URL_SIKDOROK}/${IMAGE_NAME}:latest"
+        sh "docker image rm ${AWS_REGISTRY_URL_SIKDOROK}/${IMAGE_NAME}:${BUILD_NUMBER}"
+        sh "docker system prune -a --volumes -f" // 사용 안하는 것 전부 삭제
+      }
+    }
+
+    stage('Server Run') {
+      post {
+        success {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_SUCCESS_COLOR, message: '배포에 성공하였습니다.\n==================================================================')
+        }
+        failure {
+          slackSend(channel: SLACK_CHANNEL, color: SLACK_FAIL_COLOR, message: '배포에 실패하였습니다.\n==================================================================')
+        }
+      }
+      steps {
+        sshagent(credentials: [SSH_CONNECTION_CREDENTIAL]) {
+            sh "ssh -o StrictHostKeyChecking=no ${SSH_CONNECTION} 'IMAGE_NAME=${IMAGE_NAME} AWS_REGISTRY_URL_SIKDOROK=${AWS_REGISTRY_URL_SIKDOROK} BUILD_NUMBER=${BUILD_NUMBER} ./deploy.sh'"
+        }
+      }
+    }
   }
 
 }

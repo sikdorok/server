@@ -7,10 +7,10 @@ API 에 관계없이 아래 사항을 지켜주셔야 합니다.
 | 환경 | 도메인 주소
 
 | 개발서버
-| http://chulsi-dev.com
+| http://sikdorok.jeffrey-oh.click
 
 | 운영서버
-| https://chulsi.com
+| 미정 (개발서버와 같을 수 있음)
 |===
 
 === Method 규칙
@@ -67,6 +67,10 @@ API 에 관계없이 아래 사항을 지켜주셔야 합니다.
 | 500
 | Internal Server Error
 | 알수없는 오류(서버 오류)
+
+| 510
+| Email Send Failed
+| 이메일 발송 실패
 
 | 700
 | Kakao Oauth 요청에 실패했습니다.
