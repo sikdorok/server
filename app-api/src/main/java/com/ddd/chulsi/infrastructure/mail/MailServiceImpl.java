@@ -100,9 +100,6 @@ public class MailServiceImpl implements MailService {
                            <div class="mt20">
                                <span class="grey">(비밀번호 재설정 링크는 1시간 동안 유효합니다.)</span>
                            </div>
-                           <div class="taco" style="position: fixed; right: 240px; top: 160px;">
-                               <img src="{images-directory}/taco.png" alt="taco">
-                           </div>
                            <div class="mt40">
                                <img src="{images-directory}/strap.png" alt="strap">
                            </div>
