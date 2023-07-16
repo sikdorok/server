@@ -9,6 +9,7 @@ import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,6 +40,8 @@ public class WebSecurityConfig {
     private final JwtTokenUtil jwtTokenUtil;
     private final JWTProperties properties;
 
+    private final RedisTemplate<String, Object> redisTemplate;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -67,7 +70,7 @@ public class WebSecurityConfig {
             ) // 요청에 대한 사용권한 체크
             .oauth2Login()
             .and()
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil, properties), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenUtil, properties, redisTemplate), UsernamePasswordAuthenticationFilter.class)
             .build();
     }
 

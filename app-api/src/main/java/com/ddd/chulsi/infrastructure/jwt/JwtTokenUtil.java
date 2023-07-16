@@ -135,8 +135,10 @@ public class JwtTokenUtil {
         return checkNull(getClaims(token, properties, true));
     }
 
-    public JWTClaim checkAuth(String token, JWTProperties properties, boolean isChecked) {
-        return checkNull(getClaims(token, properties, isChecked));
+    public Long getExpiration(String token) {
+        DecodedJWT decode = JWT.decode(token);
+        Long expiration = decode.getExpiresAt().getTime();
+        Long now = new Date().getTime();
+        return (expiration - now);
     }
-
 }
