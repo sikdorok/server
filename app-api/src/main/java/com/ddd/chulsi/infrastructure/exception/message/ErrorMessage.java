@@ -45,4 +45,8 @@ public class ErrorMessage {
     public static final String OAUTH_REQUEST_FAILED = "{oauth} Oauth 요청에 실패했습니다.";
 
     public static final String EMAIL_SEND_FAILED = "이메일 발송에 실패했습니다.";
+
+    public static final String PASSWORD_VALIDATION_FAILED = "비밀번호는 8자 이상, 20자 이하, 영문, 숫자, 특수문자만 입력 가능합니다";
+
+    public static final String EMAIL_VALIDATION_FAILED = "올바른 이메일 주소를 입력해주세요";
 }

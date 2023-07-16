@@ -16,10 +16,12 @@ import com.ddd.chulsi.infrastructure.mail.MailService;
 import com.ddd.chulsi.infrastructure.oauth.OauthInfo;
 import com.ddd.chulsi.infrastructure.oauth.OauthKakaoService;
 import com.ddd.chulsi.infrastructure.util.RedisUtil;
+import com.ddd.chulsi.infrastructure.util.StringUtil;
 import com.ddd.chulsi.presentation.users.dto.UsersDTO;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -94,7 +97,7 @@ public class UsersFacade {
         usersInfoLogin.setAccessToken(accessToken);
 
         // Refresh Token 유효시간을 가져온 후 Redis에 Refresh Token을 저장합니다.
-        redisUtil.set("RT:" + usersInfoLogin.getUsersId(), refreshToken, properties.getRefreshExpiresTime(), TimeUnit.MILLISECONDS);
+        redisUtil.set("REFRESH_TOKEN:" + usersInfoLogin.getUsersId(), refreshToken, properties.getRefreshExpiresTime(), TimeUnit.MILLISECONDS);
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
             .maxAge((long) 14 * 24 * 60 * 60)
@@ -165,8 +168,8 @@ public class UsersFacade {
 
         // Redis 에서 해당 User id 로 저장된 Refresh Token 이 있는지 여부를 확인 후 있을 경우 삭제합니다.
         try {
-            if(redisUtil.hasKey("RT:" + users.getUsersId()).get()) {
-                redisUtil.delete("RT:" + users.getUsersId());
+            if (redisUtil.hasKey("REFRESH_TOKEN:" + users.getUsersId()).get()) {
+                redisUtil.delete("REFRESH_TOKEN:" + users.getUsersId());
 
                 Long expiration = jwtTokenUtil.getExpiration(token);
                 redisUtil.set(token, "logout", expiration, TimeUnit.MILLISECONDS);
@@ -195,7 +198,58 @@ public class UsersFacade {
         Users users = usersService.findByEmail(passwordFind.email());
         if (users == null) throw new NotFoundException();
 
-        boolean result = mailService.sendMail(Collections.singletonList(users));
+        String code = StringUtil.getRandomNumberString();
+
+        try {
+            if (redisUtil.hasKey("PASSWORD_LINK_ALIVE:" + users.getUsersId()).get()) {
+                CompletableFuture<Object> future = redisUtil.get("PASSWORD_LINK_ALIVE:" + users.getUsersId());
+                String codeCheck = future.get().toString();
+
+                while (code.equals(codeCheck))
+                    code = StringUtil.getRandomNumberString();
+
+                redisUtil.delete("PASSWORD_LINK_ALIVE:" + users.getUsersId());
+            }
+
+            redisUtil.set("PASSWORD_LINK_ALIVE:" + users.getUsersId(), code, 3600, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new SlackNotificationHandler("Redis Server Error");
+        }
+
+        boolean result = mailService.sendMail(Collections.singletonList(users), code);
         if (!result) throw new EmailSendFailedException();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void passwordReset(UsersCommand.PasswordReset passwordReset) {
+        Users users = usersService.findByUsersId(passwordReset.usersId());
+        if (users == null) throw new NotFoundException();
+
+        users.passwordReset(passwordReset.password());
+
+        try {
+            if (redisUtil.hasKey("PASSWORD_LINK_ALIVE:" + users.getUsersId()).get())
+                redisUtil.delete("PASSWORD_LINK_ALIVE:" + users.getUsersId());
+        } catch (InterruptedException | ExecutionException e) {
+            throw new SlackNotificationHandler("Redis Server Error");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public boolean passwordLinkAlive(UsersCommand.PasswordLinkAlive passwordLinkAlive) {
+        Users users = usersService.findByUsersId(passwordLinkAlive.usersId());
+        if (users == null) return false;
+
+        try {
+            if (redisUtil.hasKey("PASSWORD_LINK_ALIVE:" + users.getUsersId()).get()) {
+                CompletableFuture<Object> future = redisUtil.get("PASSWORD_LINK_ALIVE:" + users.getUsersId());
+                String code = future.get().toString();
+                return code.equals(passwordLinkAlive.code());
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new SlackNotificationHandler("Redis Server Error");
+        }
+
+        return false;
     }
 }

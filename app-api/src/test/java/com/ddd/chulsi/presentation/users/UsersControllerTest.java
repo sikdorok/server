@@ -16,6 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.print.attribute.DocAttribute;
+
+import java.util.UUID;
+
 import static com.ddd.chulsi.infrastructure.format.DocumentOptionalGenerator.dateFormatFull;
 import static com.ddd.chulsi.infrastructure.inMemory.users.UsersFactory.*;
 import static com.ddd.chulsi.infrastructure.util.ApiDocumentUtils.getDocumentRequest;
@@ -28,6 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UsersController.class)
@@ -236,6 +241,75 @@ class UsersControllerTest extends ControllerTest {
             ));
 
         verify(usersFacade).passwordFind(any(UsersCommand.PasswordFind.class));
+
+    }
+
+    @Test
+    void 비밀번호_링크_유효성_검사() throws Exception {
+
+        given(usersFacade.passwordLinkAlive(any(UsersCommand.PasswordLinkAlive.class))).willReturn(true);
+
+        UsersDTO.PasswordLinkAliveRequest request = new UsersDTO.PasswordLinkAliveRequest(UUID.randomUUID(), "012345");
+
+        mockMvc.perform(
+                post("/users/password-link-alive")
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("users/password-link-alive",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
+                    fieldWithPath("code").type(JsonFieldType.STRING).description("인증코드")
+                ),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.BOOLEAN).description("결과 데이터")
+                )
+            ));
+
+        verify(usersFacade).passwordLinkAlive(any(UsersCommand.PasswordLinkAlive.class));
+
+    }
+
+    @Test
+    void 비밀번호_재설정() throws Exception {
+
+        doNothing().when(usersFacade).passwordReset(any(UsersCommand.PasswordReset.class));
+
+        UsersDTO.PasswordResetRequest request = new UsersDTO.PasswordResetRequest(UUID.randomUUID(), "qwer1234!", "qwer1234!");
+
+        mockMvc.perform(
+                put("/users/password-reset")
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("users/password-reset",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
+                    fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호"),
+                    fieldWithPath("passwordCheck").type(JsonFieldType.STRING).description("비밀번호 확인")
+                ),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
+                )
+            ));
+
+        verify(usersFacade).passwordReset(any(UsersCommand.PasswordReset.class));
 
     }
 

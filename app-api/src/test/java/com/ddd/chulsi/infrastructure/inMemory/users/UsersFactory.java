@@ -16,7 +16,7 @@ public class UsersFactory {
             .oauthId(2_384_324L)
             .oauthType(DefinedCode.C000200001)
             .email("email@email.com")
-            .password("비밀번호")
+            .password("qwer1234!")
             .name("이름")
             .refreshToken("refreshToken")
             .lastLoginAt(LocalDateTime.now())
@@ -35,7 +35,7 @@ public class UsersFactory {
     public static UsersDTO.LoginRequest givenLoginRequest() {
         return new UsersDTO.LoginRequest(
             "sikdorok@chulsi.com",
-            "비밀번호"
+            "qwer1234!"
         );
     }
 
@@ -43,8 +43,8 @@ public class UsersFactory {
         return new UsersDTO.Register(
             "닉네임",
             "sikdorok@chulsi.com",
-            "비밀번호",
-            "비밀번호"
+            "qwer1234!",
+            "qwer1234!"
         );
     }
 

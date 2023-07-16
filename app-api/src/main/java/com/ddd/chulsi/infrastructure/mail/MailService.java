@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface MailService {
 
-    boolean sendMail(List<Users> receiveList);
+    boolean sendMail(List<Users> receiveList, String redisCode);
 
 }

@@ -51,4 +51,22 @@ public class UsersCommand {
             return new PasswordFind(email);
         }
     }
+
+    public record PasswordReset(
+        UUID usersId,
+        String password
+    ) {
+        public static PasswordReset nonState(UUID usersId, String password) {
+            return new PasswordReset(usersId, password);
+        }
+    }
+
+    public record PasswordLinkAlive(
+        UUID usersId,
+        String code
+    ) {
+        public static PasswordLinkAlive nonState(UUID usersId, String code) {
+            return new PasswordLinkAlive(usersId, code);
+        }
+    }
 }

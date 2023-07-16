@@ -67,3 +67,21 @@ include::{snippets}/users/password-find/request-fields.adoc[]
 === Response
 include::{snippets}/users/password-find/response-fields.adoc[]
 include::{snippets}/users/password-find/response-body.adoc[]
+
+[[비밀번호_링크_유효성_검사]]
+== 비밀번호 링크 유효성 검사
+include::{snippets}/users/password-link-alive/http-request.adoc[]
+=== Request
+include::{snippets}/users/password-link-alive/request-fields.adoc[]
+=== Response
+include::{snippets}/users/password-link-alive/response-fields.adoc[]
+include::{snippets}/users/password-link-alive/response-body.adoc[]
+
+[[비밀번호_재설정]]
+== 비밀번호 재설정
+include::{snippets}/users/password-reset/http-request.adoc[]
+=== Request
+include::{snippets}/users/password-reset/request-fields.adoc[]
+=== Response
+include::{snippets}/users/password-reset/response-fields.adoc[]
+include::{snippets}/users/password-reset/response-body.adoc[]
