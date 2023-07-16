@@ -9,7 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final JWTProperties properties;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -42,9 +46,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String token = authorization.replace(JwtTokenUtil.PREFIX, "");
                 boolean isAccess = !request.getRequestURI().equals("/users/access-token");
 
+                // Redis에 해당 accessToken이 "logout" 으로 블랙리스트에 올라가있는지 확인
+                Object isLogout = redisTemplate.opsForValue().get(token);
+
                 try {
-                    Authentication authentication = jwtTokenUtil.getAuthentication(token, properties, isAccess);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    if(ObjectUtils.isEmpty(isLogout)) {
+                        Authentication authentication = jwtTokenUtil.getAuthentication(token, properties, isAccess);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    } else if(isLogout.equals("logout")) {
+                        ErrorResponse.of(response, HttpStatus.FORBIDDEN, ErrorMessage.FORBIDDEN);
+                        return;
+                    }
                 } catch (TokenExpiredException e) {
                     if (!request.getRequestURI().equals("/users/auto-login") && !request.getRequestURI().equals("/users/access-token")) {
                         ErrorResponse.of(response, HttpStatus.UNAUTHORIZED, ErrorMessage.TOKEN_EXPIRED_ERROR);

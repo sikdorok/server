@@ -8,16 +8,14 @@ import com.ddd.chulsi.domainCore.model.users.Users;
 import com.ddd.chulsi.domainCore.model.users.UsersCommand;
 import com.ddd.chulsi.domainCore.model.users.UsersInfo;
 import com.ddd.chulsi.domainCore.model.users.UsersService;
-import com.ddd.chulsi.infrastructure.exception.EmailSendFailedException;
-import com.ddd.chulsi.infrastructure.exception.NotFoundException;
-import com.ddd.chulsi.infrastructure.exception.UserExistsException;
-import com.ddd.chulsi.infrastructure.exception.UserNotFoundException;
+import com.ddd.chulsi.infrastructure.exception.*;
 import com.ddd.chulsi.infrastructure.jwt.JWTClaim;
 import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
 import com.ddd.chulsi.infrastructure.mail.MailService;
 import com.ddd.chulsi.infrastructure.oauth.OauthInfo;
 import com.ddd.chulsi.infrastructure.oauth.OauthKakaoService;
+import com.ddd.chulsi.infrastructure.util.RedisUtil;
 import com.ddd.chulsi.presentation.users.dto.UsersDTO;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,12 +23,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -40,6 +41,8 @@ public class UsersFacade {
     private final JwtTokenUtil jwtTokenUtil;
     private final JWTProperties properties;
     private final ApplicationEventPublisher eventPublisher;
+
+    private final RedisUtil redisUtil;
 
     private final UsersService usersService;
     private final OauthTokenService oauthTokenService;
@@ -89,6 +92,9 @@ public class UsersFacade {
 
         // Token 정보 추가
         usersInfoLogin.setAccessToken(accessToken);
+
+        // Refresh Token 유효시간을 가져온 후 Redis에 Refresh Token을 저장합니다.
+        redisUtil.set("RT:" + usersInfoLogin.getUsersId(), refreshToken, properties.getRefreshExpiresTime(), TimeUnit.MILLISECONDS);
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
             .maxAge((long) 14 * 24 * 60 * 60)
@@ -140,7 +146,7 @@ public class UsersFacade {
         return usersLogin(new UsersInfo.UsersInfoLogin(users, kakaoInfoResponse.accessToken()), response);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, noRollbackFor = SlackNotificationHandler.class)
     public void logout(String token) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
@@ -156,6 +162,18 @@ public class UsersFacade {
         }
 
         users.logout();
+
+        // Redis 에서 해당 User id 로 저장된 Refresh Token 이 있는지 여부를 확인 후 있을 경우 삭제합니다.
+        try {
+            if(redisUtil.hasKey("RT:" + users.getUsersId()).get()) {
+                redisUtil.delete("RT:" + users.getUsersId());
+
+                Long expiration = jwtTokenUtil.getExpiration(token);
+                redisUtil.set(token, "logout", expiration, TimeUnit.MILLISECONDS);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new SlackNotificationHandler("Redis Server Error");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
