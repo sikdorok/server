@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(value = "/users", name = "유저")
 @RequiredArgsConstructor
@@ -72,6 +74,23 @@ public class UsersController {
     ) {
         UsersCommand.PasswordFind passwordFind = passwordFindRequest.toCommand();
         usersFacade.passwordFind(passwordFind);
+        return BaseResponse.ofSuccess();
+    }
+
+    @PostMapping(value = "/password-link-alive", name = "비밀번호 재설정 링크 유효성 검사")
+    public BaseResponse<Boolean> passwordLinkAlive(
+        @RequestBody @Valid UsersDTO.PasswordLinkAliveRequest passwordLinkAliveRequest
+    ) {
+        UsersCommand.PasswordLinkAlive passwordLinkAlive = passwordLinkAliveRequest.toCommand();
+        return BaseResponse.ofSuccess(usersFacade.passwordLinkAlive(passwordLinkAlive));
+    }
+
+    @PutMapping(value = "/password-reset", name = "비밀번호 재설정")
+    public BaseResponse<Void> passwordReset(
+        @RequestBody @Valid UsersDTO.PasswordResetRequest passwordResetRequest
+    ) {
+        UsersCommand.PasswordReset passwordReset = passwordResetRequest.toCommand();
+        usersFacade.passwordReset(passwordReset);
         return BaseResponse.ofSuccess();
     }
 

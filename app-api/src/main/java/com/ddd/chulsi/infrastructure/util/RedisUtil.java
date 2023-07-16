@@ -28,4 +28,10 @@ public class RedisUtil {
     public CompletableFuture<Boolean> hasKey(String key) {
         return CompletableFuture.completedFuture(Boolean.TRUE.equals(redisTemplate.hasKey(key)));
     }
+
+    @Async
+    public CompletableFuture<Object> get(String key) {
+        return CompletableFuture.completedFuture(redisTemplate.opsForValue().get(key));
+    }
+
 }

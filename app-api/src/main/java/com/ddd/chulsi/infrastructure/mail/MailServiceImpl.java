@@ -20,12 +20,13 @@ public class MailServiceImpl implements MailService {
     private final JavaMailSender javaMailSender;
 
     @Override
-    public boolean sendMail(List<Users> receiveList) {
+    public boolean sendMail(List<Users> receiveList, String redisCode) {
         MimeMessage message = javaMailSender.createMimeMessage();
 
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
             String imagesDirectory = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() +":" + httpServletRequest.getServerPort() + "/assets/images";
+            String passwordResetUrl = "https://jeffrey-oh.tistory.com/";
 
             for (Users users : receiveList) {
                 // 1. 메일 수신자 설정
@@ -37,7 +38,7 @@ public class MailServiceImpl implements MailService {
                 // 3. 메일 내용 설정
                 // HTML 적용됨
                 String content = """
-                    <!DOCTYPE html>
+                   <!DOCTYPE html>
                    <html lang="ko">
                    
                    <head>
@@ -56,8 +57,9 @@ public class MailServiceImpl implements MailService {
                                <b>{nickname}</b>님 안녕하세요.<br />
                                아래 버튼을 선택하여 비밀번호를 재설정해주세요.
                            </div>
-                           <div style="margin-top: 20px;">
-                               <button style="width: 200px; height: 50px; border-radius: 4px; background-color: #00CC8F; border-color: #FFF; border-width: 0px; font-size: 16px; color: #FFF;" type="button">비밀번호 재설정하기</button> </div>
+                           <a href="{password-reset-url}" target="_blank" style="text-decoration: unset; display: inline-block;">
+                               <div style="margin-top: 20px; width: 200px; height: 50px; border-radius: 4px; background-color: #00CC8F; border-color: #FFF; border-width: 0px; font-size: 16px; color: #FFF; display: block; text-align: center; line-height: 50px;">비밀번호 재설정하기</div>
+                           </a>
                            <div style="margin-top: 20px;">
                                <span style="color: #808080;">(비밀번호 재설정 링크는 1시간 동안 유효합니다.)</span>
                            </div>
@@ -75,6 +77,7 @@ public class MailServiceImpl implements MailService {
                     """;
                 content = content.replace("{images-directory}", imagesDirectory);
                 content = content.replace("{nickname}", users.getName());
+                content = content.replace("{password-reset-url}", passwordResetUrl);
                 messageHelper.setText(content,true);
 
                 // 4. 메일 전송
