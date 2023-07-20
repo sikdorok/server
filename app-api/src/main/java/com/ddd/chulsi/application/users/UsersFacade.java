@@ -21,11 +21,9 @@ import com.ddd.chulsi.presentation.users.dto.UsersDTO;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +63,7 @@ public class UsersFacade {
     public UsersDTO.LoginResponse autoLogin(String token, HttpServletResponse response) {
         JWTClaim jwtClaim = jwtTokenUtil.getClaimsForRefreshToken(token, properties, true);
 
-        UUID usersId = jwtClaim.getUserId();
+        UUID usersId = jwtClaim.getUsersId();
         Users users = usersService.findByUsersId(usersId);
         if (
             users == null ||
@@ -79,7 +77,7 @@ public class UsersFacade {
 
     public UsersDTO.LoginResponse usersLogin(UsersInfo.UsersInfoLogin usersInfoLogin, HttpServletResponse response) {
         JWTClaim jwtClaim = JWTClaim.builder()
-            .userId(usersInfoLogin.getUsersId())
+            .usersId(usersInfoLogin.getUsersId())
             .auth(DefinedCode.C000100002)
             .build();
 
@@ -153,7 +151,7 @@ public class UsersFacade {
     public void logout(String token) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
-        Users users = usersService.findByUsersId(jwtClaim.getUserId());
+        Users users = usersService.findByUsersId(jwtClaim.getUsersId());
         if (users == null) throw new UserNotFoundException();
 
         if (users.getOauthType() == DefinedCode.C000200001) {

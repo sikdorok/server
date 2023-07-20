@@ -8,6 +8,7 @@ import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import com.ddd.chulsi.infrastructure.exception.response.ErrorResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +82,9 @@ public class GlobalExceptionHandler {
             if (cause instanceof BadRequestException badRequestException) {
                 message = badRequestException.getMessage();
                 field = badRequestException.getField();
+                break;
+            } else if (cause instanceof InvalidFormatException) {
+                message = "올바른 형식이 아닙니다.";
                 break;
             }
             cause = cause.getCause();

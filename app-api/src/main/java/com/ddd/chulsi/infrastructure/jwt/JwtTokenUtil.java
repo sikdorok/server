@@ -24,7 +24,7 @@ public class JwtTokenUtil {
 
     public static final String PREFIX = "Bearer ";
 
-    private static final String USER_ID_KEY = "userId";
+    private static final String USERS_ID_KEY = "usersId";
 
     // JWT 토큰 인증정보 생성
     public String createToken(JWTClaim claim, JWTProperties properties, boolean isAccess) {
@@ -45,7 +45,7 @@ public class JwtTokenUtil {
             .withIssuedAt(new Date())
             .withExpiresAt(new Date(new Date().getTime() + expiresAt * 1000))
             .withClaim("auth", claim.getAuth().toString())
-            .withClaim(USER_ID_KEY, claim.getUserId().toString())
+            .withClaim(USERS_ID_KEY, claim.getUsersId().toString())
             .sign(Algorithm.HMAC256(secret));
     }
 
@@ -98,12 +98,12 @@ public class JwtTokenUtil {
         Claim auth = claims.getOrDefault("auth", null);
         if (auth == null) throw new InvalidJWTTokenException(ErrorMessage.INVALID_JWT_TOKEN, "auth");
 
-        Claim userId = claims.getOrDefault(USER_ID_KEY, null);
-        if (userId == null) throw new InvalidJWTTokenException(ErrorMessage.INVALID_JWT_TOKEN, USER_ID_KEY);
+        Claim usersId = claims.getOrDefault(USERS_ID_KEY, null);
+        if (usersId == null) throw new InvalidJWTTokenException(ErrorMessage.INVALID_JWT_TOKEN, USERS_ID_KEY);
 
         return JWTClaim.builder()
             .auth(DefinedCode.valueOf(auth.asString()))
-            .userId(UUID.fromString(userId.asString()))
+            .usersId(UUID.fromString(usersId.asString()))
             .build();
     }
 
@@ -125,7 +125,7 @@ public class JwtTokenUtil {
         if (
             jwtClaim == null ||
             jwtClaim.getAuth() == null ||
-            jwtClaim.getUserId() == null
+            jwtClaim.getUsersId() == null
         ) throw new InvalidJWTTokenException();
 
         return jwtClaim;
