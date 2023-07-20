@@ -13,6 +13,6 @@ import java.util.UUID;
 public class JWTClaim {
 
     private DefinedCode auth;
-    private UUID userId;
+    private UUID usersId;
 
 }

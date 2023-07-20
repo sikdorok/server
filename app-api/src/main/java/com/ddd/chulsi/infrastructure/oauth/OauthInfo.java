@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class OauthInfo {
 
-    public record KakaoInfoResponse(
+    public record KakaoInfoResponse (
         @JsonProperty("token_type")
         String tokenType,
 
@@ -23,26 +23,26 @@ public class OauthInfo {
 
     }
 
-    public record KakaoLogoutResponse(
+    public record KakaoLogoutResponse (
         @JsonProperty("id")
         Long id
     ) {
 
     }
 
-    public record KakaoUserMe(
+    public record KakaoUserMe (
         @JsonProperty("id")
         Long id,
 
         @JsonProperty("kakao_account")
         KakaoAccount kakaoAccount
     ) {
-        public record KakaoAccount(
+        public record KakaoAccount (
             @JsonProperty("profile")
             KakaoProfile kakaoProfile
         ) { }
 
-        public record KakaoProfile(
+        public record KakaoProfile (
             @JsonProperty("nickname")
             String nickname
         ) { }

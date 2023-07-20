@@ -6,62 +6,51 @@ import com.ddd.chulsi.infrastructure.exception.BadRequestException;
 import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import com.ddd.chulsi.infrastructure.util.BCryptUtils;
 import com.ddd.chulsi.infrastructure.util.StringUtil;
-import io.micrometer.common.util.StringUtils;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.apache.commons.validator.routines.EmailValidator;
-import org.hibernate.validator.constraints.Length;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public class UsersDTO {
 
-    public record OauthLoginRequest(
+    public record OauthLoginRequest (
+        @NotNull
         String authorizationCode
     ) {
-        public OauthLoginRequest {
-            Objects.requireNonNull(authorizationCode);
-        }
         public UsersCommand.LoginCommand toCommand() {
             return UsersCommand.LoginCommand.nonState(authorizationCode);
         }
     }
 
-    public record LoginResponse(
+    public record LoginResponse (
         UsersInfo.UsersInfoLogin usersInfoLogin
     ) {
 
     }
 
-    public record Register(
+    public record Register (
+        @NotBlank
         String nickname,
+
+        @Email(message = ErrorMessage.EMAIL_VALIDATION_FAILED)
+        @NotBlank
         String email,
+
+        @NotBlank
         String password,
+
+        @NotBlank
         String passwordCheck
     ) {
         public Register {
-            if (StringUtils.isBlank(nickname))
-                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "nickname");
             if (nickname.length() < 2 || nickname.length() > 10)
                 throw new BadRequestException("이름은 2자 이상, 10자 이하로 입력해주세요", "nickname");
-
-            if (StringUtils.isBlank(email) || !EmailValidator.getInstance().isValid(email))
-                throw new BadRequestException(ErrorMessage.EMAIL_VALIDATION_FAILED, "email");
-
-            if (StringUtils.isBlank(password))
-                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "password");
             if (!StringUtil.isEnglishAndNumberAndSpecial(password, 8))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "password");
-
-            if (StringUtils.isBlank(passwordCheck))
-                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "passwordCheck");
             if (!StringUtil.isEnglishAndNumberAndSpecial(passwordCheck, 8))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "passwordCheck");
-
             if (!Objects.deepEquals(password, passwordCheck))
                 throw new BadRequestException("입력하신 비밀번호가 일치하지 않습니다", "password, passwordCheck");
         }
@@ -70,15 +59,15 @@ public class UsersDTO {
         }
     }
 
-    public record LoginRequest(
+    public record LoginRequest (
+        @Email(message = ErrorMessage.EMAIL_VALIDATION_FAILED)
+        @NotBlank
         String email,
+
+        @NotBlank
         String password
     ) {
         public LoginRequest {
-            if (StringUtils.isBlank(email) || !EmailValidator.getInstance().isValid(email))
-                throw new BadRequestException(ErrorMessage.EMAIL_VALIDATION_FAILED, "email");
-            if (StringUtils.isBlank(password))
-                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "password");
             if (!StringUtil.isEnglishAndNumberAndSpecial(password, 8))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "password");
         }
@@ -87,37 +76,31 @@ public class UsersDTO {
         }
     }
 
-    public record PasswordFindRequest(
+    public record PasswordFindRequest (
+        @Email(message = ErrorMessage.EMAIL_VALIDATION_FAILED)
+        @NotBlank
         String email
     ) {
-        public PasswordFindRequest {
-            if (StringUtils.isBlank(email) || !EmailValidator.getInstance().isValid(email))
-                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "email");
-        }
         public UsersCommand.PasswordFind toCommand() {
             return UsersCommand.PasswordFind.nonState(email);
         }
     }
 
-    public record PasswordResetRequest(
+    public record PasswordResetRequest (
+        @NotNull
         UUID usersId,
+
+        @NotBlank
         String password,
+
+        @NotBlank
         String passwordCheck
     ) {
         public PasswordResetRequest {
-            if (usersId == null)
-                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "usersId");
-
-            if (StringUtils.isBlank(password))
-                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "password");
             if (!StringUtil.isEnglishAndNumberAndSpecial(password, 8))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "password");
-
-            if (StringUtils.isBlank(passwordCheck))
-                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "passwordCheck");
             if (!StringUtil.isEnglishAndNumberAndSpecial(passwordCheck, 8))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "passwordCheck");
-
             if (!Objects.deepEquals(password, passwordCheck))
                 throw new BadRequestException("입력하신 비밀번호가 일치하지 않습니다", "password, passwordCheck");
         }
@@ -127,17 +110,13 @@ public class UsersDTO {
         }
     }
 
-    public record PasswordLinkAliveRequest(
+    public record PasswordLinkAliveRequest (
+        @NotNull
         UUID usersId,
+
+        @NotBlank
         String code
     ) {
-        public PasswordLinkAliveRequest {
-            if (usersId == null)
-                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "usersId");
-
-            if (StringUtils.isBlank(code))
-                throw new BadRequestException(ErrorMessage.FORBIDDEN);
-        }
 
         public UsersCommand.PasswordLinkAlive toCommand() {
             return UsersCommand.PasswordLinkAlive.nonState(usersId, code);

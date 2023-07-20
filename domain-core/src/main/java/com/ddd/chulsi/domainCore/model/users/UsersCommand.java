@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class UsersCommand {
 
-    public record LoginCommand(
+    public record LoginCommand (
         String authorizationCode,
         String state
     ) {
@@ -13,7 +13,7 @@ public class UsersCommand {
         }
     }
 
-    public record UsersLogin(
+    public record UsersLogin (
         String email,
         String password
     ) {
@@ -22,12 +22,12 @@ public class UsersCommand {
         }
     }
 
-    public record UsersRefreshTokenUpdateEvent(
+    public record UsersRefreshTokenUpdateEvent (
         UUID usersId,
         String refreshToken
     ) { }
 
-    public record RegisterCommand(
+    public record RegisterCommand (
         String nickname,
         String email,
         String password
@@ -44,7 +44,7 @@ public class UsersCommand {
         }
     }
 
-    public record PasswordFind(
+    public record PasswordFind (
         String email
     ) {
         public static PasswordFind nonState(String email) {
@@ -52,7 +52,7 @@ public class UsersCommand {
         }
     }
 
-    public record PasswordReset(
+    public record PasswordReset (
         UUID usersId,
         String password
     ) {
@@ -61,7 +61,7 @@ public class UsersCommand {
         }
     }
 
-    public record PasswordLinkAlive(
+    public record PasswordLinkAlive (
         UUID usersId,
         String code
     ) {

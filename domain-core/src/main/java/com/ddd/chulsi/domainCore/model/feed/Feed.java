@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Getter
 @Entity
-@Table(name = "users")
+@Table(name = "feed")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -55,6 +55,6 @@ public class Feed extends DateColumn {
     private long views = 0;
 
     @Column(name = "isMain", columnDefinition = "BIT(1) DEFAULT 0", nullable = false)
-    private boolean isWithdrew;
+    private boolean isMain;
 
 }
