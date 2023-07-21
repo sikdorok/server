@@ -4,4 +4,6 @@ public interface FeedStore {
 
     void register(Feed insertFeed);
 
+    void delete(Feed feed);
+
 }

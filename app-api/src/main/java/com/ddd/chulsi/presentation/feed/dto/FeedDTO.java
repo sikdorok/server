@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class FeedDTO {
 
@@ -22,6 +23,7 @@ public class FeedDTO {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
         LocalDateTime time,
         String memo,
+
         @NotNull
         DefinedCode icon,
         boolean isMain
@@ -45,4 +47,33 @@ public class FeedDTO {
 
     }
 
+    public record FeedInfoUpdateRequest(
+        @NotNull
+        UUID feedId,
+
+        @NotNull
+        DefinedCode tag,
+
+        @NotNull
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+        LocalDateTime time,
+        String memo,
+
+        @NotNull
+        DefinedCode icon,
+        boolean isMain,
+        UUID deletePhotoToken
+    ) implements Validator {
+        public FeedCommand.InfoUpdateCommand toCommand() {
+            return FeedCommand.InfoUpdateCommand.nonState(feedId, tag, time, memo, icon, isMain, deletePhotoToken);
+        }
+
+        @Override
+        public void verify() {
+            if (!tag.getSectionCode().equals(DefinedCode.C0003.getSectionCode()))
+                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "tag");
+            if (!icon.getSectionCode().equals(DefinedCode.C0004.getSectionCode()))
+                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "icon");
+        }
+    }
 }

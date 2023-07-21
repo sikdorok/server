@@ -8,4 +8,8 @@ public interface FeedService {
 
     Feed findByFeedId(UUID feedId);
 
+    Feed findByUsersIdAndIsMain(UUID usersId, boolean isMain);
+
+    void delete(Feed feed);
+
 }

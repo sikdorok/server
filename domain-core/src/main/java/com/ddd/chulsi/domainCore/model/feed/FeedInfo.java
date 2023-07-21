@@ -19,13 +19,25 @@ public class FeedInfo {
         DefinedCode icon,
         boolean isMain
     ) {
-        public static FeedInfoDTO nonState(UUID feedId, boolean isMine, DefinedCode tag, LocalDateTime timeFull, String memo, DefinedCode icon, boolean isMain) {
+        public static FeedInfoDTO toDTO(Feed feed, UUID usersId) {
             DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 E요일", Locale.KOREAN);
             DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.KOREAN);
 
+            LocalDateTime timeFull = feed.getTime();
+
             String date = timeFull.format(dateFormat);
             String time = timeFull.format(timeFormat);
-            return new FeedInfoDTO(feedId, isMine, tag, date, time, memo, icon, isMain);
+
+            return new FeedInfoDTO(
+                feed.getFeedId(),
+                usersId.equals(feed.getUsersId()),
+                DefinedCode.valueOf(feed.getTag()),
+                date,
+                time,
+                feed.getMemo(),
+                feed.getIcon(),
+                feed.isMain()
+            );
         }
     }
 

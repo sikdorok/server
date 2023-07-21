@@ -9,4 +9,6 @@ public interface FeedJpaRepository extends JpaRepository<Feed, UUID> {
 
     Optional<Feed> findByFeedId(UUID feedId);
 
+    Optional<Feed> findByUsersIdAndIsMain(UUID usersId, boolean isMain);
+
 }

@@ -30,7 +30,7 @@ public class FeedController {
 //        return BaseResponse.ofSuccess(feedFacade.list(token, listCommand));
 //    }
 
-    @GetMapping(value = "/info/{feedId}", name = "정보 조회")
+    @GetMapping(value = "{feedId}", name = "정보 조회")
     public BaseResponse<FeedDTO.FeedInfoResponse> info(
         @AuthToken String token,
         @PathVariable @NotNull UUID feedId
@@ -38,7 +38,7 @@ public class FeedController {
         return BaseResponse.ofSuccess(feedFacade.info(token, feedId));
     }
 
-    @PostMapping(value = "/register", name = "등록", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(name = "등록", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResponse<Void> register(
         @AuthToken String token,
         @RequestPart @Valid FeedDTO.FeedRegisterRequest request,
@@ -48,25 +48,25 @@ public class FeedController {
         feedFacade.register(token, registerCommand, file);
         return BaseResponse.ofSuccess();
     }
-//
-//    @PutMapping(value = "/register", name = "정보 수정", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public BaseResponse<Void> feedInfoUpdate(
-//        @AuthToken String token,
-//        @RequestPart @Valid FeedDTO.FeedInfoUpdateRequest request,
-//        @RequestPart(required = false) MultipartFile file
-//    ) {
-//        FeedCommand.InfoUpdateCommand infoUpdateCommand = request.toCommand();
-//        feedFacade.infoUpdate(token, infoUpdateCommand, file);
-//        return BaseResponse.ofSuccess();
-//    }
-//
-//    @DeleteMapping(value = "/delete/{feedId}", name = "정보 삭제")
-//    public BaseResponse<Void> delete(
-//        @AuthToken String token,
-//        @PathVariable @NotNull UUID feedId
-//    ) {
-//        feedFacade.delete(token, feedId);
-//        return BaseResponse.ofSuccess();
-//    }
+
+    @PutMapping(name = "정보 수정", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public BaseResponse<Void> feedInfoUpdate(
+        @AuthToken String token,
+        @RequestPart @Valid FeedDTO.FeedInfoUpdateRequest request,
+        @RequestPart(required = false) MultipartFile file
+    ) {
+        FeedCommand.InfoUpdateCommand infoUpdateCommand = request.toCommand();
+        feedFacade.infoUpdate(token, infoUpdateCommand, file);
+        return BaseResponse.ofSuccess();
+    }
+
+    @DeleteMapping(value = "{feedId}", name = "정보 삭제")
+    public BaseResponse<Void> delete(
+        @AuthToken String token,
+        @PathVariable @NotNull UUID feedId
+    ) {
+        feedFacade.delete(token, feedId);
+        return BaseResponse.ofSuccess();
+    }
 
 }
