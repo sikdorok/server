@@ -49,7 +49,7 @@ class UsersControllerTest extends ControllerTest {
     @Test
     void 카카오_로그인() throws Exception {
 
-        given(usersFacade.kakaoLogin(any(UsersCommand.LoginCommand.class), any(HttpServletResponse.class))).willReturn(givenLoginResponse());
+        given(usersFacade.kakaoLogin(any(UsersCommand.LoginCommand.class), any(HttpServletResponse.class))).willReturn(givenKakaoLoginResponse());
 
         UsersDTO.OauthLoginRequest request = new UsersDTO.OauthLoginRequest("authorizationCode");
 
@@ -72,10 +72,11 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                    fieldWithPath("data.usersInfoLogin").type(JsonFieldType.OBJECT).description("유저 정보"),
-                    fieldWithPath("data.usersInfoLogin.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
-                    fieldWithPath("data.usersInfoLogin.accessToken").type(JsonFieldType.STRING).description("access token"),
-                    fieldWithPath("data.usersInfoLogin.lastLoginAt").type(JsonFieldType.STRING).description("마지막 로그인 일시")
+                    fieldWithPath("data.isRegistered").type(JsonFieldType.BOOLEAN).description("회원가입 유무"),
+                    fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 정보"),
+                    fieldWithPath("data.usersInfo.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
+                    fieldWithPath("data.usersInfo.accessToken").type(JsonFieldType.STRING).description("access token"),
+                    fieldWithPath("data.usersInfo.lastLoginAt").type(JsonFieldType.STRING).description("마지막 로그인 일시")
                 )
             ));
 
@@ -136,10 +137,11 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                    fieldWithPath("data.usersInfoLogin").type(JsonFieldType.OBJECT).description("유저 로그인 정보"),
-                    fieldWithPath("data.usersInfoLogin.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
-                    fieldWithPath("data.usersInfoLogin.accessToken").type(JsonFieldType.STRING).description("JWT Access Token"),
-                    fieldWithPath("data.usersInfoLogin.lastLoginAt").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("마지막 로그인 일시").optional()
+                    fieldWithPath("data.isRegistered").type(JsonFieldType.BOOLEAN).description("회원가입 유무"),
+                    fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 로그인 정보"),
+                    fieldWithPath("data.usersInfo.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
+                    fieldWithPath("data.usersInfo.accessToken").type(JsonFieldType.STRING).description("JWT Access Token"),
+                    fieldWithPath("data.usersInfo.lastLoginAt").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("마지막 로그인 일시").optional()
                 )
             ));
 
@@ -172,10 +174,11 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                    fieldWithPath("data.usersInfoLogin").type(JsonFieldType.OBJECT).description("유저 로그인 정보"),
-                    fieldWithPath("data.usersInfoLogin.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
-                    fieldWithPath("data.usersInfoLogin.accessToken").type(JsonFieldType.STRING).description("JWT Access Token"),
-                    fieldWithPath("data.usersInfoLogin.lastLoginAt").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("마지막 로그인 일시").optional()
+                    fieldWithPath("data.isRegistered").type(JsonFieldType.BOOLEAN).description("회원가입 유무"),
+                    fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 로그인 정보"),
+                    fieldWithPath("data.usersInfo.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
+                    fieldWithPath("data.usersInfo.accessToken").type(JsonFieldType.STRING).description("JWT Access Token"),
+                    fieldWithPath("data.usersInfo.lastLoginAt").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("마지막 로그인 일시").optional()
                 )
             ));
 
@@ -200,10 +203,11 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                    fieldWithPath("data.usersInfoLogin").type(JsonFieldType.OBJECT).description("유저 로그인 정보"),
-                    fieldWithPath("data.usersInfoLogin.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
-                    fieldWithPath("data.usersInfoLogin.accessToken").type(JsonFieldType.STRING).description("JWT Access Token"),
-                    fieldWithPath("data.usersInfoLogin.lastLoginAt").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("마지막 로그인 일시").optional()
+                    fieldWithPath("data.isRegistered").type(JsonFieldType.BOOLEAN).description("회원가입 유무"),
+                    fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 로그인 정보"),
+                    fieldWithPath("data.usersInfo.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
+                    fieldWithPath("data.usersInfo.accessToken").type(JsonFieldType.STRING).description("JWT Access Token"),
+                    fieldWithPath("data.usersInfo.lastLoginAt").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("마지막 로그인 일시").optional()
                 )
             ));
 

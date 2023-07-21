@@ -25,7 +25,15 @@ public class UsersDTO {
     }
 
     public record LoginResponse (
-        UsersInfo.UsersInfoLogin usersInfoLogin
+        boolean isRegistered,
+        UsersInfo.UsersInfoLogin usersInfo
+    ) {
+
+    }
+
+    public record KakaoLoginResponse<T> (
+        boolean isRegistered,
+        T usersInfo
     ) {
 
     }
