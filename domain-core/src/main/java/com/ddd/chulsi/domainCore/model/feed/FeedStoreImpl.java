@@ -14,4 +14,9 @@ public class FeedStoreImpl implements FeedStore {
         feedJpaRepository.save(insertFeed);
     }
 
+    @Override
+    public void delete(Feed feed) {
+        feedJpaRepository.delete(feed);
+    }
+
 }

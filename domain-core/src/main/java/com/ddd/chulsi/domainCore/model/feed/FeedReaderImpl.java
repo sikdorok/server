@@ -15,4 +15,9 @@ public class FeedReaderImpl implements FeedReader {
     public Feed findByFeedId(UUID feedId) {
         return feedJpaRepository.findByFeedId(feedId).orElse(null);
     }
+
+    @Override
+    public Feed findByUsersIdAndIsMain(UUID usersId, boolean isMain) {
+        return feedJpaRepository.findByUsersIdAndIsMain(usersId, isMain).orElse(null);
+    }
 }

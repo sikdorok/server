@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
@@ -57,4 +58,18 @@ public class Feed extends DateColumn {
     @Column(name = "isMain", columnDefinition = "BIT(1) DEFAULT 0", nullable = false)
     private boolean isMain;
 
+    public void infoUpdate(FeedCommand.InfoUpdateCommand infoUpdateCommand) {
+        this.tag = infoUpdateCommand.tag().toString();
+        this.time = infoUpdateCommand.time();
+        if (StringUtils.isNotBlank(infoUpdateCommand.memo())) this.memo = infoUpdateCommand.memo();
+        this.icon = infoUpdateCommand.icon();
+    }
+
+    public void updateIsMainTrue() {
+        this.isMain = true;
+    }
+
+    public void updateIsMainFalse() {
+        this.isMain = false;
+    }
 }

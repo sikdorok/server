@@ -30,4 +30,18 @@ public class FeedCommand {
         }
     }
 
+    public record InfoUpdateCommand(
+        UUID feedId,
+        DefinedCode tag,
+        LocalDateTime time,
+        String memo,
+        DefinedCode icon,
+        boolean isMain,
+        UUID deletePhotoToken
+    ) {
+        public static InfoUpdateCommand nonState(UUID feedId, DefinedCode tag, LocalDateTime time, String memo, DefinedCode icon, boolean isMain, UUID deletePhotoToken) {
+            return new InfoUpdateCommand(feedId, tag, time, memo, icon, isMain, deletePhotoToken);
+        }
+    }
+
 }

@@ -22,4 +22,14 @@ public class FeedServiceImpl implements FeedService {
         return feedReader.findByFeedId(feedId);
     }
 
+    @Override
+    public Feed findByUsersIdAndIsMain(UUID usersId, boolean isMain) {
+        return feedReader.findByUsersIdAndIsMain(usersId, isMain);
+    }
+
+    @Override
+    public void delete(Feed feed) {
+        feedStore.delete(feed);
+    }
+
 }

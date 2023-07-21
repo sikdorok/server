@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -31,10 +32,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -57,7 +58,7 @@ class FeedControllerTest extends ControllerTest {
 
         mockMvc.perform(
                 get(
-                    "/feed/info/{feedId}",
+                    "/feed/{feedId}",
                     UUID.randomUUID()
                 )
                     .contentType(MediaType.APPLICATION_JSON)
@@ -104,7 +105,7 @@ class FeedControllerTest extends ControllerTest {
         MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(feedRegisterRequest).getBytes(StandardCharsets.UTF_8));
 
         mockMvc.perform(
-                multipart("/feed/register")
+                multipart("/feed")
                     .file(file)
                     .file(request)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -129,6 +130,88 @@ class FeedControllerTest extends ControllerTest {
                     fieldWithPath("memo").type(JsonFieldType.STRING).description("메모").optional(),
                     fieldWithPath("icon").type(JsonFieldType.STRING).attributes(iconFormat()).description("대표 아이콘"),
                     fieldWithPath("isMain").type(JsonFieldType.BOOLEAN).description("대표 아이콘 설정 여부")
+                ),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
+                )
+            ));
+
+    }
+
+    @Test
+    void 수정() throws Exception {
+
+        doNothing().when(feedFacade).register(anyString(), any(FeedCommand.RegisterCommand.class), any(MultipartFile.class));
+
+        FeedDTO.FeedInfoUpdateRequest feedInfoUpdateRequest = givenInfoUpdateRequest();
+
+        MockMultipartFile file = new MockMultipartFile("file", "profile.png", "multipart/form-data", "uploadFile".getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(feedInfoUpdateRequest).getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(
+                multipart(HttpMethod.PUT,"/feed")
+                    .file(file)
+                    .file(request)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
+                    .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100001)))
+                    .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100002)))
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("feed/info-update",
+                getDocumentRequest(),
+                getDocumentResponse(),requestParts(
+                    partWithName("request").description("요청값"),
+                    partWithName("file").description("업로드 파일").optional()
+                ),
+                requestPartFields(
+                    "request",
+                    fieldWithPath("feedId").type(JsonFieldType.STRING).description("피드 고유번호"),
+                    fieldWithPath("tag").type(JsonFieldType.STRING).attributes(tagFormat()).description("태그"),
+                    fieldWithPath("time").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("등록시간"),
+                    fieldWithPath("memo").type(JsonFieldType.STRING).description("메모").optional(),
+                    fieldWithPath("icon").type(JsonFieldType.STRING).attributes(iconFormat()).description("대표 아이콘"),
+                    fieldWithPath("isMain").type(JsonFieldType.BOOLEAN).description("대표 아이콘 설정 여부"),
+                    fieldWithPath("deletePhotoToken").type(JsonFieldType.STRING).description("삭제할 photo token").optional()
+                ),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
+                )
+            ));
+
+    }
+
+    @Test
+    void 삭제() throws Exception {
+
+        doNothing().when(feedFacade).delete(anyString(), any(UUID.class));
+
+        mockMvc.perform(
+                delete(
+                    "/feed/{feedId}",
+                    UUID.randomUUID()
+                )
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
+                    .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100001)))
+                    .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100002)))
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("feed/delete",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("feedId").description("피드 고유번호")
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),

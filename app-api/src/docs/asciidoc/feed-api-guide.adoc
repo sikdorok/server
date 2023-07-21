@@ -35,3 +35,21 @@ include::{snippets}/feed/info/path-parameters.adoc[]
 === Response
 include::{snippets}/feed/info/response-fields.adoc[]
 include::{snippets}/feed/info/response-body.adoc[]
+
+[[수정]]
+== 수정
+include::{snippets}/feed/info-update/http-request.adoc[]
+=== Request
+include::{snippets}/feed/info-update/request-part-request-fields.adoc[]
+=== Response
+include::{snippets}/feed/info-update/response-fields.adoc[]
+include::{snippets}/feed/info-update/response-body.adoc[]
+
+[[삭제]]
+== 삭제
+include::{snippets}/feed/delete/http-request.adoc[]
+=== Request
+include::{snippets}/feed/delete/path-parameters.adoc[]
+=== Response
+include::{snippets}/feed/delete/response-fields.adoc[]
+include::{snippets}/feed/delete/response-body.adoc[]

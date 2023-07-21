@@ -6,4 +6,6 @@ public interface FeedReader {
 
     Feed findByFeedId(UUID feedId);
 
+    Feed findByUsersIdAndIsMain(UUID usersId, boolean isMain);
+
 }
