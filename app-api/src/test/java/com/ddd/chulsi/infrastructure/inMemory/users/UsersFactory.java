@@ -29,7 +29,13 @@ public class UsersFactory {
     public static UsersDTO.LoginResponse givenLoginResponse() {
         UsersInfo.UsersInfoLogin usersInfoLogin = new UsersInfo.UsersInfoLogin(givenUsers(), "oauth access token");
         usersInfoLogin.setAccessToken("access Token");
-        return new UsersDTO.LoginResponse(usersInfoLogin);
+        return new UsersDTO.LoginResponse(true, usersInfoLogin);
+    }
+
+    public static UsersDTO.KakaoLoginResponse givenKakaoLoginResponse() {
+        UsersInfo.UsersInfoLogin usersInfoLogin = new UsersInfo.UsersInfoLogin(givenUsers(), "oauth access token");
+        usersInfoLogin.setAccessToken("access Token");
+        return new UsersDTO.KakaoLoginResponse(true, usersInfoLogin);
     }
 
     public static UsersDTO.LoginRequest givenLoginRequest() {

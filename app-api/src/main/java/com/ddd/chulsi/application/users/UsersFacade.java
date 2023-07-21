@@ -108,7 +108,7 @@ public class UsersFacade {
 
         eventPublisher.publishEvent(new UsersCommand.UsersRefreshTokenUpdateEvent(usersInfoLogin.getUsersId(), refreshToken));
 
-        return new UsersDTO.LoginResponse(usersInfoLogin);
+        return new UsersDTO.LoginResponse(true, usersInfoLogin);
     }
 
     @EventListener
@@ -121,20 +121,24 @@ public class UsersFacade {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public UsersDTO.LoginResponse kakaoLogin(UsersCommand.LoginCommand loginCommand, HttpServletResponse response) {
+    public UsersDTO.KakaoLoginResponse kakaoLogin(UsersCommand.LoginCommand loginCommand, HttpServletResponse response) {
         OauthInfo.KakaoInfoResponse kakaoInfoResponse = oauthKakaoService.getAccessToken(loginCommand.authorizationCode());
         OauthInfo.KakaoUserMe kakaoUserMe = oauthKakaoService.getUserName(kakaoInfoResponse.accessToken());
 
         Users users = usersService.findByOauthTypeAndOauthId(DefinedCode.C000200001, kakaoUserMe.id());
         if (users == null) {
-            // 존재하지 않는 회원이면 회원가입 처리
-            users = usersService.store(
-                Users.builder()
-                    .oauthType(DefinedCode.C000200001)
-                    .oauthId(kakaoUserMe.id())
-                    .name(kakaoUserMe.kakaoAccount().kakaoProfile().nickname())
-                    .build()
-            );
+            // 존재하지 않는 회원이면 회원가입 처리를 위해 데이터 Return
+            String nickname = kakaoUserMe.kakaoAccount().kakaoProfile().nickname();
+            String email = kakaoUserMe.kakaoAccount().isEmailValid() && kakaoUserMe.kakaoAccount().isEmailVerified() ? kakaoUserMe.kakaoAccount().email() : null;
+
+            // 이메일 중복검사
+            if (email != null) {
+                Users duplicationCheckByEmail = usersService.findByEmail(email);
+                if (duplicationCheckByEmail != null) email = null;
+            }
+
+            OauthInfo.KakaoUserMeDTO kakaoUserMeDTO = new OauthInfo.KakaoUserMeDTO(nickname, email);
+            return new UsersDTO.KakaoLoginResponse<>(false, kakaoUserMeDTO);
         }
 
         OauthToken oauthToken = oauthTokenService.findByOauthTypeAndOauthId(DefinedCode.C000200001, kakaoUserMe.id());
@@ -144,7 +148,12 @@ public class UsersFacade {
             oauthToken.updateAccessToken(kakaoInfoResponse.accessToken());
         }
 
-        return usersLogin(new UsersInfo.UsersInfoLogin(users, kakaoInfoResponse.accessToken()), response);
+        UsersDTO.LoginResponse loginResponse = usersLogin(new UsersInfo.UsersInfoLogin(users, kakaoInfoResponse.accessToken()), response);
+
+        return new UsersDTO.KakaoLoginResponse<>(
+            true,
+            loginResponse.usersInfo()
+        );
     }
 
     @Transactional(rollbackFor = Exception.class, noRollbackFor = SlackNotificationHandler.class)

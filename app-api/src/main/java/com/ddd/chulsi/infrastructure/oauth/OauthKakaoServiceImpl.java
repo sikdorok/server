@@ -105,7 +105,7 @@ public class OauthKakaoServiceImpl implements OauthKakaoService {
             httpHeaders.set("Authorization", accessToken.startsWith(JwtTokenUtil.PREFIX) ? accessToken : JwtTokenUtil.PREFIX + accessToken);
 
             MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
-            requestBody.add("property_keys", "[\"kakao_account.profile\"]");
+            requestBody.add("property_keys", "[\"kakao_account.profile\", \"kakao_account.email\"]");
             HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(requestBody, httpHeaders);
 
             OauthInfo.KakaoUserMe response = restTemplate.postForObject(

@@ -1,6 +1,8 @@
 package com.ddd.chulsi.infrastructure.oauth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 public class OauthInfo {
 
@@ -39,7 +41,16 @@ public class OauthInfo {
     ) {
         public record KakaoAccount (
             @JsonProperty("profile")
-            KakaoProfile kakaoProfile
+            KakaoProfile kakaoProfile,
+
+            @JsonProperty("is_email_valid")
+            boolean isEmailValid,
+
+            @JsonProperty("is_email_verified")
+            boolean isEmailVerified,
+
+            @JsonProperty("email")
+            String email
         ) { }
 
         public record KakaoProfile (
@@ -47,4 +58,9 @@ public class OauthInfo {
             String nickname
         ) { }
     }
+
+    public record KakaoUserMeDTO (
+       String nickname,
+       String email
+    ) {}
 }

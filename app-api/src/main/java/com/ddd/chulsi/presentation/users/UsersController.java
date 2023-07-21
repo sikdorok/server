@@ -26,7 +26,7 @@ public class UsersController {
     }
 
     @PostMapping(value = "/kakao/login", name = "카카오 로그인")
-    public BaseResponse<UsersDTO.LoginResponse> kakaoLogin(
+    public BaseResponse<UsersDTO.KakaoLoginResponse> kakaoLogin(
         @RequestBody @Valid UsersDTO.OauthLoginRequest loginRequest,
         HttpServletResponse response
     ) {
