@@ -23,8 +23,9 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public Feed findByUsersIdAndIsMain(UUID usersId, boolean isMain) {
-        return feedReader.findByUsersIdAndIsMain(usersId, isMain);
+    public void updateMain(UUID usersId, boolean isMain) {
+        Feed mainFeed = feedReader.findByUsersIdAndIsMain(usersId, isMain);
+        if (mainFeed != null) mainFeed.updateIsMainFalse();
     }
 
     @Override

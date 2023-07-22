@@ -57,7 +57,7 @@ public class FeedFactory {
     }
 
     public static FeedDTO.FeedInfoResponse givenFeedInfoResponse() {
-        return new FeedDTO.FeedInfoResponse(givenFeedInfo());
+        return new FeedDTO.FeedInfoResponse("식도록", givenFeedInfo());
     }
 
 }

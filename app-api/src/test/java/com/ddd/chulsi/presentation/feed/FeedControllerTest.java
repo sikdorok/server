@@ -80,6 +80,7 @@ class FeedControllerTest extends ControllerTest {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("소유자 닉네임"),
                     fieldWithPath("data.feedInfo").type(JsonFieldType.OBJECT).description("피드 정보"),
                     fieldWithPath("data.feedInfo.feedId").type(JsonFieldType.STRING).description("피드 고유번호"),
                     fieldWithPath("data.feedInfo.isMine").type(JsonFieldType.BOOLEAN).description("소유권 여부"),

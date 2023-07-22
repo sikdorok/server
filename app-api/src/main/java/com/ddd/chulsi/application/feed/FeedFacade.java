@@ -8,15 +8,13 @@ import com.ddd.chulsi.domainCore.model.photos.Photos;
 import com.ddd.chulsi.domainCore.model.photos.PhotosInfo;
 import com.ddd.chulsi.domainCore.model.photos.PhotosService;
 import com.ddd.chulsi.domainCore.model.users.Users;
-import com.ddd.chulsi.domainCore.model.users.UsersService;
 import com.ddd.chulsi.infrastructure.aws.FileProvider;
 import com.ddd.chulsi.infrastructure.exception.BadRequestException;
-import com.ddd.chulsi.infrastructure.exception.NotFoundException;
-import com.ddd.chulsi.infrastructure.exception.UserNotFoundException;
-import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import com.ddd.chulsi.infrastructure.jwt.JWTClaim;
 import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
+import com.ddd.chulsi.infrastructure.specification.feed.FeedSpecification;
+import com.ddd.chulsi.infrastructure.specification.users.UsersSpecification;
 import com.ddd.chulsi.infrastructure.util.CollectionUtils;
 import com.ddd.chulsi.presentation.feed.dto.FeedDTO;
 import jakarta.transaction.Transactional;
@@ -39,8 +37,9 @@ public class FeedFacade {
     private final JWTProperties properties;
 
     private final FileProvider fileProvider;
-    private final UsersService usersService;
+    private final UsersSpecification usersSpecification;
     private final FeedService feedService;
+    private final FeedSpecification feedSpecification;
     private final PhotosService photosService;
 
     @Transactional(rollbackOn = Exception.class)
@@ -49,14 +48,11 @@ public class FeedFacade {
 
         UUID usersId = jwtClaim.getUsersId();
 
-        Users users = usersService.findByUsersId(usersId);
-        if (users == null) throw new UserNotFoundException();
+        Users users = usersSpecification.findByUsersId(usersId);
 
         // 대표 아이콘 처리 확인
-        if (registerCommand.isMain()) {
-            Feed mainFeed = feedService.findByUsersIdAndIsMain(usersId, true);
-            if (mainFeed != null) mainFeed.updateIsMainFalse();
-        }
+        if (registerCommand.isMain())
+            feedService.updateMain(usersId, true);
 
         Feed insertFeed = registerCommand.toEntity(usersId);
         Feed newFeed = feedService.register(insertFeed);
@@ -78,11 +74,9 @@ public class FeedFacade {
 
         UUID usersId = jwtClaim.getUsersId();
 
-        Users users = usersService.findByUsersId(usersId);
-        if (users == null) throw new UserNotFoundException();
+        Users users = usersSpecification.findByUsersId(usersId);
 
-        Feed feed = feedService.findByFeedId(feedId);
-        if (feed == null) throw new NotFoundException();
+        Feed feed = feedSpecification.findByFeedId(feedId);
 
         List<PhotosInfo.Info> photosInfoList = photosService.findAllByTargetIdOrderByCreatedAtDesc(feed.getFeedId());
 
@@ -100,20 +94,15 @@ public class FeedFacade {
 
         UUID usersId = jwtClaim.getUsersId();
 
-        Users users = usersService.findByUsersId(usersId);
-        if (users == null) throw new UserNotFoundException();
+        Users users = usersSpecification.findByUsersId(usersId);
 
-        Feed feed = feedService.findByFeedId(infoUpdateCommand.feedId());
-        if (feed == null) throw new NotFoundException();
-        if (!feed.getUsersId().equals(usersId))
-            throw new BadRequestException(ErrorMessage.FORBIDDEN);
+        Feed feed = feedSpecification.findByFeedIdAndIsMind(infoUpdateCommand.feedId(), usersId);
 
         feed.infoUpdate(infoUpdateCommand);
 
         // 대표 아이콘 처리 확인
         if (infoUpdateCommand.isMain()) {
-            Feed mainFeed = feedService.findByUsersIdAndIsMain(usersId, true);
-            if (mainFeed != null) mainFeed.updateIsMainFalse();
+            feedService.updateMain(usersId, true);
             feed.updateIsMainTrue();
         }
 
@@ -148,13 +137,9 @@ public class FeedFacade {
 
         UUID usersId = jwtClaim.getUsersId();
 
-        Users users = usersService.findByUsersId(usersId);
-        if (users == null) throw new UserNotFoundException();
+        Users users = usersSpecification.findByUsersId(usersId);
 
-        Feed feed = feedService.findByFeedId(feedId);
-        if (feed == null) throw new NotFoundException();
-        if (!feed.getUsersId().equals(usersId))
-            throw new BadRequestException(ErrorMessage.FORBIDDEN);
+        Feed feed = feedSpecification.findByFeedIdAndIsMind(feedId, usersId);
 
         List<PhotosInfo.Info> photosInfoList = photosService.findAllByTargetIdOrderByCreatedAtDesc(feed.getFeedId());
 
