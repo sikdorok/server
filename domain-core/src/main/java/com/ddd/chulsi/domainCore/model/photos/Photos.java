@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Getter
 @Entity
-@Table(name = "users")
+@Table(name = "photos")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -39,6 +39,9 @@ public class Photos extends DateColumn {
 
     @Column(name = "originFileName", nullable = false)
     private String originFileName;
+
+    @Column(name = "uploadFullPath", nullable = false)
+    private String uploadFullPath;
 
     @Column(name = "contentType", length = 200, nullable = false)
     private String contentType;

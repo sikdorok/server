@@ -3,6 +3,7 @@ package com.ddd.chulsi.domainCore.model.feed;
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 public class FeedCommand {
@@ -37,10 +38,10 @@ public class FeedCommand {
         String memo,
         DefinedCode icon,
         boolean isMain,
-        UUID deletePhotoToken
+        Set<UUID> deletePhotoId
     ) {
-        public static InfoUpdateCommand nonState(UUID feedId, DefinedCode tag, LocalDateTime time, String memo, DefinedCode icon, boolean isMain, UUID deletePhotoToken) {
-            return new InfoUpdateCommand(feedId, tag, time, memo, icon, isMain, deletePhotoToken);
+        public static InfoUpdateCommand nonState(UUID feedId, DefinedCode tag, LocalDateTime time, String memo, DefinedCode icon, boolean isMain, Set<UUID> deletePhotoId) {
+            return new InfoUpdateCommand(feedId, tag, time, memo, icon, isMain, deletePhotoId);
         }
     }
 

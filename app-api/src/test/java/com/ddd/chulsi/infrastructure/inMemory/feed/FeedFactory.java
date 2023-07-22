@@ -6,7 +6,10 @@ import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.presentation.feed.dto.FeedDTO;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
+
+import static com.ddd.chulsi.infrastructure.inMemory.photos.PhotosFactory.givenPhotosInfoList;
 
 public class FeedFactory {
 
@@ -40,14 +43,16 @@ public class FeedFactory {
             "메모",
             DefinedCode.C000400001,
             false,
-            UUID.randomUUID()
+            Set.of(UUID.randomUUID(), UUID.randomUUID())
         );
     }
 
     public static FeedInfo.FeedInfoDTO givenFeedInfo() {
         return FeedInfo.FeedInfoDTO.toDTO(
             givenFeed(),
-            UUID.randomUUID()
+            UUID.randomUUID(),
+            givenPhotosInfoList(),
+            0
         );
     }
 

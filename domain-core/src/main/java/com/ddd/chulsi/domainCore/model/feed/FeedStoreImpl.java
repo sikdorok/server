@@ -10,8 +10,8 @@ public class FeedStoreImpl implements FeedStore {
     private final FeedJpaRepository feedJpaRepository;
 
     @Override
-    public void register(Feed insertFeed) {
-        feedJpaRepository.save(insertFeed);
+    public Feed register(Feed insertFeed) {
+        return feedJpaRepository.save(insertFeed);
     }
 
     @Override
