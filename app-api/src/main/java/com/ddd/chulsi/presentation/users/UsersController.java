@@ -7,6 +7,8 @@ import com.ddd.chulsi.presentation.shared.response.dto.BaseResponse;
 import com.ddd.chulsi.presentation.users.dto.UsersDTO;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,6 +92,13 @@ public class UsersController {
         UsersCommand.PasswordReset passwordReset = passwordResetRequest.toCommand();
         usersFacade.passwordReset(passwordReset);
         return BaseResponse.ofSuccess();
+    }
+
+    @GetMapping(value = "/email-check/{email}", name = "이메일 중복검사")
+    public BaseResponse<Boolean> emailCheck(
+        @PathVariable @Email @NotBlank String email
+    ) {
+        return BaseResponse.ofSuccess(usersFacade.emailCheck(email));
     }
 
 }

@@ -259,4 +259,9 @@ public class UsersFacade {
 
         return false;
     }
+
+    @Transactional(readOnly = true)
+    public Boolean emailCheck(String email) {
+        return usersService.duplicationCheckEmail(email);
+    }
 }

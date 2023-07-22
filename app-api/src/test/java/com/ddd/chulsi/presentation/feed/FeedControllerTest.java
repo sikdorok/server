@@ -84,8 +84,7 @@ class FeedControllerTest extends ControllerTest {
                     fieldWithPath("data.feedInfo.feedId").type(JsonFieldType.STRING).description("피드 고유번호"),
                     fieldWithPath("data.feedInfo.isMine").type(JsonFieldType.BOOLEAN).description("소유권 여부"),
                     fieldWithPath("data.feedInfo.tag").type(JsonFieldType.STRING).description("태그"),
-                    fieldWithPath("data.feedInfo.date").type(JsonFieldType.STRING).description("날짜"),
-                    fieldWithPath("data.feedInfo.time").type(JsonFieldType.STRING).description("시간"),
+                    fieldWithPath("data.feedInfo.time").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("날짜 및 시간"),
                     fieldWithPath("data.feedInfo.memo").type(JsonFieldType.STRING).description("내용").optional(),
                     fieldWithPath("data.feedInfo.icon").type(JsonFieldType.STRING).description("대표 아이콘"),
                     fieldWithPath("data.feedInfo.isMain").type(JsonFieldType.BOOLEAN).description("대표 아이콘 설정 여부")
