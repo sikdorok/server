@@ -1,6 +1,8 @@
 package com.ddd.chulsi.domainCore.model.feed;
 
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +15,8 @@ public class FeedInfo {
         UUID feedId,
         boolean isMine,
         DefinedCode tag,
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         LocalDateTime time,
         String memo,
         DefinedCode icon,
