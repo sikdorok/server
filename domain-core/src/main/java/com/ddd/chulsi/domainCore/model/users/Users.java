@@ -105,4 +105,15 @@ public class Users extends DateColumn {
         this.password = newPassword;
     }
 
+    public void photosLimitPlus() {
+        this.photosLimit++;
+        if (this.photosLimit > 20)
+            this.photosLimit = 20;
+    }
+
+    public void photosLimitMinus() {
+        this.photosLimit--;
+        if (this.photosLimit < 0)
+            this.photosLimit = 0;
+    }
 }

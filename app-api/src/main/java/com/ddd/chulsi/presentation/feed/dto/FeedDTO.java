@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 public class FeedDTO {
@@ -62,10 +63,10 @@ public class FeedDTO {
         @NotNull
         DefinedCode icon,
         boolean isMain,
-        UUID deletePhotoToken
+        Set<UUID> deletePhotoId
     ) implements Validator {
         public FeedCommand.InfoUpdateCommand toCommand() {
-            return FeedCommand.InfoUpdateCommand.nonState(feedId, tag, time, memo, icon, isMain, deletePhotoToken);
+            return FeedCommand.InfoUpdateCommand.nonState(feedId, tag, time, memo, icon, isMain, deletePhotoId);
         }
 
         @Override

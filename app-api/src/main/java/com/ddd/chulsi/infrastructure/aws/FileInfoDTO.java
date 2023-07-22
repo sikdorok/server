@@ -1,17 +1,28 @@
 package com.ddd.chulsi.infrastructure.aws;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import com.ddd.chulsi.domainCore.model.photos.Photos;
 
-@ToString
-@Getter
-@AllArgsConstructor
-public class FileInfoDTO {
-    private final String uploadPath;
-    private final String uploadFileName;
-    private final String originFileName;
-    private final String contentType;
-    private final String ext;
-    private final long size;
+import java.util.UUID;
+
+public record FileInfoDTO(
+    String uploadPath,
+    String uploadFileName,
+    String originFileName,
+    String uploadFullPath,
+    String contentType,
+    String ext,
+    long size
+) {
+    public Photos toPhotos(UUID targetId, FileInfoDTO fileInfoDTO) {
+        return Photos.builder()
+            .targetId(targetId)
+            .uploadPath(fileInfoDTO.uploadPath)
+            .uploadFileName(fileInfoDTO.uploadFileName)
+            .originFileName(fileInfoDTO.originFileName)
+            .uploadFullPath(fileInfoDTO.uploadFullPath)
+            .contentType(fileInfoDTO.contentType)
+            .ext(fileInfoDTO.ext)
+            .size(fileInfoDTO.size)
+            .build();
+    }
 }

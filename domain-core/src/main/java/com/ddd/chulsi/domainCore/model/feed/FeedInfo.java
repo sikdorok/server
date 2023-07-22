@@ -1,12 +1,11 @@
 package com.ddd.chulsi.domainCore.model.feed;
 
+import com.ddd.chulsi.domainCore.model.photos.PhotosInfo;
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
+import java.util.List;
 import java.util.UUID;
 
 public class FeedInfo {
@@ -20,9 +19,11 @@ public class FeedInfo {
         LocalDateTime time,
         String memo,
         DefinedCode icon,
-        boolean isMain
+        boolean isMain,
+        List<PhotosInfo.Info> photosInfoList,
+        int photosLimit
     ) {
-        public static FeedInfoDTO toDTO(Feed feed, UUID usersId) {
+        public static FeedInfoDTO toDTO(Feed feed, UUID usersId, List<PhotosInfo.Info> photosInfoList, int photosLimit) {
             return new FeedInfoDTO(
                 feed.getFeedId(),
                 usersId.equals(feed.getUsersId()),
@@ -30,7 +31,9 @@ public class FeedInfo {
                 feed.getTime(),
                 feed.getMemo(),
                 feed.getIcon(),
-                feed.isMain()
+                feed.isMain(),
+                photosInfoList,
+                photosLimit
             );
         }
     }

@@ -13,8 +13,8 @@ public class FeedServiceImpl implements FeedService {
     private final FeedStore feedStore;
 
     @Override
-    public void register(Feed insertFeed) {
-        feedStore.register(insertFeed);
+    public Feed register(Feed insertFeed) {
+        return feedStore.register(insertFeed);
     }
 
     @Override

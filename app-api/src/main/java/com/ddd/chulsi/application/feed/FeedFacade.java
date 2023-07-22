@@ -4,12 +4,20 @@ import com.ddd.chulsi.domainCore.model.feed.Feed;
 import com.ddd.chulsi.domainCore.model.feed.FeedCommand;
 import com.ddd.chulsi.domainCore.model.feed.FeedInfo;
 import com.ddd.chulsi.domainCore.model.feed.FeedService;
+import com.ddd.chulsi.domainCore.model.photos.Photos;
+import com.ddd.chulsi.domainCore.model.photos.PhotosInfo;
+import com.ddd.chulsi.domainCore.model.photos.PhotosService;
+import com.ddd.chulsi.domainCore.model.users.Users;
+import com.ddd.chulsi.domainCore.model.users.UsersService;
+import com.ddd.chulsi.infrastructure.aws.FileProvider;
 import com.ddd.chulsi.infrastructure.exception.BadRequestException;
 import com.ddd.chulsi.infrastructure.exception.NotFoundException;
+import com.ddd.chulsi.infrastructure.exception.UserNotFoundException;
 import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import com.ddd.chulsi.infrastructure.jwt.JWTClaim;
 import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
+import com.ddd.chulsi.infrastructure.util.CollectionUtils;
 import com.ddd.chulsi.presentation.feed.dto.FeedDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -27,19 +38,33 @@ public class FeedFacade {
     private final JwtTokenUtil jwtTokenUtil;
     private final JWTProperties properties;
 
+    private final FileProvider fileProvider;
+    private final UsersService usersService;
     private final FeedService feedService;
+    private final PhotosService photosService;
 
     @Transactional(rollbackOn = Exception.class)
     public void register(String token, FeedCommand.RegisterCommand registerCommand, MultipartFile file) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
-        UUID userId = jwtClaim.getUsersId();
+        UUID usersId = jwtClaim.getUsersId();
 
-        Feed insertFeed = registerCommand.toEntity(userId);
-        feedService.register(insertFeed);
-        
-        // TODO - 사진등록 photos 도메인 할 때 처리
-        // TODO - 사용자 사진 제한 카운팅 처리
+        Users users = usersService.findByUsersId(usersId);
+        if (users == null) throw new UserNotFoundException();
+
+        Feed insertFeed = registerCommand.toEntity(usersId);
+        Feed newFeed = feedService.register(insertFeed);
+
+        Optional.ofNullable(file)
+            .map(files -> {
+                if (users.getPhotosLimit() + 1 == 20) throw new BadRequestException("더 이상 사진을 등록할 수 없습니다.");
+                return fileProvider.uploadFile("feed", files);
+            })
+            .ifPresent(fileInfoDTO -> {
+                Photos photos = fileInfoDTO.toPhotos(newFeed.getFeedId(), fileInfoDTO);
+                photosService.register(photos);
+                users.photosLimitPlus();
+            });
     }
 
     public FeedDTO.FeedInfoResponse info(String token, UUID feedId) {
@@ -47,11 +72,15 @@ public class FeedFacade {
 
         UUID usersId = jwtClaim.getUsersId();
 
+        Users users = usersService.findByUsersId(usersId);
+        if (users == null) throw new UserNotFoundException();
+
         Feed feed = feedService.findByFeedId(feedId);
         if (feed == null) throw new NotFoundException();
 
-        // TODO - photos 도메인 할 때 사진정보 Response 추가
-        FeedInfo.FeedInfoDTO feedInfoDTO = FeedInfo.FeedInfoDTO.toDTO(feed, usersId);
+        List<PhotosInfo.Info> photosInfoList = photosService.findAllByTargetIdOrderByCreatedAtDesc(feed.getFeedId());
+
+        FeedInfo.FeedInfoDTO feedInfoDTO = FeedInfo.FeedInfoDTO.toDTO(feed, usersId, photosInfoList, users.getPhotosLimit());
 
         return new FeedDTO.FeedInfoResponse(
             feedInfoDTO
@@ -63,6 +92,9 @@ public class FeedFacade {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
         UUID usersId = jwtClaim.getUsersId();
+
+        Users users = usersService.findByUsersId(usersId);
+        if (users == null) throw new UserNotFoundException();
 
         Feed feed = feedService.findByFeedId(infoUpdateCommand.feedId());
         if (feed == null) throw new NotFoundException();
@@ -78,9 +110,29 @@ public class FeedFacade {
             feed.updateIsMainTrue();
         }
 
-        // TODO - file 삭제 처리
-        // TODO - file 등록 처리
-        // TODO - 사용자 사진 제한 카운팅 처리
+        // 파일 삭제
+        if (!CollectionUtils.isEmpty(infoUpdateCommand.deletePhotoId())) {
+            Optional.of(infoUpdateCommand.deletePhotoId()).ifPresent(photosIds -> photosIds.forEach(photosId -> {
+                Photos photos = photosService.findByPhotosId(photosId);
+                if (photos != null) {
+                    fileProvider.deleteFile(photos.getUploadPath() + File.separator + photos.getUploadFileName());
+                    photosService.delete(photos);
+                    users.photosLimitMinus();
+                }
+            }));
+        }
+
+        // 파일 등록
+        Optional.ofNullable(file)
+            .map(files -> {
+                if (users.getPhotosLimit() + 1 == 20) throw new BadRequestException("더 이상 사진을 등록할 수 없습니다.");
+                return fileProvider.uploadFile("feed", files);
+            })
+            .ifPresent(fileInfoDTO -> {
+                Photos photos = fileInfoDTO.toPhotos(feed.getFeedId(), fileInfoDTO);
+                photosService.register(photos);
+                users.photosLimitPlus();
+            });
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -89,15 +141,25 @@ public class FeedFacade {
 
         UUID usersId = jwtClaim.getUsersId();
 
+        Users users = usersService.findByUsersId(usersId);
+        if (users == null) throw new UserNotFoundException();
+
         Feed feed = feedService.findByFeedId(feedId);
         if (feed == null) throw new NotFoundException();
         if (!feed.getUsersId().equals(usersId))
             throw new BadRequestException(ErrorMessage.FORBIDDEN);
 
+        List<PhotosInfo.Info> photosInfoList = photosService.findAllByTargetIdOrderByCreatedAtDesc(feed.getFeedId());
+
         feedService.delete(feed);
 
-        // TODO - photos 삭제
-        // TODO - 사용자 사진 제한 카운팅 처리
-        // TODO - Redis likes, views 삭제
+        Optional.of(photosInfoList).ifPresent(photosInfos -> photosInfos.forEach(photosInfo -> {
+            Photos photos = photosService.findByPhotosId(photosInfo.photosId());
+            if (photos != null) {
+                fileProvider.deleteFile(photos.getUploadPath() + File.separator + photos.getUploadFileName());
+                photosService.delete(photos);
+                users.photosLimitMinus();
+            }
+        }));
     }
 }

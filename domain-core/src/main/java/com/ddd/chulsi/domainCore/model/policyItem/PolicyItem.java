@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Getter
 @Entity
-@Table(name = "users")
+@Table(name = "policyItem")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
