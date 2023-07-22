@@ -52,6 +52,12 @@ public class FeedFacade {
         Users users = usersService.findByUsersId(usersId);
         if (users == null) throw new UserNotFoundException();
 
+        // 대표 아이콘 처리 확인
+        if (registerCommand.isMain()) {
+            Feed mainFeed = feedService.findByUsersIdAndIsMain(usersId, true);
+            if (mainFeed != null) mainFeed.updateIsMainFalse();
+        }
+
         Feed insertFeed = registerCommand.toEntity(usersId);
         Feed newFeed = feedService.register(insertFeed);
 
@@ -83,6 +89,7 @@ public class FeedFacade {
         FeedInfo.FeedInfoDTO feedInfoDTO = FeedInfo.FeedInfoDTO.toDTO(feed, usersId, photosInfoList, users.getPhotosLimit());
 
         return new FeedDTO.FeedInfoResponse(
+            users.getName(),
             feedInfoDTO
         );
     }

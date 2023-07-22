@@ -43,6 +43,7 @@ public class FeedDTO {
     }
 
     public record FeedInfoResponse (
+        String nickname,
         FeedInfo.FeedInfoDTO feedInfo
     ) {
 
