@@ -14,7 +14,7 @@ public class DocumentOptionalGenerator {
     }
 
     public static Attributes.Attribute dateFormatFull() {
-        return setFormat("yyyy-MM-dd HH:mm");
+        return setFormat("yyyy-MM-dd HH:mm:ss");
     }
 
     public static Attributes.Attribute tagFormat() {

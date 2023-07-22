@@ -85,3 +85,12 @@ include::{snippets}/users/password-reset/request-fields.adoc[]
 === Response
 include::{snippets}/users/password-reset/response-fields.adoc[]
 include::{snippets}/users/password-reset/response-body.adoc[]
+
+[[이메일_중복검사]]
+== 이메일 중복검사
+include::{snippets}/users/email-check/http-request.adoc[]
+=== Request
+include::{snippets}/users/email-check/path-parameters.adoc[]
+=== Response
+include::{snippets}/users/email-check/response-fields.adoc[]
+include::{snippets}/users/email-check/response-body.adoc[]
