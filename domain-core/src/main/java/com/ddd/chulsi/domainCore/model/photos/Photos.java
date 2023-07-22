@@ -28,26 +28,25 @@ public class Photos extends DateColumn {
     @Column(name = "photosId", columnDefinition = "BINARY(16)")
     private UUID photosId;
 
-    @Column(name = "token", nullable = false, columnDefinition = "BINARY(16)")
-    private UUID token;
+    @Column(name = "targetId", nullable = false, columnDefinition = "BINARY(16)")
+    private UUID targetId;
 
-    @Column(name = "feedId", nullable = false, columnDefinition = "BINARY(16)")
-    private UUID feedId;
+    @Column(name = "uploadPath", nullable = false)
+    private String uploadPath;
+
+    @Column(name = "uploadFileName", nullable = false)
+    private String uploadFileName;
 
     @Column(name = "originFileName", nullable = false)
     private String originFileName;
 
-    @Column(name = "path", nullable = false)
-    private String path;
+    @Column(name = "contentType", length = 200, nullable = false)
+    private String contentType;
 
-    @Column(name = "fullPath", nullable = false)
-    private String fullPath;
-
-    @Column(name = "ext", nullable = false)
+    @Column(name = "ext", length = 10, nullable = false)
     private String ext;
 
-    @Builder.Default
     @Column(name = "size", nullable = false)
-    private long size = 0L;
+    private long size;
 
 }
