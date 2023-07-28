@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ValidationAspect {
 
-    @Pointcut("execution(* com.ddd.chulsi.*Controller.*(..))")
+    @Pointcut("execution(* com.ddd.chulsi..*Controller.*(..))")
     public void validationPointcut(){ }
 
     @Before("validationPointcut()")

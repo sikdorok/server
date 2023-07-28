@@ -57,16 +57,7 @@ public class FeedFacade {
         Feed insertFeed = registerCommand.toEntity(usersId);
         Feed newFeed = feedService.register(insertFeed);
 
-        Optional.ofNullable(file)
-            .map(files -> {
-                if (users.getPhotosLimit() + 1 == 20) throw new BadRequestException("더 이상 사진을 등록할 수 없습니다.");
-                return fileProvider.uploadFile("feed", files);
-            })
-            .ifPresent(fileInfoDTO -> {
-                Photos photos = fileInfoDTO.toPhotos(newFeed.getFeedId(), fileInfoDTO);
-                photosService.register(photos);
-                users.photosLimitPlus();
-            });
+        feedPhotoUpload(file, users, newFeed);
     }
 
     public FeedDTO.FeedInfoResponse info(String token, UUID feedId) {
@@ -119,6 +110,10 @@ public class FeedFacade {
         }
 
         // 파일 등록
+        feedPhotoUpload(file, users, feed);
+    }
+
+    private void feedPhotoUpload(MultipartFile file, Users users, Feed feed) {
         Optional.ofNullable(file)
             .map(files -> {
                 if (users.getPhotosLimit() + 1 == 20) throw new BadRequestException("더 이상 사진을 등록할 수 없습니다.");

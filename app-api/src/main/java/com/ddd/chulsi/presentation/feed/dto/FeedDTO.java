@@ -39,6 +39,8 @@ public class FeedDTO {
                 throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "tag");
             if (!icon.getSectionCode().equals(DefinedCode.C0004.getSectionCode()))
                 throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "icon");
+            if (time.toLocalDate().isAfter(LocalDateTime.now().toLocalDate()))
+                throw new BadRequestException("당일 날짜만 등록 가능합니다.", "time");
         }
     }
 
@@ -76,6 +78,8 @@ public class FeedDTO {
                 throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "tag");
             if (!icon.getSectionCode().equals(DefinedCode.C0004.getSectionCode()))
                 throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "icon");
+            if (time.toLocalDate().isAfter(LocalDateTime.now().toLocalDate()))
+                throw new BadRequestException("당일 날짜만 등록 가능합니다.", "time");
         }
     }
 }
