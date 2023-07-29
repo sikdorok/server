@@ -348,4 +348,30 @@ class UsersControllerTest extends ControllerTest {
 
     }
 
+    @Test
+    void accessToken_재발급() throws Exception {
+
+        given(usersFacade.accessToken(anyString())).willReturn("AccessToken");
+
+        mockMvc.perform(
+                post("/users/access-token")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "RefreshToken")
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("users/access-token",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.STRING).description("AccessToken")
+                )
+            ));
+
+    }
+
 }

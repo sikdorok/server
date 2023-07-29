@@ -94,3 +94,11 @@ include::{snippets}/users/email-check/path-parameters.adoc[]
 === Response
 include::{snippets}/users/email-check/response-fields.adoc[]
 include::{snippets}/users/email-check/response-body.adoc[]
+
+[[AccessToken_재발급]]
+== AccessToken 재발급
+=== Http
+include::{snippets}/users/access-token/http-request.adoc[]
+=== Response
+include::{snippets}/users/access-token/response-fields.adoc[]
+include::{snippets}/users/access-token/response-body.adoc[]

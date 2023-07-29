@@ -263,4 +263,17 @@ public class UsersFacade {
     public Boolean emailCheck(String email) {
         return usersService.duplicationCheckEmail(email);
     }
+
+    @Transactional(readOnly = true)
+    public String accessToken(String refreshToken) {
+        JWTClaim jwtClaim = jwtTokenUtil.getClaimsForRefreshToken(refreshToken, properties, true);
+
+        UUID userId = jwtClaim.getUsersId();
+
+        // 존재하는 유저인지 확인
+        Users users = usersService.findByUsersId(userId);
+        if (users == null) return null;
+
+        return jwtTokenUtil.createToken(jwtClaim, properties, true);
+    }
 }

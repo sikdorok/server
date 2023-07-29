@@ -101,4 +101,12 @@ public class UsersController {
         return BaseResponse.ofSuccess(usersFacade.emailCheck(email));
     }
 
+    @PostMapping(value = "/access-token", name = "Access Token 재발급")
+    public BaseResponse<String> accessToken(
+        @AuthToken String refreshToken
+    ) {
+        String accessToken = usersFacade.accessToken(refreshToken);
+        return BaseResponse.ofSuccess(accessToken);
+    }
+
 }
