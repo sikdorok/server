@@ -27,6 +27,15 @@ include::{snippets}/users/kakao/login/request-fields.adoc[]
 include::{snippets}/users/kakao/login/response-fields.adoc[]
 include::{snippets}/users/kakao/login/response-body.adoc[]
 
+[[카카오_로그인_회원가입_필요]]
+== 카카오 로그인 회원가입 필요
+include::{snippets}/users/kakao/login/need-sign-up/http-request.adoc[]
+=== Request
+include::{snippets}/users/kakao/login/need-sign-up/request-fields.adoc[]
+=== Response
+include::{snippets}/users/kakao/login/need-sign-up/response-fields.adoc[]
+include::{snippets}/users/kakao/login/need-sign-up/response-body.adoc[]
+
 [[로그아웃]]
 == 로그아웃
 include::{snippets}/users/logout/http-request.adoc[]

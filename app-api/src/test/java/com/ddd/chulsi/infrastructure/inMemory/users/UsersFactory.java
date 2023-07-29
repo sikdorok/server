@@ -3,6 +3,7 @@ package com.ddd.chulsi.infrastructure.inMemory.users;
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.domainCore.model.users.Users;
 import com.ddd.chulsi.domainCore.model.users.UsersInfo;
+import com.ddd.chulsi.infrastructure.oauth.OauthInfo;
 import com.ddd.chulsi.presentation.users.dto.UsersDTO;
 
 import java.time.LocalDateTime;
@@ -38,9 +39,14 @@ public class UsersFactory {
         return new UsersDTO.KakaoLoginResponse(true, usersInfoLogin);
     }
 
+    public static UsersDTO.KakaoLoginResponse givenKakaoLoginNeedSignUpResponse() {
+        OauthInfo.KakaoUserMeDTO kakaoUserMeDTO = new OauthInfo.KakaoUserMeDTO("닉네임", "team.sikdorok@gmail.com");
+        return new UsersDTO.KakaoLoginResponse(false, kakaoUserMeDTO);
+    }
+
     public static UsersDTO.LoginRequest givenLoginRequest() {
         return new UsersDTO.LoginRequest(
-            "sikdorok@chulsi.com",
+            "team.sikdorok@gmail.com",
             "qwer1234!"
         );
     }
@@ -48,7 +54,7 @@ public class UsersFactory {
     public static UsersDTO.Register givenRegisterRequest() {
         return new UsersDTO.Register(
             "닉네임",
-            "sikdorok@chulsi.com",
+            "team.sikdorok@gmail.com",
             "qwer1234!",
             "qwer1234!"
         );

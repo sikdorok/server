@@ -84,6 +84,41 @@ class UsersControllerTest extends ControllerTest {
     }
 
     @Test
+    void 카카오_로그인_회원가입_필요() throws Exception {
+
+        given(usersFacade.kakaoLogin(any(UsersCommand.LoginCommand.class), any(HttpServletResponse.class))).willReturn(givenKakaoLoginNeedSignUpResponse());
+
+        UsersDTO.OauthLoginRequest request = new UsersDTO.OauthLoginRequest("accessToken");
+
+        mockMvc.perform(
+                post("/users/kakao/login")
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("users/kakao/login/need-sign-up",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("accessToken").type(JsonFieldType.STRING).description("Kakao accessToken")
+                ),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("data.isRegistered").type(JsonFieldType.BOOLEAN).description("회원가입 유무"),
+                    fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 정보"),
+                    fieldWithPath("data.usersInfo.nickname").type(JsonFieldType.STRING).description("닉네임"),
+                    fieldWithPath("data.usersInfo.email").type(JsonFieldType.STRING).description("이메일")
+                )
+            ));
+
+    }
+
+    @Test
     void 로그아웃() throws Exception {
 
         doNothing().when(usersFacade).logout(anyString());
