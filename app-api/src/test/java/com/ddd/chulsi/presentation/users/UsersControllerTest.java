@@ -14,10 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
-
-import javax.print.attribute.DocAttribute;
 
 import java.util.UUID;
 
@@ -55,7 +52,7 @@ class UsersControllerTest extends ControllerTest {
 
         given(usersFacade.kakaoLogin(any(UsersCommand.LoginCommand.class), any(HttpServletResponse.class))).willReturn(givenKakaoLoginResponse());
 
-        UsersDTO.OauthLoginRequest request = new UsersDTO.OauthLoginRequest("authorizationCode");
+        UsersDTO.OauthLoginRequest request = new UsersDTO.OauthLoginRequest("accessToken");
 
         mockMvc.perform(
                 post("/users/kakao/login")
@@ -70,7 +67,7 @@ class UsersControllerTest extends ControllerTest {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestFields(
-                    fieldWithPath("authorizationCode").type(JsonFieldType.STRING).description("인가 코드")
+                    fieldWithPath("accessToken").type(JsonFieldType.STRING).description("Kakao accessToken")
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),

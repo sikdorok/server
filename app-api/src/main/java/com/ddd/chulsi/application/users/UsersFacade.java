@@ -122,8 +122,7 @@ public class UsersFacade {
 
     @Transactional(rollbackFor = Exception.class)
     public UsersDTO.KakaoLoginResponse kakaoLogin(UsersCommand.LoginCommand loginCommand, HttpServletResponse response) {
-        OauthInfo.KakaoInfoResponse kakaoInfoResponse = oauthKakaoService.getAccessToken(loginCommand.authorizationCode());
-        OauthInfo.KakaoUserMe kakaoUserMe = oauthKakaoService.getUserName(kakaoInfoResponse.accessToken());
+        OauthInfo.KakaoUserMe kakaoUserMe = oauthKakaoService.getUserName(loginCommand.accessToken());
 
         Users users = usersService.findByOauthTypeAndOauthId(DefinedCode.C000200001, kakaoUserMe.id());
         if (users == null) {
@@ -143,12 +142,12 @@ public class UsersFacade {
 
         OauthToken oauthToken = oauthTokenService.findByOauthTypeAndOauthId(DefinedCode.C000200001, kakaoUserMe.id());
         if (oauthToken == null) {
-            oauthTokenService.save(OauthToken.builder().oauthId(kakaoUserMe.id()).oauthType(DefinedCode.C000200001).accessToken(kakaoInfoResponse.accessToken()).build());
+            oauthTokenService.save(OauthToken.builder().oauthId(kakaoUserMe.id()).oauthType(DefinedCode.C000200001).accessToken(loginCommand.accessToken()).build());
         } else {
-            oauthToken.updateAccessToken(kakaoInfoResponse.accessToken());
+            oauthToken.updateAccessToken(loginCommand.accessToken());
         }
 
-        UsersDTO.LoginResponse loginResponse = usersLogin(new UsersInfo.UsersInfoLogin(users, kakaoInfoResponse.accessToken()), response);
+        UsersDTO.LoginResponse loginResponse = usersLogin(new UsersInfo.UsersInfoLogin(users, loginCommand.accessToken()), response);
 
         return new UsersDTO.KakaoLoginResponse<>(
             true,

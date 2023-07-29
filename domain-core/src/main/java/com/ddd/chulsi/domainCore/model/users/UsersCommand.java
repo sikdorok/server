@@ -5,11 +5,10 @@ import java.util.UUID;
 public class UsersCommand {
 
     public record LoginCommand (
-        String authorizationCode,
-        String state
+        String accessToken
     ) {
-        public static LoginCommand nonState(String authorizationCode) {
-            return new LoginCommand(authorizationCode, null);
+        public static LoginCommand nonState(String accessToken) {
+            return new LoginCommand(accessToken);
         }
     }
 

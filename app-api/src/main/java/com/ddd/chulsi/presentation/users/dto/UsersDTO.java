@@ -16,11 +16,11 @@ import java.util.UUID;
 public class UsersDTO {
 
     public record OauthLoginRequest (
-        @NotNull
-        String authorizationCode
+        @NotBlank
+        String accessToken
     ) {
         public UsersCommand.LoginCommand toCommand() {
-            return UsersCommand.LoginCommand.nonState(authorizationCode);
+            return UsersCommand.LoginCommand.nonState(accessToken);
         }
     }
 
