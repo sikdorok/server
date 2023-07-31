@@ -1,5 +1,6 @@
 package com.ddd.chulsi.domainCore.model.photos;
 
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,15 @@ public class PhotosServiceImpl implements PhotosService {
     @Override
     public void delete(Photos photos) {
         photosStore.delete(photos);
+    }
+
+    @Override
+    public Photos findByToken(UUID photosToken) {
+        return photosReader.findByToken(photosToken);
+    }
+
+    @Override
+    public List<Photos> findByTypeAndSubType(DefinedCode type, DefinedCode subType) {
+        return photosReader.findByTypeAndSubType(type, subType);
     }
 }

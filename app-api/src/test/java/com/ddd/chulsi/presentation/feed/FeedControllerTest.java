@@ -91,6 +91,7 @@ class FeedControllerTest extends ControllerTest {
                     fieldWithPath("data.feedInfo.isMain").type(JsonFieldType.BOOLEAN).description("대표 아이콘 설정 여부"),
                     fieldWithPath("data.feedInfo.photosInfoList[]").type(JsonFieldType.ARRAY).description("사진 정보 목록").optional(),
                     fieldWithPath("data.feedInfo.photosInfoList[].photosId").type(JsonFieldType.STRING).description("사진 고유번호"),
+                    fieldWithPath("data.feedInfo.photosInfoList[].token").type(JsonFieldType.STRING).description("사진 토큰"),
                     fieldWithPath("data.feedInfo.photosInfoList[].uploadFullPath").type(JsonFieldType.STRING).description("첨부파일 주소"),
                     fieldWithPath("data.feedInfo.photosLimit").type(JsonFieldType.NUMBER).description("현재 업로드한 사진 개수")
                 )

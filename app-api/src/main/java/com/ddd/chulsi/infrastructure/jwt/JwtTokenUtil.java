@@ -8,6 +8,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
+import com.ddd.chulsi.infrastructure.exception.BadRequestException;
 import com.ddd.chulsi.infrastructure.exception.InvalidJWTTokenException;
 import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -133,6 +134,12 @@ public class JwtTokenUtil {
 
     public JWTClaim checkAuth(String token, JWTProperties properties) {
         return checkNull(getClaims(token, properties, true));
+    }
+
+    public void checkAuthIsManager(String token, JWTProperties properties) {
+        JWTClaim jwtClaim = checkNull(getClaims(token, properties, true));
+        if (jwtClaim.getAuth() != DefinedCode.C000100001)
+            throw new BadRequestException();
     }
 
     public Long getExpiration(String token) {

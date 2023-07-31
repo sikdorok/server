@@ -78,7 +78,7 @@ public class UsersFacade {
     public UsersDTO.LoginResponse usersLogin(UsersInfo.UsersInfoLogin usersInfoLogin, HttpServletResponse response) {
         JWTClaim jwtClaim = JWTClaim.builder()
             .usersId(usersInfoLogin.getUsersId())
-            .auth(DefinedCode.C000100002)
+            .auth(usersInfoLogin.getAuth())
             .build();
 
         // Token 발행

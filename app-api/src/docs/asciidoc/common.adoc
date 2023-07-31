@@ -72,6 +72,10 @@ API 에 관계없이 아래 사항을 지켜주셔야 합니다.
 | Email Send Failed
 | 이메일 발송 실패
 
+| 511
+| Json De/Serialized Failed
+| 이메일 발송 실패
+
 | 700
 | Kakao Oauth 요청에 실패했습니다.
 | 카카오 - 서버 통신 실패
