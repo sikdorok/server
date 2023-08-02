@@ -14,19 +14,25 @@ import com.ddd.chulsi.infrastructure.exception.BadRequestException;
 import com.ddd.chulsi.infrastructure.jwt.JWTClaim;
 import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
+import com.ddd.chulsi.infrastructure.mapper.feed.FeedMapper;
 import com.ddd.chulsi.infrastructure.specification.feed.FeedSpecification;
 import com.ddd.chulsi.infrastructure.specification.users.UsersSpecification;
 import com.ddd.chulsi.infrastructure.util.CollectionUtils;
 import com.ddd.chulsi.presentation.feed.dto.FeedDTO;
-import jakarta.transaction.Transactional;
+import com.ddd.chulsi.presentation.shared.response.dto.PagingDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,8 +47,9 @@ public class FeedFacade {
     private final FeedService feedService;
     private final FeedSpecification feedSpecification;
     private final PhotosService photosService;
+    private final FeedMapper feedMapper;
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void register(String token, FeedCommand.RegisterCommand registerCommand, MultipartFile file) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
@@ -79,7 +86,7 @@ public class FeedFacade {
         );
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void infoUpdate(String token, FeedCommand.InfoUpdateCommand infoUpdateCommand, MultipartFile file) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
@@ -126,7 +133,7 @@ public class FeedFacade {
             });
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(String token, UUID feedId) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
@@ -149,4 +156,45 @@ public class FeedFacade {
 
         feedService.delete(feed);
     }
+
+    @Transactional(readOnly = true)
+    public FeedDTO.HomeResponse homeList(String token, FeedCommand.HomeCommand homeCommand) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+
+        UUID usersId = jwtClaim.getUsersId();
+
+        usersSpecification.findByUsersId(usersId);
+
+        // 이전달
+        List<List<FeedInfo.HomeInfo.WeeklyFeed>> prevWeeklyFeeds = feedService.weeklyList(usersId, homeCommand.getDate().minusMonths(1));
+
+        // 현재
+        List<List<FeedInfo.HomeInfo.WeeklyFeed>> weeklyFeeds = feedService.weeklyList(usersId, homeCommand.getDate());
+
+        // 다음달
+        List<List<FeedInfo.HomeInfo.WeeklyFeed>> nextWeeklyFeeds = feedService.weeklyList(usersId, homeCommand.getDate().plusMonths(1));
+
+        LinkedHashMap<String, List<List<FeedInfo.HomeInfo.WeeklyFeed>>> weeklyMap = new LinkedHashMap<>();
+        weeklyMap.put(homeCommand.getDate().minusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")), prevWeeklyFeeds);
+        weeklyMap.put(homeCommand.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM")), weeklyFeeds);
+        weeklyMap.put(homeCommand.getDate().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")), nextWeeklyFeeds);
+
+        // 목록 피드
+        Page<FeedInfo.HomeFeedItemDTO> feedList = feedService.findAllByUsersIdAndTime(usersId, homeCommand);
+        PagingDTO pagingDTO = feedMapper.toPagingDTO(feedList);
+        List<FeedInfo.HomeFeedItem> homeFeedItemList = feedMapper.toConvertDTO(feedList.getContent());
+
+        LinkedHashMap<DefinedCode, List<FeedInfo.HomeFeedItem>> dailyFeed = new LinkedHashMap<>();
+        dailyFeed.put(DefinedCode.C000300001, homeFeedItemList.stream().filter(item -> item.tag().equals(DefinedCode.C000300001)).collect(Collectors.toList()));
+        dailyFeed.put(DefinedCode.C000300002, homeFeedItemList.stream().filter(item -> item.tag().equals(DefinedCode.C000300002)).collect(Collectors.toList()));
+        dailyFeed.put(DefinedCode.C000300003, homeFeedItemList.stream().filter(item -> item.tag().equals(DefinedCode.C000300003)).collect(Collectors.toList()));
+        dailyFeed.put(DefinedCode.C000300004, homeFeedItemList.stream().filter(item -> item.tag().equals(DefinedCode.C000300004)).collect(Collectors.toList()));
+
+        return new FeedDTO.HomeResponse(
+            pagingDTO,
+            weeklyMap,
+            dailyFeed
+        );
+    }
+
 }

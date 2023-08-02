@@ -23,7 +23,6 @@ public class PhotosCustomRepositoryImpl implements PhotosCustomRepository {
         return queryFactory
             .select(Projections.constructor(
                 PhotosInfo.Info.class,
-                photos.photosId,
                 photos.token,
                 photos.uploadFullPath
             ))
