@@ -1,6 +1,7 @@
 package com.ddd.chulsi.domainCore.model.photos;
 
 import com.ddd.chulsi.domainCore.model.shared.DateColumn;
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,17 @@ public class Photos extends DateColumn {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "photosId", columnDefinition = "BINARY(16)")
     private UUID photosId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 10, nullable = false)
+    private DefinedCode type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subType", length = 10)
+    private DefinedCode subType;
+
+    @Column(name = "token", nullable = false, columnDefinition = "BINARY(16)")
+    private UUID token;
 
     @Column(name = "targetId", nullable = false, columnDefinition = "BINARY(16)")
     private UUID targetId;

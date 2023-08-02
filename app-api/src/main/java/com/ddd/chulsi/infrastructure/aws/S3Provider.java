@@ -14,7 +14,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -69,7 +68,7 @@ public class S3Provider implements FileProvider {
             final String ext = FileUtil.getFileExt(uploadFile);
             final long size = uploadFile.getSize();
             amazonS3.putObject(new PutObjectRequest(bucketName, uploadPath + "/" + uploadFileName, uploadFile.getInputStream(), objectMetadata));
-            final String uploadFullPath = endpoint + uploadPath + File.separator + uploadFileName;
+            final String uploadFullPath = endpoint + uploadPath + "/" + uploadFileName;
 
             return new FileInfoDTO(uploadPath, uploadFileName, originFileName, uploadFullPath, contentType, ext, size);
         } catch (IOException e) {

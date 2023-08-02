@@ -7,6 +7,7 @@ import com.ddd.chulsi.domainCore.model.feed.FeedService;
 import com.ddd.chulsi.domainCore.model.photos.Photos;
 import com.ddd.chulsi.domainCore.model.photos.PhotosInfo;
 import com.ddd.chulsi.domainCore.model.photos.PhotosService;
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.domainCore.model.users.Users;
 import com.ddd.chulsi.infrastructure.aws.FileProvider;
 import com.ddd.chulsi.infrastructure.exception.BadRequestException;
@@ -23,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -98,11 +98,11 @@ public class FeedFacade {
         }
 
         // 파일 삭제
-        if (!CollectionUtils.isEmpty(infoUpdateCommand.deletePhotoId())) {
-            Optional.of(infoUpdateCommand.deletePhotoId()).ifPresent(photosIds -> photosIds.forEach(photosId -> {
-                Photos photos = photosService.findByPhotosId(photosId);
+        if (!CollectionUtils.isEmpty(infoUpdateCommand.deletePhotoTokens())) {
+            Optional.of(infoUpdateCommand.deletePhotoTokens()).ifPresent(tokens -> tokens.forEach(photoToken -> {
+                Photos photos = photosService.findByToken(photoToken);
                 if (photos != null) {
-                    fileProvider.deleteFile(photos.getUploadPath() + File.separator + photos.getUploadFileName());
+                    fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
                     photosService.delete(photos);
                     users.photosLimitMinus();
                 }
@@ -120,7 +120,7 @@ public class FeedFacade {
                 return fileProvider.uploadFile("feed", files);
             })
             .ifPresent(fileInfoDTO -> {
-                Photos photos = fileInfoDTO.toPhotos(feed.getFeedId(), fileInfoDTO);
+                Photos photos = fileInfoDTO.toPhotos(DefinedCode.C000600001, null, feed.getFeedId(), fileInfoDTO);
                 photosService.register(photos);
                 users.photosLimitPlus();
             });
@@ -138,15 +138,15 @@ public class FeedFacade {
 
         List<PhotosInfo.Info> photosInfoList = photosService.findAllByTargetIdOrderByCreatedAtDesc(feed.getFeedId());
 
-        feedService.delete(feed);
-
         Optional.of(photosInfoList).ifPresent(photosInfos -> photosInfos.forEach(photosInfo -> {
-            Photos photos = photosService.findByPhotosId(photosInfo.photosId());
+            Photos photos = photosService.findByToken(photosInfo.token());
             if (photos != null) {
-                fileProvider.deleteFile(photos.getUploadPath() + File.separator + photos.getUploadFileName());
+                fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
                 photosService.delete(photos);
                 users.photosLimitMinus();
             }
         }));
+
+        feedService.delete(feed);
     }
 }

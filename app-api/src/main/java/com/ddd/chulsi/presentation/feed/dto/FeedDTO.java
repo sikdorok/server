@@ -66,10 +66,10 @@ public class FeedDTO {
         @NotNull
         DefinedCode icon,
         boolean isMain,
-        Set<UUID> deletePhotoId
+        Set<UUID> deletePhotoTokens
     ) implements Validator {
         public FeedCommand.InfoUpdateCommand toCommand() {
-            return FeedCommand.InfoUpdateCommand.nonState(feedId, tag, time, memo, icon, isMain, deletePhotoId);
+            return FeedCommand.InfoUpdateCommand.nonState(feedId, tag, time, memo, icon, isMain, deletePhotoTokens);
         }
 
         @Override

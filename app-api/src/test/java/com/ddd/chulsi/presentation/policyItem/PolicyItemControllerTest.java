@@ -1,10 +1,10 @@
-package com.ddd.chulsi.presentation.feed;
+package com.ddd.chulsi.presentation.policyItem;
 
-import com.ddd.chulsi.application.feed.FeedFacade;
-import com.ddd.chulsi.domainCore.model.feed.FeedCommand;
+import com.ddd.chulsi.application.policyItem.PolicyItemFacade;
+import com.ddd.chulsi.domainCore.model.policyItem.PolicyItemCommand;
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
-import com.ddd.chulsi.presentation.feed.dto.FeedDTO;
+import com.ddd.chulsi.presentation.policyItem.dto.PolicyItemDTO;
 import com.ddd.chulsi.presentation.shared.ControllerTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static com.ddd.chulsi.infrastructure.format.DocumentOptionalGenerator.*;
-import static com.ddd.chulsi.infrastructure.inMemory.feed.FeedFactory.*;
+import static com.ddd.chulsi.infrastructure.inMemory.policyItem.PolicyItemFactory.*;
 import static com.ddd.chulsi.infrastructure.util.ApiDocumentUtils.getDocumentRequest;
 import static com.ddd.chulsi.infrastructure.util.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,8 +40,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(FeedController.class)
-class FeedControllerTest extends ControllerTest {
+@WebMvcTest(PolicyItemController.class)
+class PolicyItemControllerTest extends ControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -49,50 +49,42 @@ class FeedControllerTest extends ControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private FeedFacade feedFacade;
+    private PolicyItemFacade policyItemFacade;
 
     @Test
     void 단일_조회() throws Exception {
 
-        given(feedFacade.info(anyString(), any(UUID.class))).willReturn(givenFeedInfoResponse());
+        given(policyItemFacade.info(any(UUID.class))).willReturn(givenPolicyItemInfoResponse());
 
         mockMvc.perform(
                 get(
-                    "/feed/{feedId}",
+                    "/policy-item/{policyItemId}",
                     UUID.randomUUID()
                 )
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
-                    .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100001)))
-                    .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100002)))
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(document("feed/info",
+            .andDo(document("policy-item/info",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 pathParameters(
-                    parameterWithName("feedId").description("피드 고유번호")
+                    parameterWithName("policyItemId").description("정책 아이템 고유번호")
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("소유자 닉네임"),
-                    fieldWithPath("data.feedInfo").type(JsonFieldType.OBJECT).description("피드 정보"),
-                    fieldWithPath("data.feedInfo.feedId").type(JsonFieldType.STRING).description("피드 고유번호"),
-                    fieldWithPath("data.feedInfo.isMine").type(JsonFieldType.BOOLEAN).description("소유권 여부"),
-                    fieldWithPath("data.feedInfo.tag").type(JsonFieldType.STRING).description("태그"),
-                    fieldWithPath("data.feedInfo.time").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("날짜 및 시간"),
-                    fieldWithPath("data.feedInfo.memo").type(JsonFieldType.STRING).description("내용").optional(),
-                    fieldWithPath("data.feedInfo.icon").type(JsonFieldType.STRING).description("대표 아이콘"),
-                    fieldWithPath("data.feedInfo.isMain").type(JsonFieldType.BOOLEAN).description("대표 아이콘 설정 여부"),
-                    fieldWithPath("data.feedInfo.photosInfoList[]").type(JsonFieldType.ARRAY).description("사진 정보 목록").optional(),
-                    fieldWithPath("data.feedInfo.photosInfoList[].token").type(JsonFieldType.STRING).description("사진 토큰"),
-                    fieldWithPath("data.feedInfo.photosInfoList[].uploadFullPath").type(JsonFieldType.STRING).description("첨부파일 주소"),
-                    fieldWithPath("data.feedInfo.photosLimit").type(JsonFieldType.NUMBER).description("현재 업로드한 사진 개수")
+                    fieldWithPath("data.policyItemId").type(JsonFieldType.STRING).description("정책 아이템 고유번호"),
+                    fieldWithPath("data.type").type(JsonFieldType.STRING).attributes(policyItemTypeFormat()).description("유형"),
+                    fieldWithPath("data.data").type(JsonFieldType.STRING).description("데이터").optional(),
+                    fieldWithPath("data.sort").type(JsonFieldType.NUMBER).description("정렬"),
+                    fieldWithPath("data.photosInfoList[]").type(JsonFieldType.ARRAY).description("태그").optional(),
+                    fieldWithPath("data.photosInfoList[].photosId").type(JsonFieldType.STRING).description("이미지 고유번호").optional(),
+                    fieldWithPath("data.photosInfoList[].token").type(JsonFieldType.STRING).description("이미지 토큰").optional(),
+                    fieldWithPath("data.photosInfoList[].uploadFullPath").type(JsonFieldType.STRING).description("이미지 경로").optional()
                 )
             ));
 
@@ -101,27 +93,26 @@ class FeedControllerTest extends ControllerTest {
     @Test
     void 등록() throws Exception {
 
-        doNothing().when(feedFacade).register(anyString(), any(FeedCommand.RegisterCommand.class), any(MultipartFile.class));
+        doNothing().when(policyItemFacade).register(anyString(), any(PolicyItemCommand.RegisterCommand.class), any(MultipartFile.class));
 
-        FeedDTO.FeedRegisterRequest feedRegisterRequest = givenRegisterRequest();
+        PolicyItemDTO.RegisterRequest policyItemRegisterRequest = givenRegisterRequest();
 
         MockMultipartFile file = new MockMultipartFile("file", "profile.png", "multipart/form-data", "uploadFile".getBytes(StandardCharsets.UTF_8));
-        MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(feedRegisterRequest).getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(policyItemRegisterRequest).getBytes(StandardCharsets.UTF_8));
 
         mockMvc.perform(
-                multipart("/feed")
+                multipart("/policy-item")
                     .file(file)
                     .file(request)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .accept(MediaType.APPLICATION_JSON)
                     .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
                     .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100001)))
-                    .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100002)))
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(document("feed/register",
+            .andDo(document("policy-item/register",
                 getDocumentRequest(),
                 getDocumentResponse(),requestParts(
                     partWithName("request").description("요청값"),
@@ -129,11 +120,9 @@ class FeedControllerTest extends ControllerTest {
                 ),
                 requestPartFields(
                     "request",
-                    fieldWithPath("tag").type(JsonFieldType.STRING).attributes(tagFormat()).description("태그"),
-                    fieldWithPath("time").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("등록시간"),
-                    fieldWithPath("memo").type(JsonFieldType.STRING).description("메모").optional(),
-                    fieldWithPath("icon").type(JsonFieldType.STRING).attributes(iconFormat()).description("대표 아이콘"),
-                    fieldWithPath("isMain").type(JsonFieldType.BOOLEAN).description("대표 아이콘 설정 여부")
+                    fieldWithPath("type").type(JsonFieldType.STRING).attributes(policyItemTypeFormat()).description("유형"),
+                    fieldWithPath("data").type(JsonFieldType.STRING).description("데이터").optional(),
+                    fieldWithPath("sort").type(JsonFieldType.NUMBER).description("정렬")
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
@@ -147,27 +136,26 @@ class FeedControllerTest extends ControllerTest {
     @Test
     void 수정() throws Exception {
 
-        doNothing().when(feedFacade).register(anyString(), any(FeedCommand.RegisterCommand.class), any(MultipartFile.class));
+        doNothing().when(policyItemFacade).register(anyString(), any(PolicyItemCommand.RegisterCommand.class), any(MultipartFile.class));
 
-        FeedDTO.FeedInfoUpdateRequest feedInfoUpdateRequest = givenInfoUpdateRequest();
+        PolicyItemDTO.UpdateRequest policyItemInfoUpdateRequest = givenUpdateRequest();
 
         MockMultipartFile file = new MockMultipartFile("file", "profile.png", "multipart/form-data", "uploadFile".getBytes(StandardCharsets.UTF_8));
-        MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(feedInfoUpdateRequest).getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(policyItemInfoUpdateRequest).getBytes(StandardCharsets.UTF_8));
 
         mockMvc.perform(
-                multipart(HttpMethod.PUT,"/feed")
+                multipart(HttpMethod.PUT,"/policy-item")
                     .file(file)
                     .file(request)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .accept(MediaType.APPLICATION_JSON)
                     .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
                     .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100001)))
-                    .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100002)))
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(document("feed/info-update",
+            .andDo(document("policy-item/info-update",
                 getDocumentRequest(),
                 getDocumentResponse(),requestParts(
                     partWithName("request").description("요청값"),
@@ -175,12 +163,10 @@ class FeedControllerTest extends ControllerTest {
                 ),
                 requestPartFields(
                     "request",
-                    fieldWithPath("feedId").type(JsonFieldType.STRING).description("피드 고유번호"),
-                    fieldWithPath("tag").type(JsonFieldType.STRING).attributes(tagFormat()).description("태그"),
-                    fieldWithPath("time").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("등록시간"),
-                    fieldWithPath("memo").type(JsonFieldType.STRING).description("메모").optional(),
-                    fieldWithPath("icon").type(JsonFieldType.STRING).attributes(iconFormat()).description("대표 아이콘"),
-                    fieldWithPath("isMain").type(JsonFieldType.BOOLEAN).description("대표 아이콘 설정 여부"),
+                    fieldWithPath("policyItemId").type(JsonFieldType.STRING).description("정책 아이템 고유번호"),
+                    fieldWithPath("type").type(JsonFieldType.STRING).attributes(policyItemTypeFormat()).description("유형"),
+                    fieldWithPath("data").type(JsonFieldType.STRING).description("데이터").optional(),
+                    fieldWithPath("sort").type(JsonFieldType.NUMBER).description("정렬"),
                     fieldWithPath("deletePhotoTokens").type(JsonFieldType.ARRAY).description("삭제할 사진 토큰").optional()
                 ),
                 responseFields(
@@ -195,27 +181,26 @@ class FeedControllerTest extends ControllerTest {
     @Test
     void 삭제() throws Exception {
 
-        doNothing().when(feedFacade).delete(anyString(), any(UUID.class));
+        doNothing().when(policyItemFacade).delete(anyString(), any(UUID.class));
 
         mockMvc.perform(
                 delete(
-                    "/feed/{feedId}",
+                    "/policy-item/{policyItemId}",
                     UUID.randomUUID()
                 )
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
                     .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100001)))
-                    .with(user("user").authorities((GrantedAuthority) () -> String.valueOf(DefinedCode.C000100002)))
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(document("feed/delete",
+            .andDo(document("policy-item/delete",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 pathParameters(
-                    parameterWithName("feedId").description("피드 고유번호")
+                    parameterWithName("policyItemId").description("정책 아이템 고유번호")
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),

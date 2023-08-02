@@ -1,6 +1,7 @@
 package com.ddd.chulsi.infrastructure.aws;
 
 import com.ddd.chulsi.domainCore.model.photos.Photos;
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 
 import java.util.UUID;
 
@@ -13,8 +14,11 @@ public record FileInfoDTO(
     String ext,
     long size
 ) {
-    public Photos toPhotos(UUID targetId, FileInfoDTO fileInfoDTO) {
+    public Photos toPhotos(DefinedCode type, DefinedCode subType, UUID targetId, FileInfoDTO fileInfoDTO) {
         return Photos.builder()
+            .type(type)
+            .subType(subType)
+            .token(UUID.randomUUID())
             .targetId(targetId)
             .uploadPath(fileInfoDTO.uploadPath)
             .uploadFileName(fileInfoDTO.uploadFileName)

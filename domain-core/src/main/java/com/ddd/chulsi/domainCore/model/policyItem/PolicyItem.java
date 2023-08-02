@@ -32,14 +32,14 @@ public class PolicyItem {
     @Column(name = "type", nullable = false, length = 10)
     private DefinedCode type;
 
-    @Column(name = "subject", length = 30)
-    private String subject;
-
-    @Column(name = "message", nullable = false)
-    private String message;
+    @Column(name = "data", length = 300)
+    private String data;
 
     @Builder.Default
     @Column(name = "sort", nullable = false)
     private int sort = 1;
+
+    @Column(name = "onOff", columnDefinition = "BIT(1) DEFAULT 0", nullable = false)
+    private boolean onOff;
 
 }

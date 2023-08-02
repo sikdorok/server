@@ -1,5 +1,6 @@
 package com.ddd.chulsi.domainCore.model.users;
 
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -13,6 +14,9 @@ public class UsersInfo {
     @Getter
     public static class UsersInfoLogin {
         private final UUID usersId;
+
+        @JsonIgnore
+        private final DefinedCode auth;
 
         @Setter
         private String accessToken;
@@ -31,6 +35,7 @@ public class UsersInfo {
 
         public UsersInfoLogin(Users users, String oauthAccessToken) {
             this.usersId = users.getUsersId();
+            this.auth = users.getAuth();
             this.oauthId = users.getOauthId();
             this.oauthAccessToken = oauthAccessToken;
             this.refreshToken = users.getRefreshToken();

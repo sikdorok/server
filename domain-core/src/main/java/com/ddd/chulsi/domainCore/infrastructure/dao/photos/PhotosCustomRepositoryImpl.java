@@ -24,6 +24,7 @@ public class PhotosCustomRepositoryImpl implements PhotosCustomRepository {
             .select(Projections.constructor(
                 PhotosInfo.Info.class,
                 photos.photosId,
+                photos.token,
                 photos.uploadFullPath
             ))
             .from(photos)
