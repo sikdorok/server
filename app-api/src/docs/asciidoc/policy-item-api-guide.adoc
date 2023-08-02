@@ -1,0 +1,55 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlights
+:toc: left
+:toclevels: 3
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+ifndef::snippets-custom[]
+:snippets-custom: ../../../src/docs/custom
+
+=== link:index.html[Home]
+include::{docdir}/common.adoc[]
+
+[[title]]
+= SDR API 문서 - 정책 아이템 API
+
+[[등록]]
+== 등록
+include::{snippets}/policy-item/register/http-request.adoc[]
+=== Request
+include::{snippets}/policy-item/register/request-part-request-fields.adoc[]
+=== Response
+include::{snippets}/policy-item/register/response-fields.adoc[]
+include::{snippets}/policy-item/register/response-body.adoc[]
+
+[[단일_조회]]
+== 단일 조회
+include::{snippets}/policy-item/info/http-request.adoc[]
+=== Request
+include::{snippets}/policy-item/info/path-parameters.adoc[]
+=== Response
+include::{snippets}/policy-item/info/response-fields.adoc[]
+include::{snippets}/policy-item/info/response-body.adoc[]
+
+[[수정]]
+== 수정
+include::{snippets}/policy-item/info-update/http-request.adoc[]
+=== Request
+include::{snippets}/policy-item/info-update/request-part-request-fields.adoc[]
+=== Response
+include::{snippets}/policy-item/info-update/response-fields.adoc[]
+include::{snippets}/policy-item/info-update/response-body.adoc[]
+
+[[삭제]]
+== 삭제
+include::{snippets}/policy-item/delete/http-request.adoc[]
+=== Request
+include::{snippets}/policy-item/delete/path-parameters.adoc[]
+=== Response
+include::{snippets}/policy-item/delete/response-fields.adoc[]
+include::{snippets}/policy-item/delete/response-body.adoc[]

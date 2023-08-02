@@ -5,7 +5,6 @@ import java.util.UUID;
 public class PhotosInfo {
 
     public record Info (
-        UUID photosId,
         UUID token,
         String uploadFullPath
     ) {

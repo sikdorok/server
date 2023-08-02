@@ -25,18 +25,13 @@ public class PhotosServiceImpl implements PhotosService {
     }
 
     @Override
-    public Photos findByPhotosId(UUID photosId) {
-        return photosReader.findByPhotosId(photosId);
+    public Photos findByToken(UUID token) {
+        return photosReader.findByToken(token);
     }
 
     @Override
     public void delete(Photos photos) {
         photosStore.delete(photos);
-    }
-
-    @Override
-    public Photos findByToken(UUID photosToken) {
-        return photosReader.findByToken(photosToken);
     }
 
     @Override

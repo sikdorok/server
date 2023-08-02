@@ -21,13 +21,8 @@ public class PhotosReaderImpl implements PhotosReader {
     }
 
     @Override
-    public Photos findByPhotosId(UUID photosId) {
-        return photosJpaRepository.findByPhotosId(photosId).orElse(null);
-    }
-
-    @Override
-    public Photos findByToken(UUID photosToken) {
-        return photosJpaRepository.findByToken(photosToken).orElse(null);
+    public Photos findByToken(UUID token) {
+        return photosJpaRepository.findByToken(token).orElse(null);
     }
 
     @Override

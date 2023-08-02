@@ -27,7 +27,7 @@ public class PolicyItemCustomRepositoryImpl implements PolicyItemCustomRepositor
     public List<PolicyItemInfo.PolicyItem> getList(DefinedCode type) {
         return queryFactory
             .selectFrom(policyItem)
-            .leftJoin(photos).on(photos.type.eq(policyItem.type).and(photos.subType.eq(DefinedCode.C000600002)).and(photos.targetId.eq(policyItem.policyItemId)))
+            .leftJoin(photos).on(photos.subType.eq(policyItem.type).and(photos.targetId.eq(policyItem.policyItemId)))
             .where(policyItem.type.eq(type))
             .orderBy(policyItem.sort.asc())
             .transform(

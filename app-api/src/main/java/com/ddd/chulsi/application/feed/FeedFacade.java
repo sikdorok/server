@@ -98,9 +98,9 @@ public class FeedFacade {
         }
 
         // 파일 삭제
-        if (!CollectionUtils.isEmpty(infoUpdateCommand.deletePhotoId())) {
-            Optional.of(infoUpdateCommand.deletePhotoId()).ifPresent(photosIds -> photosIds.forEach(photosId -> {
-                Photos photos = photosService.findByPhotosId(photosId);
+        if (!CollectionUtils.isEmpty(infoUpdateCommand.deletePhotoTokens())) {
+            Optional.of(infoUpdateCommand.deletePhotoTokens()).ifPresent(tokens -> tokens.forEach(photoToken -> {
+                Photos photos = photosService.findByToken(photoToken);
                 if (photos != null) {
                     fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
                     photosService.delete(photos);
@@ -139,7 +139,7 @@ public class FeedFacade {
         List<PhotosInfo.Info> photosInfoList = photosService.findAllByTargetIdOrderByCreatedAtDesc(feed.getFeedId());
 
         Optional.of(photosInfoList).ifPresent(photosInfos -> photosInfos.forEach(photosInfo -> {
-            Photos photos = photosService.findByPhotosId(photosInfo.photosId());
+            Photos photos = photosService.findByToken(photosInfo.token());
             if (photos != null) {
                 fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
                 photosService.delete(photos);

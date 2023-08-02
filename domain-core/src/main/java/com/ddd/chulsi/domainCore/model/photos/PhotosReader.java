@@ -9,9 +9,7 @@ public interface PhotosReader {
 
     List<PhotosInfo.Info> findAllByTargetIdOrderByCreatedAtDesc(UUID feedId);
 
-    Photos findByPhotosId(UUID photosId);
-
-    Photos findByToken(UUID photosToken);
+    Photos findByToken(UUID token);
 
     List<Photos> findByTypeAndSubType(DefinedCode type, DefinedCode subType);
 

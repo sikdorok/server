@@ -38,10 +38,10 @@ public class FeedCommand {
         String memo,
         DefinedCode icon,
         boolean isMain,
-        Set<UUID> deletePhotoId
+        Set<UUID> deletePhotoTokens
     ) {
-        public static InfoUpdateCommand nonState(UUID feedId, DefinedCode tag, LocalDateTime time, String memo, DefinedCode icon, boolean isMain, Set<UUID> deletePhotoId) {
-            return new InfoUpdateCommand(feedId, tag, time, memo, icon, isMain, deletePhotoId);
+        public static InfoUpdateCommand nonState(UUID feedId, DefinedCode tag, LocalDateTime time, String memo, DefinedCode icon, boolean isMain, Set<UUID> deletePhotoTokens) {
+            return new InfoUpdateCommand(feedId, tag, time, memo, icon, isMain, deletePhotoTokens);
         }
     }
 

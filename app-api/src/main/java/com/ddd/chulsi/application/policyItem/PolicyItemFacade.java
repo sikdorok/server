@@ -57,8 +57,8 @@ public class PolicyItemFacade {
         if (policyItem == null) throw new NotFoundException();
 
         // 파일 삭제
-        if (!CollectionUtils.isEmpty(infoUpdateCommand.deleteUploadToken())) {
-            Optional.of(infoUpdateCommand.deleteUploadToken()).ifPresent(uploadTokens -> uploadTokens.forEach(photosToken -> {
+        if (!CollectionUtils.isEmpty(infoUpdateCommand.deletePhotoTokens())) {
+            Optional.of(infoUpdateCommand.deletePhotoTokens()).ifPresent(uploadTokens -> uploadTokens.forEach(photosToken -> {
                 Photos photos = photosService.findByToken(photosToken);
                 if (photos != null) {
                     fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
@@ -92,16 +92,14 @@ public class PolicyItemFacade {
     }
 
     @Transactional(readOnly = true)
-    public PolicyItemDTO.PolicyItemInfoResponse info(String token, UUID policyItemId) {
-        jwtTokenUtil.checkAuthIsManager(token, properties);
-
+    public PolicyItemDTO.PolicyItemInfoResponse info(UUID policyItemId) {
         PolicyItem policyItem = policyItemService.findByPolicyItemId(policyItemId);
         if (policyItem == null) throw new NotFoundException();
 
         List<Photos> photosList = photosService.findByTypeAndSubType(DefinedCode.C000600002, policyItem.getType());
         List<PhotosInfo.Info> photosInfoList = null;
         if (!CollectionUtils.isEmpty(photosList))
-            photosInfoList = photosList.stream().map(photos -> new PhotosInfo.Info(photos.getPhotosId(), photos.getToken(), photos.getUploadFullPath())).collect(Collectors.toList());
+            photosInfoList = photosList.stream().map(photos -> new PhotosInfo.Info(photos.getToken(), photos.getUploadFullPath())).collect(Collectors.toList());
 
         return new PolicyItemDTO.PolicyItemInfoResponse(
             policyItem.getPolicyItemId(),
@@ -113,8 +111,7 @@ public class PolicyItemFacade {
     }
 
     @Transactional(readOnly = true)
-    public PolicyItemDTO.PolicyItemListResponse list(String token, DefinedCode type) {
-        jwtTokenUtil.checkAuthIsManager(token, properties);
+    public PolicyItemDTO.PolicyItemListResponse list(DefinedCode type) {
         return new PolicyItemDTO.PolicyItemListResponse(policyItemService.getList(type));
     }
 }

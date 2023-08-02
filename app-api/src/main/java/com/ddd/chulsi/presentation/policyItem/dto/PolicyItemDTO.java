@@ -47,10 +47,10 @@ public class PolicyItemDTO {
 
         @Min(1)
         int sort,
-        Set<UUID> deleteUploadToken
+        Set<UUID> deletePhotoTokens
     ) implements Validator {
         public PolicyItemCommand.InfoUpdateCommand toCommand() {
-            return new PolicyItemCommand.InfoUpdateCommand(policyItemId, type, data, sort, deleteUploadToken);
+            return new PolicyItemCommand.InfoUpdateCommand(policyItemId, type, data, sort, deletePhotoTokens);
         }
 
         @Override

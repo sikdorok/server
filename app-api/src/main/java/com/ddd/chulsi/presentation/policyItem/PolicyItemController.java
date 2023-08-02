@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/policy", name = "정책")
+@RequestMapping(value = "/policy-item", name = "정책")
 @RequiredArgsConstructor
 public class PolicyItemController {
 
@@ -24,18 +24,16 @@ public class PolicyItemController {
 
     @GetMapping(value = "/list/{type}", name = "목록 조회")
     public BaseResponse<PolicyItemDTO.PolicyItemListResponse> list(
-        @AuthToken String token,
         @PathVariable @NotBlank DefinedCode type
-        ) {
-        return BaseResponse.ofSuccess(policyItemFacade.list(token, type));
+    ) {
+        return BaseResponse.ofSuccess(policyItemFacade.list(type));
     }
 
     @GetMapping(value = "{policyItemId}", name = "조회")
     public BaseResponse<PolicyItemDTO.PolicyItemInfoResponse> info(
-        @AuthToken String token,
         @PathVariable @NotBlank UUID policyItemId
     ) {
-        return BaseResponse.ofSuccess(policyItemFacade.info(token, policyItemId));
+        return BaseResponse.ofSuccess(policyItemFacade.info(policyItemId));
     }
 
     @PostMapping(name = "등록")

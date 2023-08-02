@@ -11,11 +11,9 @@ public interface PhotosService {
 
     List<PhotosInfo.Info> findAllByTargetIdOrderByCreatedAtDesc(UUID feedId);
 
-    Photos findByPhotosId(UUID photosId);
-
     void delete(Photos photos);
 
-    Photos findByToken(UUID photosToken);
+    Photos findByToken(UUID token);
 
     List<Photos> findByTypeAndSubType(DefinedCode type, DefinedCode subType);
 

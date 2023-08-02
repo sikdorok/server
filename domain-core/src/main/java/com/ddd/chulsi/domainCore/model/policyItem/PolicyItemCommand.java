@@ -27,7 +27,7 @@ public class PolicyItemCommand {
         DefinedCode type,
         String data,
         int sort,
-        Set<UUID> deleteUploadToken
+        Set<UUID> deletePhotoTokens
     ) {
     }
 
