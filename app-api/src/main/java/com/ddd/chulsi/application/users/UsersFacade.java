@@ -9,6 +9,7 @@ import com.ddd.chulsi.domainCore.model.users.UsersCommand;
 import com.ddd.chulsi.domainCore.model.users.UsersInfo;
 import com.ddd.chulsi.domainCore.model.users.UsersService;
 import com.ddd.chulsi.infrastructure.exception.*;
+import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import com.ddd.chulsi.infrastructure.jwt.JWTClaim;
 import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
@@ -119,6 +120,12 @@ public class UsersFacade {
         users.updateLastLoginAt();
     }
 
+    public String kakaoAccessToken(String code) {
+        OauthInfo.KakaoInfoResponse kakaoInfoResponse = oauthKakaoService.getAccessToken(code);
+        if (kakaoInfoResponse == null) throw new OauthException(700, ErrorMessage.OAUTH_REQUEST_FAILED);
+        return kakaoInfoResponse.accessToken();
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public UsersDTO.KakaoLoginResponse kakaoLogin(UsersCommand.LoginCommand loginCommand, HttpServletResponse response) {
@@ -128,15 +135,16 @@ public class UsersFacade {
         if (users == null) {
             // 존재하지 않는 회원이면 회원가입 처리를 위해 데이터 Return
             String nickname = kakaoUserMe.kakaoAccount().kakaoProfile().nickname();
-            String email = kakaoUserMe.kakaoAccount().isEmailValid() && kakaoUserMe.kakaoAccount().isEmailVerified() ? kakaoUserMe.kakaoAccount().email() : null;
+            String email = kakaoUserMe.kakaoAccount().email();
+            boolean isValidEmail = kakaoUserMe.kakaoAccount().isEmailValid() && kakaoUserMe.kakaoAccount().isEmailVerified();
 
             // 이메일 중복검사
             if (email != null) {
                 Users duplicationCheckByEmail = usersService.findByEmail(email);
-                if (duplicationCheckByEmail != null) email = null;
+                if (duplicationCheckByEmail != null) isValidEmail = false;
             }
 
-            OauthInfo.KakaoUserMeDTO kakaoUserMeDTO = new OauthInfo.KakaoUserMeDTO(nickname, email);
+            OauthInfo.KakaoUserMeDTO kakaoUserMeDTO = new OauthInfo.KakaoUserMeDTO(nickname, email, isValidEmail);
             return new UsersDTO.KakaoLoginResponse<>(false, kakaoUserMeDTO);
         }
 

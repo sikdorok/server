@@ -59,6 +59,7 @@ public class OauthInfo {
 
     public record KakaoUserMeDTO (
        String nickname,
-       String email
+       String email,
+       boolean isValidEmail
     ) {}
 }

@@ -112,7 +112,8 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("data.isRegistered").type(JsonFieldType.BOOLEAN).description("회원가입 유무"),
                     fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 정보"),
                     fieldWithPath("data.usersInfo.nickname").type(JsonFieldType.STRING).description("닉네임"),
-                    fieldWithPath("data.usersInfo.email").type(JsonFieldType.STRING).description("이메일")
+                    fieldWithPath("data.usersInfo.email").type(JsonFieldType.STRING).description("이메일"),
+                    fieldWithPath("data.usersInfo.isValidEmail").type(JsonFieldType.BOOLEAN).description("이메일 유효성")
                 )
             ));
 
