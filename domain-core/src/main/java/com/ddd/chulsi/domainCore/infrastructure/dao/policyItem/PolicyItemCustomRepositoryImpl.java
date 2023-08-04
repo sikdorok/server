@@ -42,7 +42,6 @@ public class PolicyItemCustomRepositoryImpl implements PolicyItemCustomRepositor
                             list(
                                 Projections.constructor(
                                     PhotosInfo.Info.class,
-                                    photos.photosId,
                                     photos.token,
                                     photos.uploadFullPath
                                 )

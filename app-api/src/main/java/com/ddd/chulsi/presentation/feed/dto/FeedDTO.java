@@ -5,11 +5,19 @@ import com.ddd.chulsi.domainCore.model.feed.FeedInfo;
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.infrastructure.exception.BadRequestException;
 import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
+import com.ddd.chulsi.presentation.shared.request.PageAndSizeRequest;
 import com.ddd.chulsi.presentation.shared.request.Validator;
+import com.ddd.chulsi.presentation.shared.response.dto.PagingDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -80,6 +88,45 @@ public class FeedDTO {
                 throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "icon");
             if (time.toLocalDate().isAfter(LocalDateTime.now().toLocalDate()))
                 throw new BadRequestException("당일 날짜만 등록 가능합니다.", "time");
+        }
+    }
+
+    public record MonthlyResponse(
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        LocalDate date,
+        List<FeedInfo.WeeklyCover> weeklyCovers
+    ) {
+    }
+
+    public record ListResponse(
+        PagingDTO paging,
+        List<FeedInfo.HomeFeedItem> dailyFeeds
+    ) {
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ListRequest extends PageAndSizeRequest implements Validator {
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        LocalDate date;
+
+        @NotNull
+        DefinedCode tag;
+
+        public FeedCommand.ListCommand toCommand() {
+            return FeedCommand.ListCommand.builder()
+                .page(getPage())
+                .size(getSize())
+                .date(date)
+                .tag(tag)
+                .build();
+        }
+
+        @Override
+        public void verify() {
+            if (!tag.getSectionCode().equals(DefinedCode.C0003.getSectionCode()))
+                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG, "tag");
         }
     }
 }

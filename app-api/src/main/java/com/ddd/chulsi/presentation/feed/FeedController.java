@@ -21,15 +21,6 @@ public class FeedController {
 
     private final FeedFacade feedFacade;
 
-//    @GetMapping(value = "/list", name = "정보 목록 조회")
-//    public BaseResponse<FeedDTO.FeedListResponse> list(
-//        @AuthToken String token,
-//        @Valid FeedDTO.FeedListRequest request
-//    ) {
-//        FeedCommand.ListCommand listCommand = request.toCommand();
-//        return BaseResponse.ofSuccess(feedFacade.list(token, listCommand));
-//    }
-
     @GetMapping(value = "{feedId}", name = "정보 조회")
     public BaseResponse<FeedDTO.FeedInfoResponse> info(
         @AuthToken String token,

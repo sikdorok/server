@@ -14,16 +14,20 @@ import com.ddd.chulsi.infrastructure.exception.BadRequestException;
 import com.ddd.chulsi.infrastructure.jwt.JWTClaim;
 import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
+import com.ddd.chulsi.infrastructure.mapper.feed.FeedMapper;
 import com.ddd.chulsi.infrastructure.specification.feed.FeedSpecification;
 import com.ddd.chulsi.infrastructure.specification.users.UsersSpecification;
 import com.ddd.chulsi.infrastructure.util.CollectionUtils;
 import com.ddd.chulsi.presentation.feed.dto.FeedDTO;
-import jakarta.transaction.Transactional;
+import com.ddd.chulsi.presentation.shared.response.dto.PagingDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,8 +45,9 @@ public class FeedFacade {
     private final FeedService feedService;
     private final FeedSpecification feedSpecification;
     private final PhotosService photosService;
+    private final FeedMapper feedMapper;
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void register(String token, FeedCommand.RegisterCommand registerCommand, MultipartFile file) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
@@ -79,7 +84,7 @@ public class FeedFacade {
         );
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void infoUpdate(String token, FeedCommand.InfoUpdateCommand infoUpdateCommand, MultipartFile file) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
@@ -126,7 +131,7 @@ public class FeedFacade {
             });
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(String token, UUID feedId) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
@@ -149,4 +154,35 @@ public class FeedFacade {
 
         feedService.delete(feed);
     }
+
+    @Transactional(readOnly = true)
+    public FeedDTO.MonthlyResponse monthly(String token, LocalDate date) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+
+        UUID usersId = jwtClaim.getUsersId();
+        usersSpecification.findByUsersId(usersId);
+
+        return new FeedDTO.MonthlyResponse(
+            date,
+            feedService.weeklyList(usersId, date)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public FeedDTO.ListResponse list(String token, FeedCommand.ListCommand listCommand) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+
+        UUID usersId = jwtClaim.getUsersId();
+        usersSpecification.findByUsersId(usersId);
+
+        Page<FeedInfo.HomeFeedItemDTO> feedList = feedService.findAllByUsersIdAndTime(usersId, listCommand);
+        PagingDTO paging = feedMapper.toPagingDTO(feedList);
+        List<FeedInfo.HomeFeedItem> dailyFeeds = feedMapper.toConvertDTO(feedList.getContent());
+
+        return new FeedDTO.ListResponse(
+            paging,
+            dailyFeeds
+        );
+    }
+
 }

@@ -17,6 +17,10 @@ public class DocumentOptionalGenerator {
         return setFormat("yyyy-MM-dd HH:mm:ss");
     }
 
+    public static Attributes.Attribute dateFormatYYYYMMDD() {
+        return setFormat("yyyy-MM-dd");
+    }
+
     public static Attributes.Attribute tagFormat() {
         return setFormat("C000300001 : 아침, C000300002 : 점심, C000300003 : 저녁, C000300004 : 간식");
     }

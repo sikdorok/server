@@ -1,7 +1,10 @@
 package com.ddd.chulsi.domainCore.model.feed;
 
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
+import lombok.Builder;
+import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -45,4 +48,12 @@ public class FeedCommand {
         }
     }
 
+    @Getter
+    @Builder
+    public static class ListCommand {
+        private final int page;
+        private final int size;
+        private final LocalDate date;
+        private final DefinedCode tag;
+    }
 }

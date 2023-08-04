@@ -3,6 +3,9 @@ package com.ddd.chulsi.infrastructure.util;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import static java.time.temporal.TemporalAdjusters.nextOrSame;
@@ -73,6 +76,44 @@ public class DateUtil {
 
     public static LocalDate getLastDateOfMonth(YearMonth yearMonth) {
         return yearMonth.atEndOfMonth();
+    }
+
+    /**
+     * 해당 연도-월(yearMonth)과 주(week) 값을 받아서 해당 주의 1주일치 날짜 목록을 반환하는 메서드입니다.
+     * 주의 첫번째와 마지막 날짜가 7개가 아닐 경우, 이전 달과 다음 달에서 날짜를 채워서 반환합니다.
+     *
+     * @param yearMonth LocalDate 타입의 연도-월 값
+     * @param week int 타입의 주(week) 값
+     * @return 해당 주의 1주일치 날짜 목록
+     */
+    public static List<LocalDate> getWeekDays(LocalDate yearMonth, int week) {
+        List<LocalDate> weekDates = new ArrayList<>();
+        LocalDate firstDayOfMonth = yearMonth.withDayOfMonth(1);
+        LocalDate lastDayOfMonth = yearMonth.with(TemporalAdjusters.lastDayOfMonth());
+        LocalDate firstDateOfWeek = firstDayOfMonth.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        firstDateOfWeek = firstDateOfWeek.plusWeeks(week - 1);
+
+        for (int i = 0; i < 7; i++) {
+            weekDates.add(firstDateOfWeek.plusDays(i));
+        }
+
+        // 주의 첫번째 날짜가 이전 달의 날짜인 경우, 이전 달에서 남은 날짜를 채웁니다.
+        if (weekDates.get(0).isBefore(firstDayOfMonth)) {
+            LocalDate previousMonthLastDay = firstDayOfMonth.minusDays(1);
+            for (int i = 0; i < 7 - weekDates.size(); i++) {
+                weekDates.add(i, previousMonthLastDay.minusDays(6 - i));
+            }
+        }
+
+        // 주의 마지막 날짜가 다음 달의 날짜인 경우, 다음 달에서 남은 날짜를 채웁니다.
+        if (weekDates.get(weekDates.size() - 1).isAfter(lastDayOfMonth)) {
+            LocalDate nextMonthFirstDay = lastDayOfMonth.plusDays(1);
+            for (int i = 0; i < 7 - weekDates.size(); i++) {
+                weekDates.add(nextMonthFirstDay.plusDays(i));
+            }
+        }
+
+        return weekDates;
     }
 
 }
