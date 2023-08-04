@@ -19,10 +19,9 @@ public class UsersController {
 
     private final UsersFacade usersFacade;
 
-    // TODO : 클라로 변경 시 제거
     @GetMapping
-    public String test(@RequestParam("code") String code) {
-        return code;
+    public String kakaoAuthCode(@RequestParam("code") String code) {
+        return usersFacade.kakaoAccessToken(code);
     }
 
     @PostMapping(value = "/kakao/login", name = "카카오 로그인")

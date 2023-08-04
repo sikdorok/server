@@ -33,15 +33,15 @@ public class UsersFactory {
         return new UsersDTO.LoginResponse(true, usersInfoLogin);
     }
 
-    public static UsersDTO.KakaoLoginResponse givenKakaoLoginResponse() {
+    public static UsersDTO.KakaoLoginResponse<UsersInfo.UsersInfoLogin> givenKakaoLoginResponse() {
         UsersInfo.UsersInfoLogin usersInfoLogin = new UsersInfo.UsersInfoLogin(givenUsers(), "oauth access token");
         usersInfoLogin.setAccessToken("access Token");
-        return new UsersDTO.KakaoLoginResponse(true, usersInfoLogin);
+        return new UsersDTO.KakaoLoginResponse<>(true, usersInfoLogin);
     }
 
-    public static UsersDTO.KakaoLoginResponse givenKakaoLoginNeedSignUpResponse() {
-        OauthInfo.KakaoUserMeDTO kakaoUserMeDTO = new OauthInfo.KakaoUserMeDTO("닉네임", "team.sikdorok@gmail.com");
-        return new UsersDTO.KakaoLoginResponse(false, kakaoUserMeDTO);
+    public static UsersDTO.KakaoLoginResponse<OauthInfo.KakaoUserMeDTO> givenKakaoLoginNeedSignUpResponse() {
+        OauthInfo.KakaoUserMeDTO kakaoUserMeDTO = new OauthInfo.KakaoUserMeDTO("닉네임", "team.sikdorok@gmail.com", true);
+        return new UsersDTO.KakaoLoginResponse<>(false, kakaoUserMeDTO);
     }
 
     public static UsersDTO.LoginRequest givenLoginRequest() {
