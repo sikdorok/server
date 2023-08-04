@@ -254,7 +254,7 @@ class UsersControllerTest extends ControllerTest {
     @Test
     void 비밀번호_찾기() throws Exception {
 
-        doNothing().when(usersFacade).passwordFind(any(UsersCommand.PasswordFind.class));
+        given(usersFacade.passwordFind(any(UsersCommand.PasswordFind.class))).willReturn(true);
 
         UsersDTO.PasswordFindRequest request = new UsersDTO.PasswordFindRequest("team.sikdorok@gmail.com");
 
@@ -276,7 +276,7 @@ class UsersControllerTest extends ControllerTest {
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
-                    fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
+                    fieldWithPath("data").type(JsonFieldType.BOOLEAN).description("전송 결과")
                 )
             ));
 
