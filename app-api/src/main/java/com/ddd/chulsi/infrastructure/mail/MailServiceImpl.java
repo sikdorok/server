@@ -38,39 +38,32 @@ public class MailServiceImpl implements MailService {
                 // 3. 메일 내용 설정
                 // HTML 적용됨
                 String content = """
-                   <!DOCTYPE html>
+                    <!DOCTYPE html>
                    <html lang="ko">
                    
                    <head>
-                       <meta charset="UTF-8">
-                       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                       <title>식도록</title>
+                      <meta charset="UTF-8">
+                      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                      <title>식도록</title>
                    </head>
                    
                    <body>
-                       <div style="width: 640px; height: 460px;">
-                           <div style="width: 120px;">
-                               <img src="{images-directory}/sikdorok_logo.png" alt="sikdorok" style="width: 100%;">
-                               <div style="color: #00CC8F; font-size: 16px; margin-top: 4px;"><b>비밀번호 재설정</b></div>
-                           </div>
-                           <div style="margin-top: 40px;">
-                               <b>{nickname}</b>님 안녕하세요.<br />
-                               아래 버튼을 선택하여 비밀번호를 재설정해주세요.
-                           </div>
-                           <a href="{password-reset-url}" target="_blank" style="text-decoration: unset; display: inline-block;">
-                               <div style="margin-top: 20px; width: 200px; height: 50px; border-radius: 4px; background-color: #00CC8F; border-color: #FFF; border-width: 0px; font-size: 16px; color: #FFF; display: block; text-align: center; line-height: 50px;">비밀번호 재설정하기</div>
-                           </a>
-                           <div style="margin-top: 20px;">
-                               <span style="color: #808080;">(비밀번호 재설정 링크는 1시간 동안 유효합니다.)</span>
-                           </div>
-                           <div style="margin-top: 40px;">
-                               <img src="{images-directory}/strap.png" alt="strap">
-                           </div>
-                           <div style="margin-top: 20px;">
-                               <span style="color: #808080;">문의사항은 team.sikdorok@gmail.com으로 연락 주시기 바랍니다.</span><br />
-                               <span style="color: #808080;">&copy; sikdorok All rights reserved.</span>
-                           </div>
-                       </div>
+                      <div style="width: 640px; height: 460px;">
+                          <div style="width: 240px;">
+                              <div style="color: #3C3025; font-size: 28px; padding: 16px 0px;"><b>비밀번호 재설정</b></div>
+                          </div>
+                          <div style="margin-top: 40px;">
+                              <b>{nickname}</b>님 안녕하세요.<br />
+                              아래 버튼을 선택하여 비밀번호를 재설정해주세요.
+                          </div>
+                          <a href="{password-reset-url}" target="_blank" style="text-decoration: unset; display: inline-block;">
+                              <div style="margin-top: 20px; width: 200px; height: 50px; border-radius: 4px; background-color: #3C3025; border-color: #FFF; border-width: 0px; font-size: 16px; color: #FFF; display: block; text-align: center; line-height: 50px;">비밀번호 재설정하기</div>
+                          </a>
+                          <div style="margin-top: 40px;">
+                               <span style="color: #808080;">(비밀번호 재설정 링크는 1시간 동안 유효합니다.)</span><br />
+                              <span style="color: #808080;">문의사항은 <a href="mailto:team.sikdorok@gmail.com" target="_blank">team.sikdorok@gmail.com</a>으로 연락 주시기 바랍니다.</span>
+                          </div>
+                      </div>
                    </body>
                    
                    </html>
