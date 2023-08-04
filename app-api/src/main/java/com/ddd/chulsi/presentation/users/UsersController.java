@@ -69,12 +69,11 @@ public class UsersController {
     }
 
     @PostMapping(value = "/password-find", name = "비밀번호 찾기")
-    public BaseResponse<Void> passwordFind(
+    public BaseResponse<Boolean> passwordFind(
         @RequestBody @Valid UsersDTO.PasswordFindRequest passwordFindRequest
     ) {
         UsersCommand.PasswordFind passwordFind = passwordFindRequest.toCommand();
-        usersFacade.passwordFind(passwordFind);
-        return BaseResponse.ofSuccess();
+        return BaseResponse.ofSuccess(usersFacade.passwordFind(passwordFind));
     }
 
     @PostMapping(value = "/password-link-alive", name = "비밀번호 재설정 링크 유효성 검사")

@@ -200,7 +200,7 @@ public class UsersFacade {
     }
 
     @Transactional(readOnly = true)
-    public void passwordFind(UsersCommand.PasswordFind passwordFind) {
+    public boolean passwordFind(UsersCommand.PasswordFind passwordFind) {
         Users users = usersService.findByEmail(passwordFind.email());
         if (users == null) throw new NotFoundException();
 
@@ -222,8 +222,7 @@ public class UsersFacade {
             throw new SlackNotificationHandler("Redis Server Error");
         }
 
-        boolean result = mailService.sendMail(Collections.singletonList(users), code);
-        if (!result) throw new EmailSendFailedException();
+        return mailService.sendMail(Collections.singletonList(users), code);
     }
 
     @Transactional(rollbackFor = Exception.class)
