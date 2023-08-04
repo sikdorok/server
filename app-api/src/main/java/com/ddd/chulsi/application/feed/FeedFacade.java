@@ -20,6 +20,7 @@ import com.ddd.chulsi.infrastructure.specification.users.UsersSpecification;
 import com.ddd.chulsi.infrastructure.util.CollectionUtils;
 import com.ddd.chulsi.presentation.feed.dto.FeedDTO;
 import com.ddd.chulsi.presentation.shared.response.dto.PagingDTO;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -66,17 +67,28 @@ public class FeedFacade {
     }
 
     public FeedDTO.FeedInfoResponse info(String token, UUID feedId) {
-        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+        Feed feed = feedSpecification.findByFeedId(feedId);
 
-        UUID usersId = jwtClaim.getUsersId();
+        boolean isMine = false;
+        UUID usersId = null;
+        int photosLimit = 0;
+
+        if (StringUtils.isNotBlank(token)) {
+            if (token.startsWith(JwtTokenUtil.PREFIX)) token = token.replace(JwtTokenUtil.PREFIX, "");
+            JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+            usersId = jwtClaim.getUsersId();
+            if (feed.getUsersId().equals(usersId)) isMine = true;
+        }
+
+        if (usersId == null) usersId = feed.getUsersId();
 
         Users users = usersSpecification.findByUsersId(usersId);
 
-        Feed feed = feedSpecification.findByFeedId(feedId);
+        if (isMine) photosLimit = users.getPhotosLimit();
 
         List<PhotosInfo.Info> photosInfoList = photosService.findAllByTargetIdOrderByCreatedAtDesc(feed.getFeedId());
 
-        FeedInfo.FeedInfoDTO feedInfoDTO = FeedInfo.FeedInfoDTO.toDTO(feed, usersId, photosInfoList, users.getPhotosLimit());
+        FeedInfo.FeedInfoDTO feedInfoDTO = FeedInfo.FeedInfoDTO.toDTO(feed, isMine, photosInfoList, photosLimit);
 
         return new FeedDTO.FeedInfoResponse(
             users.getName(),
