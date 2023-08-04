@@ -56,7 +56,7 @@ public class FeedFactory {
     public static FeedInfo.FeedInfoDTO givenFeedInfo() {
         return FeedInfo.FeedInfoDTO.toDTO(
             givenFeed(),
-            UUID.randomUUID(),
+            true,
             givenPhotosInfoList(),
             0
         );

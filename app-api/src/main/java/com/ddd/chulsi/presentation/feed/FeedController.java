@@ -8,6 +8,7 @@ import com.ddd.chulsi.presentation.shared.response.dto.BaseResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +24,7 @@ public class FeedController {
 
     @GetMapping(value = "{feedId}", name = "정보 조회")
     public BaseResponse<FeedDTO.FeedInfoResponse> info(
-        @AuthToken String token,
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token,
         @PathVariable @NotNull UUID feedId
     ) {
         return BaseResponse.ofSuccess(feedFacade.info(token, feedId));

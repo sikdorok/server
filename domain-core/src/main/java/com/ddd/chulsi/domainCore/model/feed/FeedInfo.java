@@ -25,10 +25,10 @@ public class FeedInfo {
         List<PhotosInfo.Info> photosInfoList,
         int photosLimit
     ) {
-        public static FeedInfoDTO toDTO(Feed feed, UUID usersId, List<PhotosInfo.Info> photosInfoList, int photosLimit) {
+        public static FeedInfoDTO toDTO(Feed feed, boolean isMine, List<PhotosInfo.Info> photosInfoList, int photosLimit) {
             return new FeedInfoDTO(
                 feed.getFeedId(),
-                usersId.equals(feed.getUsersId()),
+                isMine,
                 DefinedCode.valueOf(feed.getTag()),
                 feed.getTime(),
                 feed.getMemo(),
