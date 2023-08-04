@@ -16,8 +16,8 @@ public interface FeedService {
 
     void delete(Feed feed);
 
-    List<List<FeedInfo.HomeInfo.WeeklyFeed>> weeklyList(UUID usersId, LocalDate date);
+    List<FeedInfo.WeeklyCover> weeklyList(UUID usersId, LocalDate date);
 
-    Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.HomeCommand homeCommand);
+    Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand);
 
 }

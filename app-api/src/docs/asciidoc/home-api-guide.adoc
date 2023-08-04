@@ -1,0 +1,37 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlights
+:toc: left
+:toclevels: 3
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+ifndef::snippets-custom[]
+:snippets-custom: ../../../src/docs/custom
+
+=== link:index.html[Home]
+include::{docdir}/common.adoc[]
+
+[[title]]
+= SDR API 문서 - 홈 API
+
+[[월_단위_목록_조회]]
+== 월 단위 목록 조회
+include::{snippets}/home/monthly/http-request.adoc[]
+=== Request
+include::{snippets}/home/monthly/query-parameters.adoc[]
+=== Response
+include::{snippets}/home/monthly/response-fields.adoc[]
+include::{snippets}/home/monthly/response-body.adoc[]
+
+[[태그_목록_조회]]
+== 태그 목록 조회
+include::{snippets}/home/list/http-request.adoc[]
+=== Request
+include::{snippets}/home/list/query-parameters.adoc[]
+=== Response
+include::{snippets}/home/list/response-fields.adoc[]
+include::{snippets}/home/list/response-body.adoc[]

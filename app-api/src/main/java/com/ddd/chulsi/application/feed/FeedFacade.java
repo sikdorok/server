@@ -27,12 +27,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashMap;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -158,42 +156,32 @@ public class FeedFacade {
     }
 
     @Transactional(readOnly = true)
-    public FeedDTO.HomeResponse homeList(String token, FeedCommand.HomeCommand homeCommand) {
+    public FeedDTO.MonthlyResponse monthly(String token, LocalDate date) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
         UUID usersId = jwtClaim.getUsersId();
-
         usersSpecification.findByUsersId(usersId);
 
-        // 이전달
-        List<List<FeedInfo.HomeInfo.WeeklyFeed>> prevWeeklyFeeds = feedService.weeklyList(usersId, homeCommand.getDate().minusMonths(1));
+        return new FeedDTO.MonthlyResponse(
+            date,
+            feedService.weeklyList(usersId, date)
+        );
+    }
 
-        // 현재
-        List<List<FeedInfo.HomeInfo.WeeklyFeed>> weeklyFeeds = feedService.weeklyList(usersId, homeCommand.getDate());
+    @Transactional(readOnly = true)
+    public FeedDTO.ListResponse list(String token, FeedCommand.ListCommand listCommand) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
-        // 다음달
-        List<List<FeedInfo.HomeInfo.WeeklyFeed>> nextWeeklyFeeds = feedService.weeklyList(usersId, homeCommand.getDate().plusMonths(1));
+        UUID usersId = jwtClaim.getUsersId();
+        usersSpecification.findByUsersId(usersId);
 
-        LinkedHashMap<String, List<List<FeedInfo.HomeInfo.WeeklyFeed>>> weeklyMap = new LinkedHashMap<>();
-        weeklyMap.put(homeCommand.getDate().minusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")), prevWeeklyFeeds);
-        weeklyMap.put(homeCommand.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM")), weeklyFeeds);
-        weeklyMap.put(homeCommand.getDate().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")), nextWeeklyFeeds);
+        Page<FeedInfo.HomeFeedItemDTO> feedList = feedService.findAllByUsersIdAndTime(usersId, listCommand);
+        PagingDTO paging = feedMapper.toPagingDTO(feedList);
+        List<FeedInfo.HomeFeedItem> dailyFeeds = feedMapper.toConvertDTO(feedList.getContent());
 
-        // 목록 피드
-        Page<FeedInfo.HomeFeedItemDTO> feedList = feedService.findAllByUsersIdAndTime(usersId, homeCommand);
-        PagingDTO pagingDTO = feedMapper.toPagingDTO(feedList);
-        List<FeedInfo.HomeFeedItem> homeFeedItemList = feedMapper.toConvertDTO(feedList.getContent());
-
-        LinkedHashMap<DefinedCode, List<FeedInfo.HomeFeedItem>> dailyFeed = new LinkedHashMap<>();
-        dailyFeed.put(DefinedCode.C000300001, homeFeedItemList.stream().filter(item -> item.tag().equals(DefinedCode.C000300001)).collect(Collectors.toList()));
-        dailyFeed.put(DefinedCode.C000300002, homeFeedItemList.stream().filter(item -> item.tag().equals(DefinedCode.C000300002)).collect(Collectors.toList()));
-        dailyFeed.put(DefinedCode.C000300003, homeFeedItemList.stream().filter(item -> item.tag().equals(DefinedCode.C000300003)).collect(Collectors.toList()));
-        dailyFeed.put(DefinedCode.C000300004, homeFeedItemList.stream().filter(item -> item.tag().equals(DefinedCode.C000300004)).collect(Collectors.toList()));
-
-        return new FeedDTO.HomeResponse(
-            pagingDTO,
-            weeklyMap,
-            dailyFeed
+        return new FeedDTO.ListResponse(
+            paging,
+            dailyFeeds
         );
     }
 

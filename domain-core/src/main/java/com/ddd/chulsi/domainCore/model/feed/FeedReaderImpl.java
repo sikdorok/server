@@ -28,7 +28,7 @@ public class FeedReaderImpl implements FeedReader {
     }
 
     @Override
-    public List<FeedInfo.HomeInfo.Weekly> weeklyList(UUID usersId, LocalDate date) {
+    public List<FeedInfo.Weekly> weeklyList(UUID usersId, LocalDate date) {
         YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonth());
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
@@ -37,7 +37,7 @@ public class FeedReaderImpl implements FeedReader {
     }
 
     @Override
-    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.HomeCommand homeCommand) {
-        return feedCustomRepository.findAllByUsersIdAndTime(usersId, homeCommand);
+    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand) {
+        return feedCustomRepository.findAllByUsersIdAndTime(usersId, listCommand);
     }
 }

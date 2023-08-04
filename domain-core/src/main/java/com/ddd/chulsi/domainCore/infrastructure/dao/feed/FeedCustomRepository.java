@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public interface FeedCustomRepository {
 
-    Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.HomeCommand homeCommand);
+    Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand);
 
 }

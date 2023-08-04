@@ -17,7 +17,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -92,26 +91,42 @@ public class FeedDTO {
         }
     }
 
-    public record HomeResponse(
-        PagingDTO pagingDTO,
-        LinkedHashMap<String, List<List<FeedInfo.HomeInfo.WeeklyFeed>>> weeklyFeeds,
-        LinkedHashMap<DefinedCode, List<FeedInfo.HomeFeedItem>> dailyFeeds
+    public record MonthlyResponse(
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        LocalDate date,
+        List<FeedInfo.WeeklyCover> weeklyCovers
+    ) {
+    }
+
+    public record ListResponse(
+        PagingDTO paging,
+        List<FeedInfo.HomeFeedItem> dailyFeeds
     ) {
     }
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class HomeRequest extends PageAndSizeRequest {
+    public static class ListRequest extends PageAndSizeRequest implements Validator {
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         LocalDate date;
 
-        public FeedCommand.HomeCommand toCommand() {
-            return FeedCommand.HomeCommand.builder()
+        @NotNull
+        DefinedCode tag;
+
+        public FeedCommand.ListCommand toCommand() {
+            return FeedCommand.ListCommand.builder()
                 .page(getPage())
                 .size(getSize())
                 .date(date)
+                .tag(tag)
                 .build();
+        }
+
+        @Override
+        public void verify() {
+            if (!tag.getSectionCode().equals(DefinedCode.C0003.getSectionCode()))
+                throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG, "tag");
         }
     }
 }

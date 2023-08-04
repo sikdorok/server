@@ -41,57 +41,58 @@ public class FeedInfo {
     }
 
     public record HomeFeedItemDTO(
-        List<PhotosInfo.Info> photosInfoList,
+        UUID feedId,
         DefinedCode icon,
         boolean isMain,
         String tag,
         LocalDateTime time,
-        String memo
+        String memo,
+        List<PhotosInfo.Info> photosInfoList
     ) {
     }
 
     public record HomeFeedItem(
-        List<PhotosInfo.Info> photosInfoList,
+        UUID feedId,
         DefinedCode icon,
         boolean isMain,
 
-        @JsonIgnore
         DefinedCode tag,
         String time,
-        String memo
+        String memo,
+        List<PhotosInfo.Info> photosInfoList
     ) {
     }
 
-    public record HomeInfo(
-        List<List<WeeklyFeed>> weeklyFeeds,
-        List<DailyFeed> dailyFeeds
+    public record WeeklyCover(
+        int week,
+        List<WeeklyFeed> weeklyFeeds
     ) {
 
-        public record WeeklyFeed(
-            @JsonIgnore
-            int week,
+    }
 
-            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-            LocalDate time,
-            DefinedCode icon
-        ) {
-            public static WeeklyFeed toDTO(FeedInfo.HomeInfo.Weekly weekly) {
-                return new WeeklyFeed(weekly.getWeek(), weekly.getTime(), weekly.getIcon());
-            }
+    public record WeeklyFeed(
+        @JsonIgnore
+        int week,
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        LocalDate time,
+        DefinedCode icon
+    ) {
+        public static WeeklyFeed toDTO(FeedInfo.Weekly weekly) {
+            return new WeeklyFeed(weekly.getWeek(), weekly.getTime(), weekly.getIcon());
         }
+    }
 
-        public interface Weekly {
-            int getWeek();
-            LocalDate getTime();
-            DefinedCode getIcon();
-        }
+    public interface Weekly {
+        int getWeek();
+        LocalDate getTime();
+        DefinedCode getIcon();
+    }
 
-        public record DailyFeed(
-            DefinedCode tags,
-            List<FeedInfo.HomeFeedItem> homeFeedItems
-        ) {
-
-        }
+    public record DailyFeed(
+        DefinedCode tags,
+        List<FeedInfo.HomeFeedItem> homeFeedItems
+    ) {
 
     }
 }

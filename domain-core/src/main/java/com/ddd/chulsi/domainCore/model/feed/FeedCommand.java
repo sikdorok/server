@@ -50,9 +50,10 @@ public class FeedCommand {
 
     @Getter
     @Builder
-    public static class HomeCommand {
+    public static class ListCommand {
         private final int page;
         private final int size;
         private final LocalDate date;
+        private final DefinedCode tag;
     }
 }

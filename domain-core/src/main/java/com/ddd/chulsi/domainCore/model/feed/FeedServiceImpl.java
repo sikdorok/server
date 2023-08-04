@@ -39,42 +39,49 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public List<List<FeedInfo.HomeInfo.WeeklyFeed>> weeklyList(UUID usersId, LocalDate date) {
-        List<FeedInfo.HomeInfo.Weekly> weeklyInfo = feedReader.weeklyList(usersId, date);
+    public List<FeedInfo.WeeklyCover> weeklyList(UUID usersId, LocalDate date) {
+        List<FeedInfo.Weekly> weeklyInfo = feedReader.weeklyList(usersId, date);
 
-        List<FeedInfo.HomeInfo.WeeklyFeed> firstWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 1).map(FeedInfo.HomeInfo.WeeklyFeed::toDTO).toList());
+        List<FeedInfo.WeeklyFeed> firstWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 1).map(FeedInfo.WeeklyFeed::toDTO).toList());
         if (firstWeek.size() != 7) addPrevWeekly(usersId, date, firstWeek);
 
-        List<FeedInfo.HomeInfo.WeeklyFeed> secondWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 2).map(FeedInfo.HomeInfo.WeeklyFeed::toDTO).toList());
-        List<FeedInfo.HomeInfo.WeeklyFeed> thirdWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 3).map(FeedInfo.HomeInfo.WeeklyFeed::toDTO).toList());
-        List<FeedInfo.HomeInfo.WeeklyFeed> fourthWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 4).map(FeedInfo.HomeInfo.WeeklyFeed::toDTO).toList());
-        List<FeedInfo.HomeInfo.WeeklyFeed> fifthWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 5).map(FeedInfo.HomeInfo.WeeklyFeed::toDTO).toList());
-        List<FeedInfo.HomeInfo.WeeklyFeed> sixthWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 6).map(FeedInfo.HomeInfo.WeeklyFeed::toDTO).toList());
+        List<FeedInfo.WeeklyFeed> secondWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 2).map(FeedInfo.WeeklyFeed::toDTO).toList());
+        List<FeedInfo.WeeklyFeed> thirdWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 3).map(FeedInfo.WeeklyFeed::toDTO).toList());
+        List<FeedInfo.WeeklyFeed> fourthWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 4).map(FeedInfo.WeeklyFeed::toDTO).toList());
+        List<FeedInfo.WeeklyFeed> fifthWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 5).map(FeedInfo.WeeklyFeed::toDTO).toList());
+        List<FeedInfo.WeeklyFeed> sixthWeek = new ArrayList<>(weeklyInfo.stream().filter(weekly -> weekly.getWeek() == 6).map(FeedInfo.WeeklyFeed::toDTO).toList());
 
         if (!sixthWeek.isEmpty() && sixthWeek.size() != 7) addNextWeekly(usersId, date, sixthWeek);
         else if (fifthWeek.size() != 7) addNextWeekly(usersId, date, fifthWeek);
 
-        return Arrays.asList(firstWeek, secondWeek, thirdWeek, fourthWeek, fifthWeek, sixthWeek);
+        return Arrays.asList(
+            new FeedInfo.WeeklyCover(1, firstWeek),
+            new FeedInfo.WeeklyCover(2, secondWeek),
+            new FeedInfo.WeeklyCover(3, thirdWeek),
+            new FeedInfo.WeeklyCover(4, fourthWeek),
+            new FeedInfo.WeeklyCover(5, fifthWeek),
+            new FeedInfo.WeeklyCover(6, sixthWeek)
+        );
     }
 
     @Override
-    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.HomeCommand homeCommand) {
-        return feedReader.findAllByUsersIdAndTime(usersId, homeCommand);
+    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand) {
+        return feedReader.findAllByUsersIdAndTime(usersId, listCommand);
     }
 
-    private void addPrevWeekly(UUID usersId, LocalDate date, List<FeedInfo.HomeInfo.WeeklyFeed> originWeek) {
+    private void addPrevWeekly(UUID usersId, LocalDate date, List<FeedInfo.WeeklyFeed> originWeek) {
         int gap = 7 - originWeek.size();
-        List<FeedInfo.HomeInfo.Weekly> prevWeeklyInfo = feedReader.weeklyList(usersId, date.minusMonths(1));
-        List<FeedInfo.HomeInfo.Weekly> subList = prevWeeklyInfo.subList(prevWeeklyInfo.size() - gap, prevWeeklyInfo.size());
-        List<FeedInfo.HomeInfo.WeeklyFeed> subListConvert = new ArrayList<>(subList.stream().map(FeedInfo.HomeInfo.WeeklyFeed::toDTO).toList());
+        List<FeedInfo.Weekly> prevWeeklyInfo = feedReader.weeklyList(usersId, date.minusMonths(1));
+        List<FeedInfo.Weekly> subList = prevWeeklyInfo.subList(prevWeeklyInfo.size() - gap, prevWeeklyInfo.size());
+        List<FeedInfo.WeeklyFeed> subListConvert = new ArrayList<>(subList.stream().map(FeedInfo.WeeklyFeed::toDTO).toList());
         originWeek.addAll(0, subListConvert);
     }
 
-    private void addNextWeekly(UUID usersId, LocalDate date, List<FeedInfo.HomeInfo.WeeklyFeed> originWeek) {
+    private void addNextWeekly(UUID usersId, LocalDate date, List<FeedInfo.WeeklyFeed> originWeek) {
         int gap = 7 - originWeek.size();
-        List<FeedInfo.HomeInfo.Weekly> nextWeeklyInfo = feedReader.weeklyList(usersId, date.plusMonths(1));
-        List<FeedInfo.HomeInfo.Weekly> subList = nextWeeklyInfo.subList(0, gap);
-        List<FeedInfo.HomeInfo.WeeklyFeed> subListConvert = new ArrayList<>(subList.stream().map(FeedInfo.HomeInfo.WeeklyFeed::toDTO).toList());
+        List<FeedInfo.Weekly> nextWeeklyInfo = feedReader.weeklyList(usersId, date.plusMonths(1));
+        List<FeedInfo.Weekly> subList = nextWeeklyInfo.subList(0, gap);
+        List<FeedInfo.WeeklyFeed> subListConvert = new ArrayList<>(subList.stream().map(FeedInfo.WeeklyFeed::toDTO).toList());
         originWeek.addAll(originWeek.size(), subListConvert);
     }
 

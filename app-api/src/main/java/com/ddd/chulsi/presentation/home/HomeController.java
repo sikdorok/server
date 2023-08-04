@@ -7,9 +7,13 @@ import com.ddd.chulsi.presentation.feed.dto.FeedDTO;
 import com.ddd.chulsi.presentation.shared.response.dto.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping(value = "/home", name = "홈")
@@ -18,13 +22,21 @@ public class HomeController {
 
     private final FeedFacade feedFacade;
 
-    @GetMapping
-    public BaseResponse<FeedDTO.HomeResponse> home(
+    @GetMapping(value = "/monthly", name = "월 단위 목록")
+    public BaseResponse<FeedDTO.MonthlyResponse> monthly(
         @AuthToken String token,
-        @Valid FeedDTO.HomeRequest homeRequest
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date
     ) {
-        FeedCommand.HomeCommand homeCommand = homeRequest.toCommand();
-        return BaseResponse.ofSuccess(feedFacade.homeList(token, homeCommand));
+        return BaseResponse.ofSuccess(feedFacade.monthly(token, date));
+    }
+
+    @GetMapping(value = "/list", name = "태그 목록 조회")
+    public BaseResponse<FeedDTO.ListResponse> list(
+        @AuthToken String token,
+        @Valid FeedDTO.ListRequest listRequest
+    ) {
+        FeedCommand.ListCommand listCommand = listRequest.toCommand();
+        return BaseResponse.ofSuccess(feedFacade.list(token, listCommand));
     }
 
 }

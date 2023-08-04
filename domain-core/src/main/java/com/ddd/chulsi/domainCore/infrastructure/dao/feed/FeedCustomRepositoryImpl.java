@@ -33,15 +33,16 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
     private final QPhotos photos = QPhotos.photos;
 
     @Override
-    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.HomeCommand homeCommand) {
-        Pageable pageable = new PagingRequest(homeCommand.getPage(), homeCommand.getSize()).of();
+    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand) {
+        Pageable pageable = new PagingRequest(listCommand.getPage(), listCommand.getSize()).of();
 
         int size = queryFactory
             .select(feed)
             .from(feed)
             .where(
                 feed.usersId.eq(usersId),
-                feed.time.between(LocalDateTime.of(homeCommand.getDate(), LocalTime.of(0, 0)), LocalDateTime.of(homeCommand.getDate(), LocalTime.of(23, 59)))
+                feed.tag.contains(listCommand.getTag().toString()),
+                feed.time.between(LocalDateTime.of(listCommand.getDate(), LocalTime.of(0, 0)), LocalDateTime.of(listCommand.getDate(), LocalTime.of(23, 59)))
             )
             .fetch().size();
 
@@ -50,7 +51,8 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
             .leftJoin(photos).on(photos.type.eq(DefinedCode.C000600001).and(photos.targetId.eq(feed.feedId)))
             .where(
                 feed.usersId.eq(usersId),
-                feed.time.between(LocalDateTime.of(homeCommand.getDate(), LocalTime.of(0, 0)), LocalDateTime.of(homeCommand.getDate(), LocalTime.of(23, 59)))
+                feed.tag.contains(listCommand.getTag().toString()),
+                feed.time.between(LocalDateTime.of(listCommand.getDate(), LocalTime.of(0, 0)), LocalDateTime.of(listCommand.getDate(), LocalTime.of(23, 59)))
             )
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -59,18 +61,19 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                     .list(
                         Projections.constructor(
                             FeedInfo.HomeFeedItemDTO.class,
+                            feed.feedId,
+                            feed.icon,
+                            feed.isMain,
+                            feed.tag,
+                            feed.time,
+                            feed.memo,
                             list(
                                 Projections.constructor(
                                     PhotosInfo.Info.class,
                                     photos.token,
                                     photos.uploadFullPath
                                 )
-                            ),
-                            feed.icon,
-                            feed.isMain,
-                            feed.tag,
-                            feed.time,
-                            feed.memo
+                            )
                         )
                     )
             );
