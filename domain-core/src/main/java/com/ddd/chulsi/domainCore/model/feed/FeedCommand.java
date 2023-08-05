@@ -1,8 +1,6 @@
 package com.ddd.chulsi.domainCore.model.feed;
 
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
-import lombok.Builder;
-import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,14 +16,14 @@ public class FeedCommand {
         DefinedCode icon,
         boolean isMain
     ) {
-        public static RegisterCommand nonState(DefinedCode tag, LocalDateTime time, String memo, DefinedCode icon, boolean isMain) {
+        public static RegisterCommand toCommand(DefinedCode tag, LocalDateTime time, String memo, DefinedCode icon, boolean isMain) {
             return new RegisterCommand(tag, time, memo, icon, isMain);
         }
 
         public Feed toEntity(UUID usersId) {
             return Feed.builder()
                 .usersId(usersId)
-                .tag(tag.toString())
+                .tag(tag)
                 .time(time)
                 .memo(memo)
                 .icon(icon)
@@ -43,17 +41,29 @@ public class FeedCommand {
         boolean isMain,
         Set<UUID> deletePhotoTokens
     ) {
-        public static InfoUpdateCommand nonState(UUID feedId, DefinedCode tag, LocalDateTime time, String memo, DefinedCode icon, boolean isMain, Set<UUID> deletePhotoTokens) {
+        public static InfoUpdateCommand toCommand(UUID feedId, DefinedCode tag, LocalDateTime time, String memo, DefinedCode icon, boolean isMain, Set<UUID> deletePhotoTokens) {
             return new InfoUpdateCommand(feedId, tag, time, memo, icon, isMain, deletePhotoTokens);
         }
     }
 
-    @Getter
-    @Builder
-    public static class ListCommand {
-        private final int page;
-        private final int size;
-        private final LocalDate date;
-        private final DefinedCode tag;
+    public record ListCommand(
+        int page,
+        int size,
+        LocalDate date,
+        DefinedCode tag
+    ) {
+        public static ListCommand toCommand(int page, int size, LocalDate date, DefinedCode tag) {
+            return new ListCommand(page, size, date, tag);
+        }
+    }
+
+    public record ListViewCommand(
+        int size,
+        LocalDate date,
+        LocalDate cursorDate
+    ) {
+        public static ListViewCommand toCommand(int size, LocalDate date, LocalDate cursorDate) {
+            return new ListViewCommand(size, date, cursorDate);
+        }
     }
 }

@@ -29,9 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -49,7 +47,7 @@ public class FeedFacade {
     private final FeedMapper feedMapper;
 
     @Transactional(rollbackFor = Exception.class)
-    public void register(String token, FeedCommand.RegisterCommand registerCommand, MultipartFile file) {
+    public UUID register(String token, FeedCommand.RegisterCommand registerCommand, MultipartFile file) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
         UUID usersId = jwtClaim.getUsersId();
@@ -64,6 +62,8 @@ public class FeedFacade {
         Feed newFeed = feedService.register(insertFeed);
 
         feedPhotoUpload(file, users, newFeed);
+
+        return newFeed.getFeedId();
     }
 
     public FeedDTO.FeedInfoResponse info(String token, UUID feedId) {
@@ -97,7 +97,7 @@ public class FeedFacade {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void infoUpdate(String token, FeedCommand.InfoUpdateCommand infoUpdateCommand, MultipartFile file) {
+    public UUID infoUpdate(String token, FeedCommand.InfoUpdateCommand infoUpdateCommand, MultipartFile file) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
         UUID usersId = jwtClaim.getUsersId();
@@ -128,6 +128,8 @@ public class FeedFacade {
 
         // 파일 등록
         feedPhotoUpload(file, users, feed);
+
+        return feed.getFeedId();
     }
 
     private void feedPhotoUpload(MultipartFile file, Users users, Feed feed) {
@@ -195,6 +197,67 @@ public class FeedFacade {
             paging,
             dailyFeeds
         );
+    }
+
+    @Transactional(readOnly = true)
+    public FeedDTO.ListViewResponse listView(String token, FeedCommand.ListViewCommand listViewCommand) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+
+        UUID usersId = jwtClaim.getUsersId();
+        usersSpecification.findByUsersId(usersId);
+
+        // nextCursorDate 값이 null 일 수도 있음
+        // 기록물이 size 만큼 없는 경우
+        String nextCursorDate = feedService.nextCursorDate(usersId, listViewCommand);
+
+        List<FeedInfo.HomeListViewFeedItemDTO> feedList = feedService.listViewWithCursorBased(usersId, listViewCommand, nextCursorDate);
+        List<FeedInfo.HomeListViewFeedItem> homeListViewFeedItemList = feedList != null ? feedMapper.toConvertDTOWithCursorBased(feedList) : Collections.emptyList();
+
+        List<FeedInfo.HomeListViewDTO> dailyFeeds = new ArrayList<>();
+
+        String flag = null;
+        for (FeedInfo.HomeListViewFeedItem item : homeListViewFeedItemList) {
+            String date = item.date();
+            if (flag != null && flag.equals(date)) continue;
+            flag = date;
+
+            Map<String, List<FeedInfo.HomeListViewFeedItem>> map = new LinkedHashMap<>();
+
+            List<FeedInfo.HomeListViewFeedItem> morning = new ArrayList<>(homeListViewFeedItemList.stream().filter(v -> v.date().equals(date) && v.tag() == DefinedCode.C000300001).toList());
+            sortedFeedList(morning);
+
+            List<FeedInfo.HomeListViewFeedItem> afternoon = new ArrayList<>(homeListViewFeedItemList.stream().filter(v -> v.date().equals(date) && v.tag() == DefinedCode.C000300002).toList());
+            sortedFeedList(afternoon);
+
+            List<FeedInfo.HomeListViewFeedItem> evening = new ArrayList<>(homeListViewFeedItemList.stream().filter(v -> v.date().equals(date) && v.tag() == DefinedCode.C000300003).toList());
+            sortedFeedList(evening);
+
+            List<FeedInfo.HomeListViewFeedItem> snack = new ArrayList<>(homeListViewFeedItemList.stream().filter(v -> v.date().equals(date) && v.tag() == DefinedCode.C000300004).toList());
+            sortedFeedList(snack);
+
+            map.put("morning", morning);
+            map.put("afternoon", afternoon);
+            map.put("evening", evening);
+            map.put("snack", snack);
+
+            dailyFeeds.add(new FeedInfo.HomeListViewDTO(date, map));
+        }
+
+        return new FeedDTO.ListViewResponse(
+            nextCursorDate != null,
+            nextCursorDate != null ? LocalDate.parse(nextCursorDate) : null,
+            dailyFeeds
+        );
+    }
+
+    private void sortedFeedList(List<FeedInfo.HomeListViewFeedItem> feedList) {
+        if (feedList.isEmpty() || feedList.size() == 1) return;
+
+        feedList.sort((o1, o2) -> {
+            if (o1.originTime().isBefore(o2.originTime())) return -1;
+            else if (o1.originTime().isAfter(o2.originTime())) return 1;
+            else return 0;
+        });
     }
 
 }

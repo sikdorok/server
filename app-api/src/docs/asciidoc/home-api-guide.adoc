@@ -35,3 +35,12 @@ include::{snippets}/home/list/query-parameters.adoc[]
 === Response
 include::{snippets}/home/list/response-fields.adoc[]
 include::{snippets}/home/list/response-body.adoc[]
+
+[[리스트뷰_목록_조회]]
+== 리스트뷰 목록 조회
+include::{snippets}/home/list-view/http-request.adoc[]
+=== Request
+include::{snippets}/home/list-view/query-parameters.adoc[]
+=== Response
+include::{snippets}/home/list-view/response-fields.adoc[]
+include::{snippets}/home/list-view/response-body.adoc[]

@@ -32,7 +32,7 @@ spring:
     properties:
       hibernate.connection.provider_disables_autocommit: false # ID 관련되어서 하이버네이트 속성에 따른 생성
       hibernate:
-        dialect: com.ddd.chulsi.infrastructure.config.datasource.CustomMysql8Dialect # 내장함수 사용을 위해 커스텀 파일로 등록
+        function_contributor: com.ddd.chulsi.infrastructure.config.datasource.MySQLContributor # 내장함수 사용을 위해 커스텀 파일로 등록
         enable_lazy_load_no_trans: true
         format_sql: true # 하이버네이트 sql문 포맷 정렬 여부
       jdbc:

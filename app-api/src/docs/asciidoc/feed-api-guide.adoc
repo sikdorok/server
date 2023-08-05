@@ -30,6 +30,10 @@ include::{snippets}/feed/register/response-body.adoc[]
 [[단일_조회]]
 == 단일 조회
 include::{snippets}/feed/info/http-request.adoc[]
+
+- 소유자 조회 시 -> `Authorization` 필수
+- 공유하기 조회 시 -> `Authorization` 불필요
+
 === Request
 include::{snippets}/feed/info/path-parameters.adoc[]
 === Response

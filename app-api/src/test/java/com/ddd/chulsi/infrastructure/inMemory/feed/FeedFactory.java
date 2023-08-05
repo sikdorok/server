@@ -9,10 +9,7 @@ import com.ddd.chulsi.presentation.shared.response.dto.PagingDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.ddd.chulsi.infrastructure.inMemory.photos.PhotosFactory.givenPhotosInfoList;
@@ -23,7 +20,7 @@ public class FeedFactory {
         return Feed.builder()
             .feedId(UUID.randomUUID())
             .usersId(UUID.randomUUID())
-            .tag(DefinedCode.C000300001.toString())
+            .tag(DefinedCode.C000300001)
             .time(LocalDateTime.now())
             .memo("메모")
             .icon(DefinedCode.C000400001)
@@ -100,6 +97,87 @@ public class FeedFactory {
         return new FeedDTO.ListResponse(
             new PagingDTO(1, 1, 2),
             List.of(givenHomeFeedItem(), givenHomeFeedItem())
+        );
+    }
+    public static Map<String, List<FeedInfo.HomeListViewFeedItem>> givenHomeListViewFeedItemMap(String date) {
+        Map<String, List<FeedInfo.HomeListViewFeedItem>> map = new LinkedHashMap<>();
+        map.put("morning", List.of(
+            new FeedInfo.HomeListViewFeedItem(
+                UUID.randomUUID(),
+                DefinedCode.C000400001,
+                false,
+                DefinedCode.C000300001,
+                date,
+                LocalDateTime.now(),
+                "오전 07:27",
+                "일찍 먹는 아침",
+                givenPhotosInfoList()
+            ),
+            new FeedInfo.HomeListViewFeedItem(
+                UUID.randomUUID(),
+                DefinedCode.C000400003,
+                true,
+                DefinedCode.C000300001,
+                date,
+                LocalDateTime.now(),
+                "오전 10:54",
+                "아침 또 먹자",
+                givenPhotosInfoList()
+            )
+        ));
+        map.put("afternoon", Collections.emptyList());
+        map.put("evening", Collections.emptyList());
+        map.put("snack", List.of(
+            new FeedInfo.HomeListViewFeedItem(
+                UUID.randomUUID(),
+                DefinedCode.C000400003,
+                false,
+                DefinedCode.C000300004,
+                date,
+                LocalDateTime.now(),
+                "오전 11:00",
+                "간식 최고야",
+                givenPhotosInfoList()
+            ),
+            new FeedInfo.HomeListViewFeedItem(
+                UUID.randomUUID(),
+                DefinedCode.C000400006,
+                false,
+                DefinedCode.C000300004,
+                date,
+                LocalDateTime.now(),
+                "오후 04:30",
+                "간식 또 먹음",
+                givenPhotosInfoList()
+            ),
+            new FeedInfo.HomeListViewFeedItem(
+                UUID.randomUUID(),
+                DefinedCode.C000400005,
+                false,
+                DefinedCode.C000300004,
+                date,
+                LocalDateTime.now(),
+                "오후 09:10",
+                "간식 사먹음...",
+                givenPhotosInfoList()
+            )
+        ));
+
+        return map;
+    }
+
+    public static FeedInfo.HomeListViewDTO givenHomeListViewDTO(String date) {
+        return new FeedInfo.HomeListViewDTO(
+            date,
+            givenHomeListViewFeedItemMap(date)
+        );
+    }
+
+    public static FeedDTO.ListViewResponse givenListViewResponse() {
+        return new FeedDTO.ListViewResponse(
+            true,
+            LocalDate.now(),
+            Arrays.asList(givenHomeListViewDTO("05일 토요일"), givenHomeListViewDTO("06일 일요일"))
         );
     }
 

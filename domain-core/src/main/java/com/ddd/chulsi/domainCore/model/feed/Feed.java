@@ -31,11 +31,16 @@ public class Feed extends DateColumn {
     @Column(name = "feedId", columnDefinition = "BINARY(16)")
     private UUID feedId;
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cursorId", nullable = false)
+    private Long cursorId;
+
     @Column(name = "usersId", columnDefinition = "BINARY(16)")
     private UUID usersId;
 
-    @Column(name = "tag", nullable = false, length = 300)
-    private String tag;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tag", nullable = false, length = 10)
+    private DefinedCode tag;
 
     @Column(name = "time", nullable = false, columnDefinition = "DATETIME")
     private LocalDateTime time;
@@ -59,7 +64,7 @@ public class Feed extends DateColumn {
     private boolean isMain;
 
     public void infoUpdate(FeedCommand.InfoUpdateCommand infoUpdateCommand) {
-        this.tag = infoUpdateCommand.tag().toString();
+        this.tag = infoUpdateCommand.tag();
         this.time = infoUpdateCommand.time();
         if (StringUtils.isNotBlank(infoUpdateCommand.memo())) this.memo = infoUpdateCommand.memo();
         this.icon = infoUpdateCommand.icon();

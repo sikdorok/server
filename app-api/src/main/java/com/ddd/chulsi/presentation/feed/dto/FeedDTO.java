@@ -9,6 +9,7 @@ import com.ddd.chulsi.presentation.shared.request.PageAndSizeRequest;
 import com.ddd.chulsi.presentation.shared.request.Validator;
 import com.ddd.chulsi.presentation.shared.response.dto.PagingDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,7 +39,7 @@ public class FeedDTO {
         boolean isMain
     ) implements Validator {
         public FeedCommand.RegisterCommand toCommand() {
-            return FeedCommand.RegisterCommand.nonState(tag, time, memo, icon, isMain);
+            return FeedCommand.RegisterCommand.toCommand(tag, time, memo, icon, isMain);
         }
 
         @Override
@@ -48,7 +49,7 @@ public class FeedDTO {
             if (!icon.getSectionCode().equals(DefinedCode.C0004.getSectionCode()))
                 throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "icon");
             if (time.toLocalDate().isAfter(LocalDateTime.now().toLocalDate()))
-                throw new BadRequestException("당일 날짜만 등록 가능합니다.", "time");
+                throw new BadRequestException("당일 날짜만 등록 가능합니다.", "date");
         }
     }
 
@@ -77,7 +78,7 @@ public class FeedDTO {
         Set<UUID> deletePhotoTokens
     ) implements Validator {
         public FeedCommand.InfoUpdateCommand toCommand() {
-            return FeedCommand.InfoUpdateCommand.nonState(feedId, tag, time, memo, icon, isMain, deletePhotoTokens);
+            return FeedCommand.InfoUpdateCommand.toCommand(feedId, tag, time, memo, icon, isMain, deletePhotoTokens);
         }
 
         @Override
@@ -87,7 +88,7 @@ public class FeedDTO {
             if (!icon.getSectionCode().equals(DefinedCode.C0004.getSectionCode()))
                 throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG_DEFAULT, "icon");
             if (time.toLocalDate().isAfter(LocalDateTime.now().toLocalDate()))
-                throw new BadRequestException("당일 날짜만 등록 가능합니다.", "time");
+                throw new BadRequestException("당일 날짜만 등록 가능합니다.", "date");
         }
     }
 
@@ -115,18 +116,41 @@ public class FeedDTO {
         DefinedCode tag;
 
         public FeedCommand.ListCommand toCommand() {
-            return FeedCommand.ListCommand.builder()
-                .page(getPage())
-                .size(getSize())
-                .date(date)
-                .tag(tag)
-                .build();
+            return FeedCommand.ListCommand.toCommand(getPage(), getSize(), date, tag);
         }
 
         @Override
         public void verify() {
             if (!tag.getSectionCode().equals(DefinedCode.C0003.getSectionCode()))
                 throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG, "tag");
+        }
+    }
+
+    public record ListViewResponse(
+        boolean hasNext,
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+        LocalDate cursorDate,
+        List<FeedInfo.HomeListViewDTO> dailyFeeds
+    ) {
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ListViewRequest {
+        @Min(1)
+        int size;
+
+        @NotNull
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        LocalDate date;
+
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        LocalDate cursorDate;
+
+        public FeedCommand.ListViewCommand toCommand() {
+            return FeedCommand.ListViewCommand.toCommand(size, date, cursorDate);
         }
     }
 }

@@ -248,7 +248,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ErrorResponse handleException(Exception exception) throws JsonProcessingException {
+    public ErrorResponse handleException(Exception exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
 
         // slack noti

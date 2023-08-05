@@ -7,8 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class FeedInfo {
 
@@ -29,7 +28,7 @@ public class FeedInfo {
             return new FeedInfoDTO(
                 feed.getFeedId(),
                 isMine,
-                DefinedCode.valueOf(feed.getTag()),
+                feed.getTag(),
                 feed.getTime(),
                 feed.getMemo(),
                 feed.getIcon(),
@@ -44,7 +43,7 @@ public class FeedInfo {
         UUID feedId,
         DefinedCode icon,
         boolean isMain,
-        String tag,
+        DefinedCode tag,
         LocalDateTime time,
         String memo,
         List<PhotosInfo.Info> photosInfoList
@@ -89,10 +88,42 @@ public class FeedInfo {
         DefinedCode getIcon();
     }
 
-    public record DailyFeed(
-        DefinedCode tags,
-        List<FeedInfo.HomeFeedItem> homeFeedItems
+    public record HomeListViewFeedItemDTO(
+        UUID feedId,
+        DefinedCode icon,
+        boolean isMain,
+        DefinedCode tag,
+        LocalDateTime time,
+        String memo,
+        List<PhotosInfo.Info> photosInfoList
+    ) {
+    }
+
+    public record HomeListViewFeedItem(
+        UUID feedId,
+        DefinedCode icon,
+        boolean isMain,
+
+        @JsonIgnore
+        DefinedCode tag,
+
+        @JsonIgnore
+        String date,
+
+        @JsonIgnore
+        LocalDateTime originTime,
+
+        String time,
+        String memo,
+        List<PhotosInfo.Info> photosInfoList
+    ) {
+    }
+
+    public record HomeListViewDTO(
+        String date,
+        Map<String, List<HomeListViewFeedItem>> feeds
     ) {
 
     }
+
 }

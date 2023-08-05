@@ -101,7 +101,7 @@ class FeedControllerTest extends ControllerTest {
     @Test
     void 등록() throws Exception {
 
-        doNothing().when(feedFacade).register(anyString(), any(FeedCommand.RegisterCommand.class), any(MultipartFile.class));
+        given(feedFacade.register(anyString(), any(FeedCommand.RegisterCommand.class), any(MultipartFile.class))).willReturn(UUID.randomUUID());
 
         FeedDTO.FeedRegisterRequest feedRegisterRequest = givenRegisterRequest();
 
@@ -138,7 +138,7 @@ class FeedControllerTest extends ControllerTest {
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
-                    fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
+                    fieldWithPath("data").type(JsonFieldType.STRING).description("피드 고유번호")
                 )
             ));
 
@@ -147,7 +147,7 @@ class FeedControllerTest extends ControllerTest {
     @Test
     void 수정() throws Exception {
 
-        doNothing().when(feedFacade).register(anyString(), any(FeedCommand.RegisterCommand.class), any(MultipartFile.class));
+        given(feedFacade.infoUpdate(anyString(), any(FeedCommand.InfoUpdateCommand.class), any(MultipartFile.class))).willReturn(UUID.randomUUID());
 
         FeedDTO.FeedInfoUpdateRequest feedInfoUpdateRequest = givenInfoUpdateRequest();
 
@@ -186,7 +186,7 @@ class FeedControllerTest extends ControllerTest {
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
-                    fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
+                    fieldWithPath("data").type(JsonFieldType.STRING).description("피드 고유번호")
                 )
             ));
 

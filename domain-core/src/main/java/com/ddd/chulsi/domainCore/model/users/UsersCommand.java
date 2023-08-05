@@ -7,7 +7,7 @@ public class UsersCommand {
     public record LoginCommand (
         String accessToken
     ) {
-        public static LoginCommand nonState(String accessToken) {
+        public static LoginCommand toCommand(String accessToken) {
             return new LoginCommand(accessToken);
         }
     }
@@ -16,7 +16,7 @@ public class UsersCommand {
         String email,
         String password
     ) {
-        public static UsersLogin nonState(String email, String password) {
+        public static UsersLogin toCommand(String email, String password) {
             return new UsersLogin(email, password);
         }
     }
@@ -31,7 +31,7 @@ public class UsersCommand {
         String email,
         String password
     ) {
-        public static RegisterCommand nonState(String nickname, String email, String password) {
+        public static RegisterCommand toCommand(String nickname, String email, String password) {
             return new RegisterCommand(nickname, email, password);
         }
         public Users toEntity() {
@@ -46,7 +46,7 @@ public class UsersCommand {
     public record PasswordFind (
         String email
     ) {
-        public static PasswordFind nonState(String email) {
+        public static PasswordFind toCommand(String email) {
             return new PasswordFind(email);
         }
     }
@@ -55,7 +55,7 @@ public class UsersCommand {
         UUID usersId,
         String password
     ) {
-        public static PasswordReset nonState(UUID usersId, String password) {
+        public static PasswordReset toCommand(UUID usersId, String password) {
             return new PasswordReset(usersId, password);
         }
     }
@@ -64,7 +64,7 @@ public class UsersCommand {
         UUID usersId,
         String code
     ) {
-        public static PasswordLinkAlive nonState(UUID usersId, String code) {
+        public static PasswordLinkAlive toCommand(UUID usersId, String code) {
             return new PasswordLinkAlive(usersId, code);
         }
     }

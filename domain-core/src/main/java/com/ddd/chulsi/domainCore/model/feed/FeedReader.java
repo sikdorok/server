@@ -16,4 +16,8 @@ public interface FeedReader {
 
     Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand);
 
+    List<FeedInfo.HomeListViewFeedItemDTO> listViewWithCursorBased(UUID usersId, FeedCommand.ListViewCommand listViewCommand, String nextCursorDate);
+
+    String nextCursorDate(UUID usersId, FeedCommand.ListViewCommand listViewCommand);
+
 }
