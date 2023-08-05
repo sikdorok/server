@@ -31,25 +31,23 @@ public class FeedController {
     }
 
     @PostMapping(name = "등록", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public BaseResponse<Void> register(
+    public BaseResponse<UUID> register(
         @AuthToken String token,
         @RequestPart @Valid FeedDTO.FeedRegisterRequest request,
         @RequestPart(required = false) MultipartFile file
     ) {
         FeedCommand.RegisterCommand registerCommand = request.toCommand();
-        feedFacade.register(token, registerCommand, file);
-        return BaseResponse.ofSuccess();
+        return BaseResponse.ofSuccess(feedFacade.register(token, registerCommand, file));
     }
 
     @PutMapping(name = "정보 수정", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public BaseResponse<Void> feedInfoUpdate(
+    public BaseResponse<UUID> feedInfoUpdate(
         @AuthToken String token,
         @RequestPart @Valid FeedDTO.FeedInfoUpdateRequest request,
         @RequestPart(required = false) MultipartFile file
     ) {
         FeedCommand.InfoUpdateCommand infoUpdateCommand = request.toCommand();
-        feedFacade.infoUpdate(token, infoUpdateCommand, file);
-        return BaseResponse.ofSuccess();
+        return BaseResponse.ofSuccess(feedFacade.infoUpdate(token, infoUpdateCommand, file));
     }
 
     @DeleteMapping(value = "{feedId}", name = "정보 삭제")

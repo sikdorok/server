@@ -20,7 +20,7 @@ public class UsersDTO {
         String accessToken
     ) {
         public UsersCommand.LoginCommand toCommand() {
-            return UsersCommand.LoginCommand.nonState(accessToken);
+            return UsersCommand.LoginCommand.toCommand(accessToken);
         }
     }
 
@@ -63,7 +63,7 @@ public class UsersDTO {
                 throw new BadRequestException("입력하신 비밀번호가 일치하지 않습니다", "password, passwordCheck");
         }
         public UsersCommand.RegisterCommand toCommand() {
-            return UsersCommand.RegisterCommand.nonState(nickname, email, BCryptUtils.hash(password));
+            return UsersCommand.RegisterCommand.toCommand(nickname, email, BCryptUtils.hash(password));
         }
     }
 
@@ -80,7 +80,7 @@ public class UsersDTO {
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "password");
         }
         public UsersCommand.UsersLogin toCommand() {
-            return UsersCommand.UsersLogin.nonState(email, BCryptUtils.hash(password));
+            return UsersCommand.UsersLogin.toCommand(email, BCryptUtils.hash(password));
         }
     }
 
@@ -90,7 +90,7 @@ public class UsersDTO {
         String email
     ) {
         public UsersCommand.PasswordFind toCommand() {
-            return UsersCommand.PasswordFind.nonState(email);
+            return UsersCommand.PasswordFind.toCommand(email);
         }
     }
 
@@ -114,7 +114,7 @@ public class UsersDTO {
         }
 
         public UsersCommand.PasswordReset toCommand() {
-            return UsersCommand.PasswordReset.nonState(usersId, BCryptUtils.hash(password));
+            return UsersCommand.PasswordReset.toCommand(usersId, BCryptUtils.hash(password));
         }
     }
 
@@ -127,7 +127,7 @@ public class UsersDTO {
     ) {
 
         public UsersCommand.PasswordLinkAlive toCommand() {
-            return UsersCommand.PasswordLinkAlive.nonState(usersId, code);
+            return UsersCommand.PasswordLinkAlive.toCommand(usersId, code);
         }
     }
 }

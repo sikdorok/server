@@ -39,4 +39,13 @@ public class HomeController {
         return BaseResponse.ofSuccess(feedFacade.list(token, listCommand));
     }
 
+    @GetMapping(value = "/list-view", name = "리스트뷰 목록 조회")
+    public BaseResponse<FeedDTO.ListViewResponse> listView(
+        @AuthToken String token,
+        @Valid FeedDTO.ListViewRequest listViewRequest
+    ) {
+        FeedCommand.ListViewCommand listViewCommand = listViewRequest.toCommand();
+        return BaseResponse.ofSuccess(feedFacade.listView(token, listViewCommand));
+    }
+
 }
