@@ -15,3 +15,4 @@ ifndef::snippets-custom[]
 == API 목록
 === link:users-api-guide.html[1. 유저]
 === link:feed-api-guide.html[2. 피드]
+=== link:home-api-guide.html[3. 홈]
