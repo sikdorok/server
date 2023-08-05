@@ -43,7 +43,7 @@ public interface FeedMapper {
         DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("a hh:mm", Locale.KOREAN);
 
         String convertTime = time.format(timeFormat);
-        if (convertTime.contains("AM")) convertTime = convertTime.replace("AM", "오전");
+        if (convertTime.startsWith("AM")) convertTime = convertTime.replace("AM", "오전");
         else convertTime = convertTime.replace("PM", "오후");
 
         return convertTime;
