@@ -228,7 +228,7 @@ class UsersControllerTest extends ControllerTest {
 
         mockMvc.perform(
                 post("/users/auto-login")
-                    .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "RefreshToken")
+                    .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
@@ -389,11 +389,13 @@ class UsersControllerTest extends ControllerTest {
 
         given(usersFacade.accessToken(anyString())).willReturn("AccessToken");
 
+        UsersDTO.AccessTokenRequest request = new UsersDTO.AccessTokenRequest("RefreshToken");
+
         mockMvc.perform(
                 post("/users/access-token")
+                    .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "RefreshToken")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
@@ -401,6 +403,9 @@ class UsersControllerTest extends ControllerTest {
             .andDo(document("users/access-token",
                 getDocumentRequest(),
                 getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("Refresh Token")
+                ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),

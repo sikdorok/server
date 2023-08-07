@@ -101,9 +101,9 @@ public class UsersController {
 
     @PostMapping(value = "/access-token", name = "Access Token 재발급")
     public BaseResponse<String> accessToken(
-        @AuthToken String refreshToken
+        @RequestBody @Valid @NotBlank UsersDTO.AccessTokenRequest accessTokenRequest
     ) {
-        String accessToken = usersFacade.accessToken(refreshToken);
+        String accessToken = usersFacade.accessToken(accessTokenRequest.refreshToken());
         return BaseResponse.ofSuccess(accessToken);
     }
 

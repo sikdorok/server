@@ -130,4 +130,9 @@ public class UsersDTO {
             return UsersCommand.PasswordLinkAlive.toCommand(usersId, code);
         }
     }
+
+    public record AccessTokenRequest (
+        @NotBlank
+        String refreshToken
+    ) {}
 }

@@ -62,7 +62,7 @@ public class UsersFacade {
 
     @Transactional(rollbackFor = Exception.class)
     public UsersDTO.LoginResponse autoLogin(String token, HttpServletResponse response) {
-        JWTClaim jwtClaim = jwtTokenUtil.getClaimsForRefreshToken(token, properties, true);
+        JWTClaim jwtClaim = jwtTokenUtil.getClaims(token, properties, true);
 
         UUID usersId = jwtClaim.getUsersId();
         Users users = usersService.findByUsersId(usersId);
