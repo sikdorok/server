@@ -75,6 +75,11 @@ public class StringUtil {
         return Pattern.matches(pattern, value);
     }
 
+    public static boolean isEnglishOrNumberOrSpecial(String value, int min, Integer max) {
+        String pattern = "^((?=.*[A-Za-z])|(?=.*\\d)|(?=.*[$@$!%*#?&]))[A-Za-z\\d$@$!%*#?&]{" + min + "," + (max == null ? "" : max) + "}$";
+        return Pattern.matches(pattern, value);
+    }
+
     /**
      * 특수문자체크
      */

@@ -55,9 +55,9 @@ public class UsersDTO {
         public Register {
             if (nickname.length() < 2 || nickname.length() > 10)
                 throw new BadRequestException("이름은 2자 이상, 10자 이하로 입력해주세요", "nickname");
-            if (!StringUtil.isEnglishAndNumberAndSpecial(password, 8))
+            if (!StringUtil.isEnglishOrNumberOrSpecial(password, 8, 20))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "password");
-            if (!StringUtil.isEnglishAndNumberAndSpecial(passwordCheck, 8))
+            if (!StringUtil.isEnglishOrNumberOrSpecial(passwordCheck, 8, 20))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "passwordCheck");
             if (!Objects.deepEquals(password, passwordCheck))
                 throw new BadRequestException("입력하신 비밀번호가 일치하지 않습니다", "password, passwordCheck");

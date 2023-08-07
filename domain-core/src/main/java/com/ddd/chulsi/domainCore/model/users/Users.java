@@ -31,9 +31,10 @@ public class Users extends DateColumn {
     @Column(name = "usersId", columnDefinition = "BINARY(16)")
     private UUID usersId;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "auth", length = 10, nullable = false)
-    private DefinedCode auth;
+    private DefinedCode auth = DefinedCode.C000100002;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "oauthType", length = 10)

@@ -6,7 +6,6 @@ import com.ddd.chulsi.infrastructure.exception.BadRequestException;
 import com.ddd.chulsi.infrastructure.exception.ServerException;
 import com.ddd.chulsi.infrastructure.exception.message.ErrorMessage;
 import com.ddd.chulsi.infrastructure.exception.response.ErrorResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
