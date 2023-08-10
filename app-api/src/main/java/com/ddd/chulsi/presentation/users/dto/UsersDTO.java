@@ -76,7 +76,7 @@ public class UsersDTO {
         String password
     ) {
         public LoginRequest {
-            if (!StringUtil.isEnglishAndNumberAndSpecial(password, 8))
+            if (!StringUtil.isEnglishOrNumberOrSpecial(password, 8, 20))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "password");
         }
         public UsersCommand.UsersLogin toCommand() {
@@ -105,9 +105,9 @@ public class UsersDTO {
         String passwordCheck
     ) {
         public PasswordResetRequest {
-            if (!StringUtil.isEnglishAndNumberAndSpecial(password, 8))
+            if (!StringUtil.isEnglishOrNumberOrSpecial(password, 8, 20))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "password");
-            if (!StringUtil.isEnglishAndNumberAndSpecial(passwordCheck, 8))
+            if (!StringUtil.isEnglishOrNumberOrSpecial(passwordCheck, 8, 20))
                 throw new BadRequestException(ErrorMessage.PASSWORD_VALIDATION_FAILED, "passwordCheck");
             if (!Objects.deepEquals(password, passwordCheck))
                 throw new BadRequestException("입력하신 비밀번호가 일치하지 않습니다", "password, passwordCheck");
