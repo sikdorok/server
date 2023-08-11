@@ -38,6 +38,21 @@ spring:
       jdbc:
         order_updates: true
         batch_versioned_data: false
+  datasource:
+    hikari: # connection-timeout :  pool에서 connect 얻을 때 최대 대기시간이며, 기본 30초임
+      poolName: SpringBootJPAHikariCP # 풀 이름 지정
+      minimum-idle: 10 # 최소 커넥션 풀 생성. 기본 maximum-pool-size 에 맞춰 생성
+      maximum-pool-size: 90 # 최대 커넥션 풀 허용 개수. 기본 10개
+      idle-timeout: 10000 # pool 에서 유휴 상태로 최대 유지시킬 수 있는 시간, minimum 이 maximum 보다 사이즈가 작을 때 동작함
+      max-lifetime: 1800000 # 커넥션 최대 유지시간 (db wait_timeout 보다 2~3초 짧게 설정하라)
+      connection-timeout: 10000 # 커넥션 풀에서 connection을 얻을 때 최대 대기 시간을 설정한다. 못 구할 시 익셉션 발생.
+      #validation-timeout: 30000 커넥션이 유효한지 검사할 때 대기 시간을 지정한다. 이 값초은 connectionTimeout보다 작아야 한다. 허용 가능한 최소 값은 250이다.
+      auto-commit: false # 커넥션 풀 auto commit 여부
+      data-source-properties: # JPA 최적화 작업 # 디비 통신 관련          #(PreparedStatement : 여러 방대한 SQL의 처리하기 위해 효율성을 높이기 위해 사용
+        cachePrepStmts: true # 데이터 캐싱과 관련된 옵션 기본적으로 캐싱을 비활성화 하고 있음. 활성화 여부
+        prepStmtCacheSize: 250 # Connection마다 캐싱할 PreparedStatement의 개수를 지정하는 옵션이다. HikariCP에서는 250 ~ 500개 추천
+        prepStmtCacheSqlLimit: 2048 # 캐싱할 PreparedStatement의 최대 길이를 지정하는 옵션이다
+        useServerPrepStmts: true # Server-Side PreparedStatement를 사용하는 옵션이다. Server-Side PreparedStatement를 사용해 preparedStatement를 캐싱할 경우, 꽤 큰 성능 향상을 기대할 수 있다.
 
   mvc:
     throw-exception-if-no-handler-found: true
