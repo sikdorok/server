@@ -67,16 +67,6 @@ public class Users extends DateColumn {
     @Column(name = "photosLimit", nullable = false, length = 20)
     private int photosLimit;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "appInfoType", length = 10)
-    private DefinedCode appInfoType;
-
-    @Column(name = "appInfoModel", length = 100)
-    private int appInfoModel;
-
-    @Column(name = "appInfoDeviceToken")
-    private int appInfoDeviceToken;
-
     @Column(name = "revokedAt")
     private LocalDateTime revokedAt;
 
