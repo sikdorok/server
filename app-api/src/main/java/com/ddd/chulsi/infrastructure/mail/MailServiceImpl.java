@@ -25,10 +25,12 @@ public class MailServiceImpl implements MailService {
 
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
-            String imagesDirectory = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() +":" + httpServletRequest.getServerPort() + "/assets/images";
-            String passwordResetUrl = "https://jeffrey-oh.tistory.com/";
+            String passwordResetUrl = "https://sikdorok.page.link/?link=https://sikdorok.jeffrey-oh.click/users/password-reset?usersId={usersId}&code={code}&apn=com.ddd.sikdorok";
 
             for (Users users : receiveList) {
+                // 0. 유저 정보 치환
+                passwordResetUrl = passwordResetUrl.replace("{usersId}", users.getUsersId().toString()).replace("{code}", redisCode);
+
                 // 1. 메일 수신자 설정
                 messageHelper.setTo(users.getEmail());
 
@@ -68,7 +70,6 @@ public class MailServiceImpl implements MailService {
                    
                    </html>
                     """;
-                content = content.replace("{images-directory}", imagesDirectory);
                 content = content.replace("{nickname}", users.getName());
                 content = content.replace("{password-reset-url}", passwordResetUrl);
                 messageHelper.setText(content,true);
