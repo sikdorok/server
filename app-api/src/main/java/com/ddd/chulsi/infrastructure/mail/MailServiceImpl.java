@@ -2,7 +2,6 @@ package com.ddd.chulsi.infrastructure.mail;
 
 import com.ddd.chulsi.domainCore.model.users.Users;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
 
-    private final HttpServletRequest httpServletRequest;
     private final JavaMailSender javaMailSender;
 
     @Override
@@ -25,7 +23,7 @@ public class MailServiceImpl implements MailService {
 
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
-            String passwordResetUrl = "https://sikdorok.page.link/?link=https://sikdorok.jeffrey-oh.click/users/password-reset?usersId={usersId}&code={code}&apn=com.ddd.sikdorok";
+            String passwordResetUrl = "https://sikdorok.page.link/?link=https://www.sikdorok.com/reset?userid={usersId}&code={code}&apn=com.ddd.sikdorok";
 
             for (Users users : receiveList) {
                 // 0. 유저 정보 치환
