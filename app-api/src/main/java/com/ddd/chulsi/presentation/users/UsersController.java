@@ -107,4 +107,12 @@ public class UsersController {
         return BaseResponse.ofSuccess(accessToken);
     }
 
+    @DeleteMapping(name = "탈퇴")
+    public BaseResponse<Void> revoke(
+        @AuthToken String token
+    ) {
+        usersFacade.revoke(token);
+        return BaseResponse.ofSuccess();
+    }
+
 }

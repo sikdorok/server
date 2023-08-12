@@ -31,10 +31,6 @@ public class Feed extends DateColumn {
     @Column(name = "feedId", columnDefinition = "BINARY(16)")
     private UUID feedId;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cursorId", nullable = false)
-    private Long cursorId;
-
     @Column(name = "usersId", columnDefinition = "BINARY(16)")
     private UUID usersId;
 

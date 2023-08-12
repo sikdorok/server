@@ -23,8 +23,10 @@ import com.ddd.chulsi.presentation.shared.response.dto.PagingDTO;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -258,6 +260,24 @@ public class FeedFacade {
             else if (o1.originTime().isAfter(o2.originTime())) return 1;
             else return 0;
         });
+    }
+
+    @EventListener
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void revokeUsers(FeedCommand.RevokeUsers revokeUsers) {
+        List<FeedInfo.FeedSimpleInfo> feeds = feedService.findAllByUsersId(revokeUsers.usersId());
+
+        if (!CollectionUtils.isEmpty(feeds)) {
+            feeds.forEach(feedInfoDTO -> Optional.of(feedInfoDTO.photosInfoList()).ifPresent(photosInfos -> photosInfos.forEach(photosInfo -> {
+                Photos photos = photosService.findByToken(photosInfo.token());
+                if (photos != null) {
+                    fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
+                    photosService.delete(photos);
+                }
+            })));
+        }
+
+        feedService.revokeUsers(revokeUsers.usersId());
     }
 
 }

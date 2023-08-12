@@ -6,8 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.UUID;
@@ -51,5 +49,10 @@ public class FeedReaderImpl implements FeedReader {
     @Override
     public String nextCursorDate(UUID usersId, FeedCommand.ListViewCommand listViewCommand) {
         return feedCustomRepository.nextCursorDate(usersId, listViewCommand);
+    }
+
+    @Override
+    public List<FeedInfo.FeedSimpleInfo> findAllByUsersId(UUID usersId) {
+        return feedCustomRepository.findAllByUsersId(usersId);
     }
 }

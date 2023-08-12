@@ -79,6 +79,16 @@ public class FeedServiceImpl implements FeedService {
         return feedReader.nextCursorDate(usersId, listViewCommand);
     }
 
+    @Override
+    public List<FeedInfo.FeedSimpleInfo> findAllByUsersId(UUID usersId) {
+        return feedReader.findAllByUsersId(usersId);
+    }
+
+    @Override
+    public void revokeUsers(UUID usersId) {
+        feedStore.revokeUsers(usersId);
+    }
+
     private void addPrevWeekly(UUID usersId, LocalDate date, List<FeedInfo.WeeklyFeed> originWeek) {
         int gap = 7 - originWeek.size();
         List<FeedInfo.Weekly> prevWeeklyInfo = feedReader.weeklyList(usersId, date.minusMonths(1));

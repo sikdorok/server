@@ -33,6 +33,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -410,6 +411,32 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("data").type(JsonFieldType.STRING).description("AccessToken")
+                )
+            ));
+
+    }
+
+    @Test
+    void 회원탈퇴() throws Exception {
+
+        doNothing().when(usersFacade).revoke(anyString());
+
+        mockMvc.perform(
+                delete("/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
+
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("users/revoke",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
                 )
             ));
 

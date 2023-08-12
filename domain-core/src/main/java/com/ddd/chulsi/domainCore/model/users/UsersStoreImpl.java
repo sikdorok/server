@@ -13,4 +13,9 @@ public class UsersStoreImpl implements UsersStore {
     public Users save(Users users) {
         return usersJpaRepository.save(users);
     }
+
+    @Override
+    public void delete(Users users) {
+        usersJpaRepository.delete(users);
+    }
 }

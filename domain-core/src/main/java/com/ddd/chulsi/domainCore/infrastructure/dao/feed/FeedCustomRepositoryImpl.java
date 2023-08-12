@@ -136,6 +136,32 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
             .fetchOne();
     }
 
+    @Override
+    public List<FeedInfo.FeedSimpleInfo> findAllByUsersId(UUID usersId) {
+        return queryFactory
+            .selectFrom(feed)
+            .leftJoin(photos).on(photos.type.eq(DefinedCode.C000600001).and(photos.targetId.eq(feed.feedId)))
+            .where(
+                feed.usersId.eq(usersId)
+            )
+            .transform(
+                groupBy(feed.feedId)
+                    .list(
+                        Projections.constructor(
+                            FeedInfo.FeedSimpleInfo.class,
+                            feed.feedId,
+                            list(
+                                Projections.constructor(
+                                    PhotosInfo.Info.class,
+                                    photos.token,
+                                    photos.uploadFullPath
+                                )
+                            )
+                        )
+                    )
+            );
+    }
+
     private BooleanExpression cursorDate(LocalDate cursorDate, String nextCursorDate) {
         // 처음 조회
         if (cursorDate == null) {

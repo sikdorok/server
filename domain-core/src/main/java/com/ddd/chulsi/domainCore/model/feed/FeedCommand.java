@@ -66,4 +66,12 @@ public class FeedCommand {
             return new ListViewCommand(size, date, cursorDate);
         }
     }
+
+    public record RevokeUsers(
+        UUID usersId
+    ) {
+        public static RevokeUsers toCommand(UUID usersId) {
+            return new RevokeUsers(usersId);
+        }
+    }
 }
