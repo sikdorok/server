@@ -67,9 +67,6 @@ public class Users extends DateColumn {
     @Column(name = "photosLimit", nullable = false, length = 20)
     private int photosLimit;
 
-    @Column(name = "revokedAt")
-    private LocalDateTime revokedAt;
-
     // 마지막 로그인 시간 수정
     public void updateLastLoginAt() {
         this.lastLoginAt = LocalDateTime.now();
@@ -88,11 +85,6 @@ public class Users extends DateColumn {
     // 로그아웃
     public void logout() {
         this.refreshToken = null;
-    }
-
-    // 탈퇴
-    public void revoke() {
-        this.revokedAt = LocalDateTime.now();
     }
 
     // 비밀번호 변경

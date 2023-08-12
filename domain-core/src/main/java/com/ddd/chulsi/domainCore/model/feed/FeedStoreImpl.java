@@ -3,6 +3,8 @@ package com.ddd.chulsi.domainCore.model.feed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class FeedStoreImpl implements FeedStore {
@@ -17,6 +19,11 @@ public class FeedStoreImpl implements FeedStore {
     @Override
     public void delete(Feed feed) {
         feedJpaRepository.delete(feed);
+    }
+
+    @Override
+    public void revokeUsers(UUID usersId) {
+        feedJpaRepository.revokeUsers(usersId);
     }
 
 }

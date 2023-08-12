@@ -112,3 +112,10 @@ include::{snippets}/users/access-token/request-fields.adoc[]
 === Response
 include::{snippets}/users/access-token/response-fields.adoc[]
 include::{snippets}/users/access-token/response-body.adoc[]
+
+[[회원탈퇴]]
+== 회원탈퇴
+include::{snippets}/users/revoke/http-request.adoc[]
+=== Response
+include::{snippets}/users/revoke/response-fields.adoc[]
+include::{snippets}/users/revoke/response-body.adoc[]

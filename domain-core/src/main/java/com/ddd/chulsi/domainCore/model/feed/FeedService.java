@@ -24,4 +24,8 @@ public interface FeedService {
 
     String nextCursorDate(UUID usersId, FeedCommand.ListViewCommand listViewCommand);
 
+    List<FeedInfo.FeedSimpleInfo> findAllByUsersId(UUID usersId);
+
+    void revokeUsers(UUID usersId);
+
 }

@@ -1,6 +1,7 @@
 package com.ddd.chulsi.application.users;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.ddd.chulsi.domainCore.model.feed.FeedCommand;
 import com.ddd.chulsi.domainCore.model.oauthToken.OauthToken;
 import com.ddd.chulsi.domainCore.model.oauthToken.OauthTokenService;
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
@@ -16,6 +17,7 @@ import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
 import com.ddd.chulsi.infrastructure.mail.MailService;
 import com.ddd.chulsi.infrastructure.oauth.OauthInfo;
 import com.ddd.chulsi.infrastructure.oauth.OauthKakaoService;
+import com.ddd.chulsi.infrastructure.specification.users.UsersSpecification;
 import com.ddd.chulsi.infrastructure.util.RedisUtil;
 import com.ddd.chulsi.infrastructure.util.StringUtil;
 import com.ddd.chulsi.presentation.users.dto.UsersDTO;
@@ -50,6 +52,7 @@ public class UsersFacade {
     private final OauthTokenService oauthTokenService;
     private final OauthKakaoService oauthKakaoService;
     private final MailService mailService;
+    private final UsersSpecification usersSpecification;
 
     @Transactional(rollbackFor = Exception.class)
     public UsersDTO.LoginResponse login(UsersCommand.UsersLogin usersLogin, HttpServletResponse response) {
@@ -282,5 +285,18 @@ public class UsersFacade {
         if (users == null) return null;
 
         return jwtTokenUtil.createToken(jwtClaim, properties, true);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void revoke(String token) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+
+        UUID usersId = jwtClaim.getUsersId();
+        Users users = usersSpecification.findByUsersId(usersId);
+
+        // 피드 전체 삭제
+        eventPublisher.publishEvent(new FeedCommand.RevokeUsers(usersId));
+
+        usersService.revoke(users);
     }
 }

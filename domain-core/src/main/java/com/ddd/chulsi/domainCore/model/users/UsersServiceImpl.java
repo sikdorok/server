@@ -43,4 +43,9 @@ public class UsersServiceImpl implements UsersService {
         return usersReader.findByEmail(email);
     }
 
+    @Override
+    public void revoke(Users users) {
+        usersStore.delete(users);
+    }
+
 }

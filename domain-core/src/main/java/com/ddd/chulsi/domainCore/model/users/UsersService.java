@@ -18,4 +18,6 @@ public interface UsersService {
 
     Users findByEmail(String email);
 
+    void revoke(Users users);
+
 }

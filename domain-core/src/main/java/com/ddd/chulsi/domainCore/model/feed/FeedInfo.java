@@ -11,6 +11,11 @@ import java.util.*;
 
 public class FeedInfo {
 
+    public record FeedSimpleInfo (
+        UUID feedId,
+        List<PhotosInfo.Info> photosInfoList
+    ) { }
+
     public record FeedInfoDTO (
         UUID feedId,
         boolean isMine,
