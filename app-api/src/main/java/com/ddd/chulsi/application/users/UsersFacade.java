@@ -140,15 +140,19 @@ public class UsersFacade {
             String nickname = kakaoUserMe.kakaoAccount().kakaoProfile().nickname();
             String email = kakaoUserMe.kakaoAccount().email();
             boolean isValidEmail = kakaoUserMe.kakaoAccount().isEmailValid() && kakaoUserMe.kakaoAccount().isEmailVerified();
+            boolean isRegistered = false;
 
             // 이메일 중복검사
             if (email != null) {
                 Users duplicationCheckByEmail = usersService.findByEmail(email);
-                if (duplicationCheckByEmail != null) isValidEmail = false;
+                if (duplicationCheckByEmail != null) {
+                    isValidEmail = false;
+                    isRegistered = true;
+                }
             }
 
             OauthInfo.KakaoUserMeDTO kakaoUserMeDTO = new OauthInfo.KakaoUserMeDTO(nickname, email, isValidEmail);
-            return new UsersDTO.KakaoLoginResponse<>(false, kakaoUserMeDTO);
+            return new UsersDTO.KakaoLoginResponse<>(isRegistered, kakaoUserMeDTO);
         }
 
         OauthToken oauthToken = oauthTokenService.findByOauthTypeAndOauthId(DefinedCode.C000200001, kakaoUserMe.id());
