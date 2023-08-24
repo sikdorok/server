@@ -1,6 +1,5 @@
 package com.ddd.chulsi.domainCore.model.appVersion;
 
-import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,8 +39,7 @@ public class AppVersion {
     @Column(name = "patch", columnDefinition = "TINYINT DEFAULT 1")
     private int patch;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "forceUpdateStatus", nullable = false, length = 10)
-    private DefinedCode forceUpdateStatus;
+    @Column(name = "forceUpdateStatus", columnDefinition = "BIT(1) DEFAULT 0", nullable = false)
+    private boolean forceUpdateStatus;
 
 }
