@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,18 +96,10 @@ public class UsersFacade {
 
         // Token 정보 추가
         usersInfoLogin.setAccessToken(accessToken);
+        usersInfoLogin.setRefreshToken(refreshToken);
 
         // Refresh Token 유효시간을 가져온 후 Redis에 Refresh Token을 저장합니다.
         redisUtil.set("REFRESH_TOKEN:" + usersInfoLogin.getUsersId(), refreshToken, properties.getRefreshExpiresTime(), TimeUnit.MILLISECONDS);
-
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-            .maxAge((long) 14 * 24 * 60 * 60)
-            .path("/")
-            .secure(true)
-            .httpOnly(true)
-            .sameSite("None")
-            .build();
-        response.setHeader("Set-Cookie", cookie.toString());
 
         eventPublisher.publishEvent(new UsersCommand.UsersRefreshTokenUpdateEvent(usersInfoLogin.getUsersId(), refreshToken));
 
