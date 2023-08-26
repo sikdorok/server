@@ -1,6 +1,7 @@
 package com.ddd.chulsi.presentation.appVersion.dto;
 
 import com.ddd.chulsi.domainCore.model.appVersion.AppVersionCommand;
+import com.ddd.chulsi.domainCore.model.appVersion.AppVersionInfo;
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -11,13 +12,13 @@ public class AppVersionDTO {
         @NotNull
         DefinedCode type,
 
-        @Min(1)
+        @Min(0)
         int major,
 
-        @Min(1)
+        @Min(0)
         int minor,
 
-        @Min(1)
+        @Min(0)
         int patch,
 
         @NotNull
@@ -28,4 +29,8 @@ public class AppVersionDTO {
         }
     }
 
+    public record AppVersionInfoResponse(
+        AppVersionInfo.AppVersionDTO appVersion
+    ) {
+    }
 }

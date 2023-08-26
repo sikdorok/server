@@ -32,4 +32,8 @@ public class DocumentOptionalGenerator {
         return setFormat("C000500001 : 이용약관, C000500002 : 개인정보 동의, C000500003 : 제 3자 정보 제공 동의, C000500004 : 온보딩 기본 이미지, C000500005 : 메인 목록 기본 이미지, C000500006 : 메인 리스트뷰 기본 이미지");
     }
 
+    public static Attributes.Attribute deviceTypeFormat() {
+        return setFormat("C000700001 : AOS, C000700002 : IOS");
+    }
+
 }
