@@ -78,6 +78,7 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 정보"),
                     fieldWithPath("data.usersInfo.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
                     fieldWithPath("data.usersInfo.accessToken").type(JsonFieldType.STRING).description("access token"),
+                    fieldWithPath("data.usersInfo.refreshToken").type(JsonFieldType.STRING).description("JWT Refresh Token"),
                     fieldWithPath("data.usersInfo.lastLoginAt").type(JsonFieldType.STRING).description("마지막 로그인 일시")
                 )
             ));
@@ -179,6 +180,7 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 로그인 정보"),
                     fieldWithPath("data.usersInfo.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
                     fieldWithPath("data.usersInfo.accessToken").type(JsonFieldType.STRING).description("JWT Access Token"),
+                    fieldWithPath("data.usersInfo.refreshToken").type(JsonFieldType.STRING).description("JWT Refresh Token"),
                     fieldWithPath("data.usersInfo.lastLoginAt").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("마지막 로그인 일시").optional()
                 )
             ));
@@ -216,6 +218,7 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 로그인 정보"),
                     fieldWithPath("data.usersInfo.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
                     fieldWithPath("data.usersInfo.accessToken").type(JsonFieldType.STRING).description("JWT Access Token"),
+                    fieldWithPath("data.usersInfo.refreshToken").type(JsonFieldType.STRING).description("JWT Refresh Token"),
                     fieldWithPath("data.usersInfo.lastLoginAt").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("마지막 로그인 일시").optional()
                 )
             ));
@@ -245,6 +248,7 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("data.usersInfo").type(JsonFieldType.OBJECT).description("유저 로그인 정보"),
                     fieldWithPath("data.usersInfo.usersId").type(JsonFieldType.STRING).description("유저 고유번호"),
                     fieldWithPath("data.usersInfo.accessToken").type(JsonFieldType.STRING).description("JWT Access Token"),
+                    fieldWithPath("data.usersInfo.refreshToken").type(JsonFieldType.STRING).description("JWT Refresh Token"),
                     fieldWithPath("data.usersInfo.lastLoginAt").type(JsonFieldType.STRING).attributes(dateFormatFull()).description("마지막 로그인 일시").optional()
                 )
             ));
