@@ -1,6 +1,7 @@
 package com.ddd.chulsi.presentation.users;
 
 import com.ddd.chulsi.application.users.UsersFacade;
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.domainCore.model.users.UsersCommand;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
 import com.ddd.chulsi.presentation.shared.ControllerTest;
@@ -18,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static com.ddd.chulsi.infrastructure.format.DocumentOptionalGenerator.dateFormatFull;
+import static com.ddd.chulsi.infrastructure.format.DocumentOptionalGenerator.*;
 import static com.ddd.chulsi.infrastructure.inMemory.users.UsersFactory.*;
 import static com.ddd.chulsi.infrastructure.util.ApiDocumentUtils.getDocumentRequest;
 import static com.ddd.chulsi.infrastructure.util.ApiDocumentUtils.getDocumentResponse;
@@ -31,8 +32,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -441,6 +441,40 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
                     fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
+                )
+            ));
+
+    }
+
+    @Test
+    void 설정() throws Exception {
+
+        given(usersFacade.settings(anyString(), anyString(), any(DefinedCode.class))).willReturn(givenSettingsResponse());
+
+        mockMvc.perform(
+                get("/users/settings?version={version}&deviceType={deviceType}", "1.0.0", DefinedCode.C000700001)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
+
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("users/settings",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                queryParameters(
+                    parameterWithName("version").description("버전"),
+                    parameterWithName("deviceType").attributes(deviceTypeFormat()).description("디바이스 종류")
+                ),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("data.oauthType").type(JsonFieldType.STRING).attributes(oauthTypeFormat()).description("oauth 종류").optional(),
+                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
+                    fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
+                    fieldWithPath("data.isLatest").type(JsonFieldType.BOOLEAN).description("최신 버전 유무")
                 )
             ));
 
