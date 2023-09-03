@@ -21,6 +21,10 @@ public class DocumentOptionalGenerator {
         return setFormat("yyyy-MM-dd");
     }
 
+    public static Attributes.Attribute oauthTypeFormat() {
+        return setFormat("C000200001 : Kakao");
+    }
+
     public static Attributes.Attribute tagFormat() {
         return setFormat("C000300001 : 아침, C000300002 : 점심, C000300003 : 저녁, C000300004 : 간식");
     }

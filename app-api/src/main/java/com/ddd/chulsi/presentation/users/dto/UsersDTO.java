@@ -1,5 +1,6 @@
 package com.ddd.chulsi.presentation.users.dto;
 
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.domainCore.model.users.UsersCommand;
 import com.ddd.chulsi.domainCore.model.users.UsersInfo;
 import com.ddd.chulsi.infrastructure.exception.BadRequestException;
@@ -135,4 +136,12 @@ public class UsersDTO {
         @NotBlank
         String refreshToken
     ) {}
+
+    public record SettingsResponse(
+        DefinedCode oauthType,
+        String nickname,
+        String email,
+        boolean isLatest
+    ) {
+    }
 }

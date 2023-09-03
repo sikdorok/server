@@ -1,6 +1,8 @@
 package com.ddd.chulsi.application.users;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.ddd.chulsi.domainCore.model.appVersion.AppVersionInfo;
+import com.ddd.chulsi.domainCore.model.appVersion.AppVersionService;
 import com.ddd.chulsi.domainCore.model.feed.FeedCommand;
 import com.ddd.chulsi.domainCore.model.oauthToken.OauthToken;
 import com.ddd.chulsi.domainCore.model.oauthToken.OauthTokenService;
@@ -52,6 +54,7 @@ public class UsersFacade {
     private final OauthKakaoService oauthKakaoService;
     private final MailService mailService;
     private final UsersSpecification usersSpecification;
+    private final AppVersionService appVersionService;
 
     @Transactional(rollbackFor = Exception.class)
     public UsersDTO.LoginResponse login(UsersCommand.UsersLogin usersLogin, HttpServletResponse response) {
@@ -294,4 +297,22 @@ public class UsersFacade {
 
         usersService.revoke(users);
     }
+
+    @Transactional(readOnly = true)
+    public UsersDTO.SettingsResponse settings(String token, String version, DefinedCode deviceType) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+
+        UUID usersId = jwtClaim.getUsersId();
+        Users users = usersSpecification.findByUsersId(usersId);
+
+        AppVersionInfo.AppVersionDTO latest = appVersionService.latest(deviceType);
+
+        return new UsersDTO.SettingsResponse(
+            users.getOauthType(),
+            users.getName(),
+            users.getEmail(),
+            latest != null && StringUtils.isNotBlank(latest.appInfoAppVersion()) && latest.appInfoAppVersion().equals(version)
+        );
+    }
+
 }

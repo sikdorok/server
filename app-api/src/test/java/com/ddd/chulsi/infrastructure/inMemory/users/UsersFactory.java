@@ -60,4 +60,13 @@ public class UsersFactory {
         );
     }
 
+    public static UsersDTO.SettingsResponse givenSettingsResponse() {
+        return new UsersDTO.SettingsResponse(
+            DefinedCode.C000200001,
+            "닉네임",
+            "team.sikdorok@gmail.com",
+            true
+        );
+    }
+
 }

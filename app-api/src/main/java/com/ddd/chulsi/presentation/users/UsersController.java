@@ -1,6 +1,7 @@
 package com.ddd.chulsi.presentation.users;
 
 import com.ddd.chulsi.application.users.UsersFacade;
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.domainCore.model.users.UsersCommand;
 import com.ddd.chulsi.infrastructure.annotation.AuthToken;
 import com.ddd.chulsi.presentation.shared.response.dto.BaseResponse;
@@ -113,6 +114,15 @@ public class UsersController {
     ) {
         usersFacade.revoke(token);
         return BaseResponse.ofSuccess();
+    }
+
+    @GetMapping(value = "/settings", name = "설정")
+    public BaseResponse<UsersDTO.SettingsResponse> settings(
+        @AuthToken String token,
+        @RequestParam String version,
+        @RequestParam DefinedCode deviceType
+        ) {
+        return BaseResponse.ofSuccess(usersFacade.settings(token, version, deviceType));
     }
 
 }

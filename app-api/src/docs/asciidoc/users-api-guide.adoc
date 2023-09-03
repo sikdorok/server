@@ -119,3 +119,12 @@ include::{snippets}/users/revoke/http-request.adoc[]
 === Response
 include::{snippets}/users/revoke/response-fields.adoc[]
 include::{snippets}/users/revoke/response-body.adoc[]
+
+[[설정]]
+== 설정
+include::{snippets}/users/settings/http-request.adoc[]
+=== Request
+include::{snippets}/users/settings/query-parameters.adoc[]
+=== Response
+include::{snippets}/users/settings/response-fields.adoc[]
+include::{snippets}/users/settings/response-body.adoc[]
