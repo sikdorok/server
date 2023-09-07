@@ -108,7 +108,7 @@ class HomeControllerTest extends ControllerTest {
                     parameterWithName("page").description("요청 페이지"),
                     parameterWithName("size").description("한 페이지에 가져올 목록 개수"),
                     parameterWithName("date").attributes(dateFormatYYYYMMDD()).description("날짜"),
-                    parameterWithName("tag").attributes(tagFormat()).description("태그")
+                    parameterWithName("tag").attributes(tagFormat()).description("태그").optional()
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
@@ -127,7 +127,9 @@ class HomeControllerTest extends ControllerTest {
                     fieldWithPath("data.dailyFeeds[].memo").type(JsonFieldType.STRING).description("메모").optional(),
                     fieldWithPath("data.dailyFeeds[].photosInfoList[]").type(JsonFieldType.ARRAY).description("사진 목록").optional(),
                     fieldWithPath("data.dailyFeeds[].photosInfoList[].token").type(JsonFieldType.STRING).description("사진 토큰").optional(),
-                    fieldWithPath("data.dailyFeeds[].photosInfoList[].uploadFullPath").type(JsonFieldType.STRING).description("사진 주소").optional()
+                    fieldWithPath("data.dailyFeeds[].photosInfoList[].uploadFullPath").type(JsonFieldType.STRING).description("사진 주소").optional(),
+                    fieldWithPath("data.initTag").type(JsonFieldType.STRING).attributes(tagFormat()).description("초기 태그 값"),
+                    fieldWithPath("data.tags").type(JsonFieldType.ARRAY).attributes(tagFormat()).description("검색 가능한 태그 목록").optional()
                 )
             ));
 

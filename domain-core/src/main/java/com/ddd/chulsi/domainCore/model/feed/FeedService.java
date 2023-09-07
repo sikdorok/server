@@ -1,5 +1,6 @@
 package com.ddd.chulsi.domainCore.model.feed;
 
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ public interface FeedService {
 
     List<FeedInfo.WeeklyCover> weeklyList(UUID usersId, LocalDate date);
 
-    Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand);
+    Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand, DefinedCode initTag);
 
     List<FeedInfo.HomeListViewFeedItemDTO> listViewWithCursorBased(UUID usersId, FeedCommand.ListViewCommand listViewCommand, String nextCursorDate);
 
@@ -27,5 +28,7 @@ public interface FeedService {
     List<FeedInfo.FeedSimpleInfo> findAllByUsersId(UUID usersId);
 
     void revokeUsers(UUID usersId);
+
+    List<DefinedCode> getOnlyTags(UUID usersId, LocalDate date);
 
 }

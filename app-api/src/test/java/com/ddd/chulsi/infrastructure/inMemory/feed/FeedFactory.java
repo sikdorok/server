@@ -96,7 +96,9 @@ public class FeedFactory {
     public static FeedDTO.ListResponse givenListResponse() {
         return new FeedDTO.ListResponse(
             new PagingDTO(1, 1, 2),
-            List.of(givenHomeFeedItem(), givenHomeFeedItem())
+            List.of(givenHomeFeedItem(), givenHomeFeedItem()),
+            DefinedCode.C000300003,
+            List.of(DefinedCode.C000300003, DefinedCode.C000300004)
         );
     }
     public static Map<String, List<FeedInfo.HomeListViewFeedItem>> givenHomeListViewFeedItemMap(String date) {

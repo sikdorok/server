@@ -101,7 +101,9 @@ public class FeedDTO {
 
     public record ListResponse(
         PagingDTO paging,
-        List<FeedInfo.HomeFeedItem> dailyFeeds
+        List<FeedInfo.HomeFeedItem> dailyFeeds,
+        DefinedCode initTag,
+        List<DefinedCode> tags
     ) {
     }
 
@@ -112,7 +114,6 @@ public class FeedDTO {
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         LocalDate date;
 
-        @NotNull
         DefinedCode tag;
 
         public FeedCommand.ListCommand toCommand() {
@@ -121,7 +122,7 @@ public class FeedDTO {
 
         @Override
         public void verify() {
-            if (!tag.getSectionCode().equals(DefinedCode.C0003.getSectionCode()))
+            if (tag != null && !tag.getSectionCode().equals(DefinedCode.C0003.getSectionCode()))
                 throw new BadRequestException(ErrorMessage.EXPECTATION_FAILED_MSG, "tag");
         }
     }

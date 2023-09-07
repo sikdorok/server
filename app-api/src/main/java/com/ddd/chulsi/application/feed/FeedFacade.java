@@ -191,13 +191,19 @@ public class FeedFacade {
         UUID usersId = jwtClaim.getUsersId();
         usersSpecification.findByUsersId(usersId);
 
-        Page<FeedInfo.HomeFeedItemDTO> feedList = feedService.findAllByUsersIdAndTime(usersId, listCommand);
+        // 검색날짜 기준 태그 목록 조회
+        List<DefinedCode> tags = feedService.getOnlyTags(usersId, listCommand.date());
+        DefinedCode initTag = tags.stream().filter(Objects::nonNull).findFirst().orElse(DefinedCode.C000300001);
+
+        Page<FeedInfo.HomeFeedItemDTO> feedList = feedService.findAllByUsersIdAndTime(usersId, listCommand, initTag);
         PagingDTO paging = feedMapper.toPagingDTO(feedList);
         List<FeedInfo.HomeFeedItem> dailyFeeds = feedMapper.toConvertDTO(feedList.getContent());
 
         return new FeedDTO.ListResponse(
             paging,
-            dailyFeeds
+            dailyFeeds,
+            initTag,
+            tags
         );
     }
 

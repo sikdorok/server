@@ -1,5 +1,6 @@
 package com.ddd.chulsi.domainCore.model.feed;
 
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -65,8 +66,8 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand) {
-        return feedReader.findAllByUsersIdAndTime(usersId, listCommand);
+    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand, DefinedCode initTag) {
+        return feedReader.findAllByUsersIdAndTime(usersId, listCommand, initTag);
     }
 
     @Override
@@ -87,6 +88,11 @@ public class FeedServiceImpl implements FeedService {
     @Override
     public void revokeUsers(UUID usersId) {
         feedStore.revokeUsers(usersId);
+    }
+
+    @Override
+    public List<DefinedCode> getOnlyTags(UUID usersId, LocalDate date) {
+        return feedReader.getOnlyTags(usersId, date);
     }
 
     private void addPrevWeekly(UUID usersId, LocalDate date, List<FeedInfo.WeeklyFeed> originWeek) {

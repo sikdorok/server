@@ -37,7 +37,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
     private final QPhotos photos = QPhotos.photos;
 
     @Override
-    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand) {
+    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand, DefinedCode initTag) {
         Pageable pageable = new PagingRequest(listCommand.page(), listCommand.size()).of();
 
         JPAQuery<Long> size = queryFactory
@@ -45,7 +45,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
             .from(feed)
             .where(
                 feed.usersId.eq(usersId),
-                feed.tag.eq(listCommand.tag()),
+                feed.tag.eq(listCommand.tag() != null ? listCommand.tag() : initTag),
                 feed.time.between(LocalDateTime.of(listCommand.date(), LocalTime.of(0, 0)), LocalDateTime.of(listCommand.date(), LocalTime.of(23, 59)))
             );
 
@@ -54,7 +54,7 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
             .leftJoin(photos).on(photos.type.eq(DefinedCode.C000600001).and(photos.targetId.eq(feed.feedId)))
             .where(
                 feed.usersId.eq(usersId),
-                feed.tag.eq(listCommand.tag()),
+                feed.tag.eq(listCommand.tag() != null ? listCommand.tag() : initTag),
                 feed.time.between(LocalDateTime.of(listCommand.date(), LocalTime.of(0, 0)), LocalDateTime.of(listCommand.date(), LocalTime.of(23, 59)))
             )
             .offset(pageable.getOffset())
@@ -160,6 +160,18 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                         )
                     )
             );
+    }
+
+    @Override
+    public List<DefinedCode> getOnlyTags(UUID usersId, LocalDate date) {
+        return queryFactory
+            .select(feed.tag)
+            .from(feed)
+            .where(
+                feed.usersId.eq(usersId),
+                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", feed.time, "%Y-%m-%d").eq(date.toString())
+            )
+            .fetch();
     }
 
     private BooleanExpression cursorDate(LocalDate cursorDate, String nextCursorDate) {
