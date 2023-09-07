@@ -65,7 +65,7 @@ encrypt:
   key: ${CONFIG_SERVER_ENCRYPT_KEY}
 
 jwt:
-  access-expires-time: 7200 # 2 시간
+  access-expires-time: 1209600 # 2 시간
   refresh-expires-time: 1209600 # 2 주
 
 logging:
