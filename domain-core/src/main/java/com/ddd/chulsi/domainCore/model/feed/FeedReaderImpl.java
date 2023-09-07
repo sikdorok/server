@@ -1,6 +1,7 @@
 package com.ddd.chulsi.domainCore.model.feed;
 
 import com.ddd.chulsi.domainCore.infrastructure.dao.feed.FeedCustomRepository;
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -37,8 +38,8 @@ public class FeedReaderImpl implements FeedReader {
     }
 
     @Override
-    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand) {
-        return feedCustomRepository.findAllByUsersIdAndTime(usersId, listCommand);
+    public Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand, DefinedCode initTag) {
+        return feedCustomRepository.findAllByUsersIdAndTime(usersId, listCommand, initTag);
     }
 
     @Override
@@ -54,5 +55,10 @@ public class FeedReaderImpl implements FeedReader {
     @Override
     public List<FeedInfo.FeedSimpleInfo> findAllByUsersId(UUID usersId) {
         return feedCustomRepository.findAllByUsersId(usersId);
+    }
+
+    @Override
+    public List<DefinedCode> getOnlyTags(UUID usersId, LocalDate date) {
+        return feedCustomRepository.getOnlyTags(usersId, date);
     }
 }
