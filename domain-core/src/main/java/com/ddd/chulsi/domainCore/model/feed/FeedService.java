@@ -4,6 +4,7 @@ import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ public interface FeedService {
 
     Feed findByFeedId(UUID feedId);
 
-    void updateMain(UUID usersId, boolean isMain);
+    void updateMain(UUID usersId, boolean isMain, LocalDateTime time);
 
     void delete(Feed feed);
 

@@ -4,6 +4,7 @@ import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public interface FeedReader {
 
     Feed findByFeedId(UUID feedId);
 
-    Feed findByUsersIdAndIsMain(UUID usersId, boolean isMain);
+    Feed findByUsersIdAndIsMainAndTime(UUID usersId, boolean isMain, LocalDateTime time);
 
     List<FeedInfo.Weekly> weeklyList(UUID usersId, LocalDate date);
 

@@ -58,7 +58,7 @@ public class FeedFacade {
 
         // 대표 아이콘 처리 확인
         if (registerCommand.isMain())
-            feedService.updateMain(usersId, true);
+            feedService.updateMain(usersId, true, registerCommand.time());
 
         Feed insertFeed = registerCommand.toEntity(usersId);
         Feed newFeed = feedService.register(insertFeed);
@@ -112,7 +112,7 @@ public class FeedFacade {
 
         // 대표 아이콘 처리 확인
         if (infoUpdateCommand.isMain()) {
-            feedService.updateMain(usersId, true);
+            feedService.updateMain(usersId, true, infoUpdateCommand.time());
             feed.updateIsMainTrue();
         }
 
