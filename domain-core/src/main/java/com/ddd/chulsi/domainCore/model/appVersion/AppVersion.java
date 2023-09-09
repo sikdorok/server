@@ -35,13 +35,13 @@ public class AppVersion {
     @Column(name = "appInfoAppVersion", nullable = false, length = 10)
     private String appInfoAppVersion;
 
-    @Column(name = "major", columnDefinition = "TINYINT DEFAULT 1")
+    @Column(name = "major", columnDefinition = "TINYINT DEFAULT 0")
     private int major;
 
-    @Column(name = "minor", columnDefinition = "TINYINT DEFAULT 1")
+    @Column(name = "minor", columnDefinition = "TINYINT DEFAULT 0")
     private int minor;
 
-    @Column(name = "patch", columnDefinition = "TINYINT DEFAULT 1")
+    @Column(name = "patch", columnDefinition = "TINYINT DEFAULT 0")
     private int patch;
 
     @Column(name = "forceUpdateStatus", columnDefinition = "BIT(1) DEFAULT 0", nullable = false)
