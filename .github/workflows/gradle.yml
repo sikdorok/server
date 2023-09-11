@@ -1,34 +1,102 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: Sikdorok Deploy
 
 on:
   push:
-    branches: [ "dev" ]
-  pull_request:
     branches: [ "dev" ]
 
 permissions:
   contents: read
 
+# env
+env:
+  SPRING_PROFILES_ACTIVE: ${GITHUB_REF##*/}
+  SSH_CONNECTION_HOST: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && '' || '3.37.134.103' }}
+  SSH_CONNECTION_NAME: "ubuntu"
+  SLACK_CHANNEL: "#chulsi-jenkins-deploy"
+  SLACK_SUCCESS_COLOR: "#2C953C"
+  SLACK_FAIL_COLOR: "#FF3232"
+  SSH_CONNECTION_CREDENTIAL: 'SIKDOROK_API_SSH'
+  IMAGE_TAG: "latest"
+  ECR_REPOSITORY: "sikdorok-api"
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 11
+    # Checkout
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # JDK Setup
+    - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'temurin'
+
+    # Gradle Permission
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    # Gradle clean build test
     - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+      env:
+        SPRING_PROFILES_ACTIVE: ${{ env.SPRING_PROFILES_ACTIVE }}
       with:
-        arguments: build
+        arguments: :app-api:clean :app-api:build :app-api:test
+
+    # AWS 자격 인증 설정
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    # ECR 로그인
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    # ECR 도커 이미지 Push
+    - name: Push docker image to ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    # GitHub Action IP
+    - name: Get Github Actions IP
+      id: ip
+      uses: haythem/public-ip@v1.2
+
+    # AWS EC2 Inbound Authorize
+    - name: Add Github Actions IP to Security group
+      run: |
+        aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+    # SSH 연결
+    - name: SSH Remote Commands
+      uses: appleboy/ssh-action@v1.0.0
+      env:
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_REGISTRY_URL_SIKDOROK: ${{ secrets.AWS_REGISTRY_URL_SIKDOROK }}
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+      with:
+        host: ${{ env.HOST }}
+        username: ${{ env.USERNAME }}
+        key: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && secrets.PROD_KEY || secrets.DEV_KEY }}
+        port: 22
+        envs: AWS_REGION, AWS_REGISTRY_URL_SIKDOROK, ECR_REPOSITORY
+        script: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_REGISTRY_URL_SIKDOROK IMAGE_NAME=$ECR_REPOSITORY IMAGE_STORAGE=$AWS_REGISTRY_URL_SIKDOROK BUILD_NUMBER=latest ./deploy.sh
+
+    # AWS EC2 Inbound Revoke
+    - name: Remove Github Actions IP From Security Group
+      run: |
+        aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
