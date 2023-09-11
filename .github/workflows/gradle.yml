@@ -22,98 +22,203 @@ jobs:
     steps:
 
     # Slack Notification
-    - name: Slack Notification
+    - name: Slack Notification - Actions Start
       uses: 8398a7/action-slack@v3
       with:
-        status: custom
-        fields: workflowRun, eventName, pullRequest
+        status: good
         custom_payload: |
           {
             attachments: [{
               color: 'good',
-              text: `workflowRun : ${process.env.AS_WORKFLOW_RUN}\n eventName : ${process.env.AS_EVENT_NAME}\n pullRequest : ${process.env.AS_PULL_REQUEST}`,
+              text: `==================================================================\n배포 파이프라인이 시작되었습니다.`,
             }]
           }
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       if: always() # Pick up events even if the job fails or is canceled.
 
-#    # Checkout
-#    - name: Checkout
-#      uses: actions/checkout@v3
-#
-#    # JDK Setup
-#    - name: Set up JDK 17
-#      uses: actions/setup-java@v3
-#      with:
-#        java-version: '17'
-#        distribution: 'temurin'
-#
-#    # Gradle Permission
-#    - name: Grant execute permission for gradlew
-#      run: chmod +x gradlew
-#
-#    # Gradle clean build test
-#    - name: Build with Gradle
-#      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-#      env:
-#        SPRING_PROFILES_ACTIVE: ${{ env.SPRING_PROFILES_ACTIVE }}
-#      with:
-#        arguments: :app-api:clean :app-api:build :app-api:test
-#
-#    # AWS 자격 인증 설정
-#    - name: Configure AWS credentials
-#      uses: aws-actions/configure-aws-credentials@v1
-#      with:
-#        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-#        aws-secret-access-key: ${{ secrets.AWS_SECRETS_ACCESS_KEY }}
-#        aws-region: ${{ secrets.AWS_REGION }}
-#
-#    # ECR 로그인
-#    - name: Login to Amazon ECR
-#      id: login-ecr
-#      uses: aws-actions/amazon-ecr-login@v1
-#
-#    # ECR 도커 이미지 Push
-#    - name: Push docker image to ECR
-#      id: build-image
-#      env:
-#        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#      run: |
-#        docker build --build-arg SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE --build-arg CONFIG_SERVER_ENCRYPT_KEY=$CONFIG_SERVER_ENCRYPT_KEY --build-arg CONFIG_SERVER_USERNAME=$CONFIG_SERVER_USERNAME --build-arg CONFIG_SERVER_PASSWORD=$CONFIG_SERVER_PASSWORD -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app-api
-#        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-#        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-#
-#    # GitHub Action IP
-#    - name: Get Github Actions IP
-#      id: ip
-#      uses: haythem/public-ip@v1.2
-#
-#    # AWS API Server EC2 Inbound Authorize
-#    - name: Add Github Actions IP to API Server Security group
-#      run: |
-#        aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-#
-#    # SSH 연결
-#    - name: SSH Remote Commands
-#      uses: appleboy/ssh-action@v1.0.0
-#      env:
-#        AWS_REGION: ${{ secrets.AWS_REGION }}
-#        AWS_REGISTRY_URL_SIKDOROK: ${{ secrets.AWS_REGISTRY_URL_SIKDOROK }}
-#        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-#        IMAGE_TAG: ${{ env.IMAGE_TAG }}
-#      with:
-#        host: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && '' || '3.37.134.103' }}
-#        username: ubuntu
-#        key: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && secrets.PROD_KEY || secrets.DEV_KEY }}
-#        port: 22
-#        envs: AWS_REGION, AWS_REGISTRY_URL_SIKDOROK, ECR_REPOSITORY, IMAGE_TAG
-#        script: |
-#          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_REGISTRY_URL_SIKDOROK
-#          IMAGE_NAME=$ECR_REPOSITORY IMAGE_STORAGE=$AWS_REGISTRY_URL_SIKDOROK BUILD_NUMBER=$IMAGE_TAG ./deploy.sh
-#
-#    # AWS API Server EC2 Inbound Revoke
-#    - name: Remove Github Actions IP From API Server Security Group
-#      if: ${{ success() || failure() }}
-#      run: |
-#        aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+    # Checkout
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # JDK Setup
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    # Gradle Permission
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    # Gradle clean build test
+    - name: Build with Gradle
+      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+      env:
+        SPRING_PROFILES_ACTIVE: ${{ env.SPRING_PROFILES_ACTIVE }}
+      with:
+        arguments: :app-api:clean :app-api:build :app-api:test
+
+    # Slack Notification - Build Test Failure
+    - name: Slack Notification - Build Test Failure
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        custom_payload: |
+          {
+            attachments: [{
+              color: 'danger',
+              text: `Build Test에 실패하였습니다.\n==================================================================`,
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: failure()
+
+    # Slack Notification - Build Test Success
+    - name: Slack Notification - Build Test Success
+      uses: 8398a7/action-slack@v3
+      with:
+        status: good
+        custom_payload: |
+          {
+            attachments: [{
+              color: 'good',
+              text: `Build Test에 성공하였습니다.`,
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: success()
+
+    # AWS 자격 인증 설정
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRETS_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    # ECR 로그인
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    # ECR 도커 이미지 Push
+    - name: Push docker image to ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        docker build --build-arg SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE --build-arg CONFIG_SERVER_ENCRYPT_KEY=$CONFIG_SERVER_ENCRYPT_KEY --build-arg CONFIG_SERVER_USERNAME=$CONFIG_SERVER_USERNAME --build-arg CONFIG_SERVER_PASSWORD=$CONFIG_SERVER_PASSWORD -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app-api
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    # Slack Notification - Container Image Build And Push Failure
+    - name: Slack Notification - Container Image Build And Push Failure
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        custom_payload: |
+          {
+            attachments: [{
+              color: 'danger',
+              text: `Container Image Build And Push에 실패하였습니다.\n==================================================================`,
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: failure()
+
+    # Slack Notification - Container Image Build And Push Success
+    - name: Slack Notification - Container Image Build And Push Success
+      uses: 8398a7/action-slack@v3
+      with:
+        status: good
+        custom_payload: |
+          {
+            attachments: [{
+              color: 'good',
+              text: `Container Image Build And Push에 성공하였습니다.`,
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: success()
+
+    # GitHub Action IP
+    - name: Get Github Actions IP
+      id: ip
+      uses: haythem/public-ip@v1.2
+
+    # AWS API Server EC2 Inbound Authorize
+    - name: Add Github Actions IP to API Server Security group
+      run: |
+        aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+    # SSH 연결
+    - name: SSH Remote Commands
+      uses: appleboy/ssh-action@v1.0.0
+      env:
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_REGISTRY_URL_SIKDOROK: ${{ secrets.AWS_REGISTRY_URL_SIKDOROK }}
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+      with:
+        host: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && '' || '3.37.134.103' }}
+        username: ubuntu
+        key: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && secrets.PROD_KEY || secrets.DEV_KEY }}
+        port: 22
+        envs: AWS_REGION, AWS_REGISTRY_URL_SIKDOROK, ECR_REPOSITORY, IMAGE_TAG
+        script: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_REGISTRY_URL_SIKDOROK
+          IMAGE_NAME=$ECR_REPOSITORY IMAGE_STORAGE=$AWS_REGISTRY_URL_SIKDOROK BUILD_NUMBER=$IMAGE_TAG ./deploy.sh
+          
+    # Slack Notification - Server Run Failure
+    - name: Slack Notification - Server Run Failure
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        custom_payload: |
+          {
+            attachments: [{
+              color: 'danger',
+              text: `배포에 실패하였습니다.\n==================================================================`,
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: failure()
+      
+    # Slack Notification - Server Run Success
+    - name: Slack Notification - Server Run Success
+      uses: 8398a7/action-slack@v3
+      with:
+        status: good
+        custom_payload: |
+          {
+            attachments: [{
+              color: 'good',
+              text: `배포에 성공하였습니다.\n==================================================================\n`,
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: success()
+
+    # AWS API Server EC2 Inbound Revoke
+    - name: Remove Github Actions IP From API Server Security Group
+      if: always()
+      run: |
+        aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+    # Slack Notification - Deploy Done
+    - name: Slack Notification - Deploy Done
+      uses: 8398a7/action-slack@v3
+      with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+      env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+      if: success()
