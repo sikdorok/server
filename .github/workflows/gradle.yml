@@ -4,25 +4,23 @@ on:
   push:
     branches: [ "dev" ]
 
-permissions:
-  contents: read
-
 # env
 env:
-  SPRING_PROFILES_ACTIVE: ${GITHUB_REF##*/}
-  SSH_CONNECTION_HOST: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && '' || '3.37.134.103' }}
-  SSH_CONNECTION_NAME: "ubuntu"
+  SPRING_PROFILES_ACTIVE: ${{ github.ref == 'refs/heads/dev' && 'dev' || 'prod' }}
   SLACK_CHANNEL: "#chulsi-jenkins-deploy"
   SLACK_SUCCESS_COLOR: "#2C953C"
   SLACK_FAIL_COLOR: "#FF3232"
-  SSH_CONNECTION_CREDENTIAL: 'SIKDOROK_API_SSH'
   IMAGE_TAG: "latest"
   ECR_REPOSITORY: "sikdorok-api"
+  CONFIG_SERVER_ENCRYPT_KEY: ${{ secrets.CONFIG_SERVER_ENCRYPT_KEY }}
+  CONFIG_SERVER_USERNAME: ${{ secrets.CONFIG_SERVER_USERNAME }}
+  CONFIG_SERVER_PASSWORD: ${{ secrets.CONFIG_SERVER_PASSWORD }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+
     # Checkout
     - name: Checkout
       uses: actions/checkout@v3
@@ -50,8 +48,8 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRETS_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
     # ECR 로그인
@@ -64,19 +62,18 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: latest
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build --build-arg SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE --build-arg CONFIG_SERVER_ENCRYPT_KEY=$CONFIG_SERVER_ENCRYPT_KEY --build-arg CONFIG_SERVER_USERNAME=$CONFIG_SERVER_USERNAME --build-arg CONFIG_SERVER_PASSWORD=$CONFIG_SERVER_PASSWORD -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app-api
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
     # GitHub Action IP
     - name: Get Github Actions IP
       id: ip
       uses: haythem/public-ip@v1.2
 
-    # AWS EC2 Inbound Authorize
-    - name: Add Github Actions IP to Security group
+    # AWS API Server EC2 Inbound Authorize
+    - name: Add Github Actions IP to API Server Security group
       run: |
         aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
@@ -87,16 +84,18 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_REGISTRY_URL_SIKDOROK: ${{ secrets.AWS_REGISTRY_URL_SIKDOROK }}
         ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
       with:
-        host: ${{ env.HOST }}
-        username: ${{ env.USERNAME }}
+        host: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && '' || '3.37.134.103' }}
+        username: ubuntu
         key: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && secrets.PROD_KEY || secrets.DEV_KEY }}
         port: 22
-        envs: AWS_REGION, AWS_REGISTRY_URL_SIKDOROK, ECR_REPOSITORY
+        envs: AWS_REGION, AWS_REGISTRY_URL_SIKDOROK, ECR_REPOSITORY, IMAGE_TAG
         script: |
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_REGISTRY_URL_SIKDOROK IMAGE_NAME=$ECR_REPOSITORY IMAGE_STORAGE=$AWS_REGISTRY_URL_SIKDOROK BUILD_NUMBER=latest ./deploy.sh
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_REGISTRY_URL_SIKDOROK
+          IMAGE_NAME=$ECR_REPOSITORY IMAGE_STORAGE=$AWS_REGISTRY_URL_SIKDOROK BUILD_NUMBER=$IMAGE_TAG ./deploy.sh
 
-    # AWS EC2 Inbound Revoke
-    - name: Remove Github Actions IP From Security Group
+    # AWS API Server EC2 Inbound Revoke
+    - name: Remove Github Actions IP From API Server Security Group
       run: |
         aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
