@@ -21,82 +21,99 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    # Checkout
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    # JDK Setup
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
+    # Slack Notification
+    - name: Slack Notification
+      uses: 8398a7/action-slack@v3
       with:
-        java-version: '17'
-        distribution: 'temurin'
-
-    # Gradle Permission
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    # Gradle clean build test
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+        status: custom
+        fields: workflow, job, commit, repo, ref, author, took, message
+        custom_payload: |
+          {
+            attachments: [{
+              color: 'good',
+              text: `workflow : ${process.env.AS_WORKFLOW}\n job : ${process.env.AS_JOB}\n commit : ${process.env.AS_COMMIT}\n repo : ${process.env.AS_REPO}\n ref : ${process.env.AS_REF}\n author : ${process.env.AS_AUTHOR}\n took : ${process.env.AS_TOOK}\n message : ${process.env.AS_MESSAGE}`,
+            }]
+          }
       env:
-        SPRING_PROFILES_ACTIVE: ${{ env.SPRING_PROFILES_ACTIVE }}
-      with:
-        arguments: :app-api:clean :app-api:build :app-api:test
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: always() # Pick up events even if the job fails or is canceled.
 
-    # AWS 자격 인증 설정
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRETS_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
-
-    # ECR 로그인
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    # ECR 도커 이미지 Push
-    - name: Push docker image to ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      run: |
-        docker build --build-arg SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE --build-arg CONFIG_SERVER_ENCRYPT_KEY=$CONFIG_SERVER_ENCRYPT_KEY --build-arg CONFIG_SERVER_USERNAME=$CONFIG_SERVER_USERNAME --build-arg CONFIG_SERVER_PASSWORD=$CONFIG_SERVER_PASSWORD -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app-api
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-    # GitHub Action IP
-    - name: Get Github Actions IP
-      id: ip
-      uses: haythem/public-ip@v1.2
-
-    # AWS API Server EC2 Inbound Authorize
-    - name: Add Github Actions IP to API Server Security group
-      run: |
-        aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-
-    # SSH 연결
-    - name: SSH Remote Commands
-      uses: appleboy/ssh-action@v1.0.0
-      env:
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        AWS_REGISTRY_URL_SIKDOROK: ${{ secrets.AWS_REGISTRY_URL_SIKDOROK }}
-        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-        IMAGE_TAG: ${{ env.IMAGE_TAG }}
-      with:
-        host: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && '' || '3.37.134.103' }}
-        username: ubuntu
-        key: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && secrets.PROD_KEY || secrets.DEV_KEY }}
-        port: 22
-        envs: AWS_REGION, AWS_REGISTRY_URL_SIKDOROK, ECR_REPOSITORY, IMAGE_TAG
-        script: |
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_REGISTRY_URL_SIKDOROK
-          IMAGE_NAME=$ECR_REPOSITORY IMAGE_STORAGE=$AWS_REGISTRY_URL_SIKDOROK BUILD_NUMBER=$IMAGE_TAG ./deploy.sh
-
-    # AWS API Server EC2 Inbound Revoke
-    - name: Remove Github Actions IP From API Server Security Group
-      if: ${{ success() || failure() }}
-      run: |
-        aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+#    # Checkout
+#    - name: Checkout
+#      uses: actions/checkout@v3
+#
+#    # JDK Setup
+#    - name: Set up JDK 17
+#      uses: actions/setup-java@v3
+#      with:
+#        java-version: '17'
+#        distribution: 'temurin'
+#
+#    # Gradle Permission
+#    - name: Grant execute permission for gradlew
+#      run: chmod +x gradlew
+#
+#    # Gradle clean build test
+#    - name: Build with Gradle
+#      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+#      env:
+#        SPRING_PROFILES_ACTIVE: ${{ env.SPRING_PROFILES_ACTIVE }}
+#      with:
+#        arguments: :app-api:clean :app-api:build :app-api:test
+#
+#    # AWS 자격 인증 설정
+#    - name: Configure AWS credentials
+#      uses: aws-actions/configure-aws-credentials@v1
+#      with:
+#        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+#        aws-secret-access-key: ${{ secrets.AWS_SECRETS_ACCESS_KEY }}
+#        aws-region: ${{ secrets.AWS_REGION }}
+#
+#    # ECR 로그인
+#    - name: Login to Amazon ECR
+#      id: login-ecr
+#      uses: aws-actions/amazon-ecr-login@v1
+#
+#    # ECR 도커 이미지 Push
+#    - name: Push docker image to ECR
+#      id: build-image
+#      env:
+#        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#      run: |
+#        docker build --build-arg SPRING_PROFILES_ACTIVE=$SPRING_PROFILES_ACTIVE --build-arg CONFIG_SERVER_ENCRYPT_KEY=$CONFIG_SERVER_ENCRYPT_KEY --build-arg CONFIG_SERVER_USERNAME=$CONFIG_SERVER_USERNAME --build-arg CONFIG_SERVER_PASSWORD=$CONFIG_SERVER_PASSWORD -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app-api
+#        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+#        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+#
+#    # GitHub Action IP
+#    - name: Get Github Actions IP
+#      id: ip
+#      uses: haythem/public-ip@v1.2
+#
+#    # AWS API Server EC2 Inbound Authorize
+#    - name: Add Github Actions IP to API Server Security group
+#      run: |
+#        aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+#
+#    # SSH 연결
+#    - name: SSH Remote Commands
+#      uses: appleboy/ssh-action@v1.0.0
+#      env:
+#        AWS_REGION: ${{ secrets.AWS_REGION }}
+#        AWS_REGISTRY_URL_SIKDOROK: ${{ secrets.AWS_REGISTRY_URL_SIKDOROK }}
+#        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+#        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+#      with:
+#        host: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && '' || '3.37.134.103' }}
+#        username: ubuntu
+#        key: ${{ env.SPRING_PROFILES_ACTIVE == 'prod' && secrets.PROD_KEY || secrets.DEV_KEY }}
+#        port: 22
+#        envs: AWS_REGION, AWS_REGISTRY_URL_SIKDOROK, ECR_REPOSITORY, IMAGE_TAG
+#        script: |
+#          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_REGISTRY_URL_SIKDOROK
+#          IMAGE_NAME=$ECR_REPOSITORY IMAGE_STORAGE=$AWS_REGISTRY_URL_SIKDOROK BUILD_NUMBER=$IMAGE_TAG ./deploy.sh
+#
+#    # AWS API Server EC2 Inbound Revoke
+#    - name: Remove Github Actions IP From API Server Security Group
+#      if: ${{ success() || failure() }}
+#      run: |
+#        aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
