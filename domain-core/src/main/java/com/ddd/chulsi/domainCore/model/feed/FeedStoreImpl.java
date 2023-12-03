@@ -26,4 +26,14 @@ public class FeedStoreImpl implements FeedStore {
         feedJpaRepository.revokeUsers(usersId);
     }
 
+    @Override
+    public void store(Feed mainFeed) {
+        feedJpaRepository.save(mainFeed);
+    }
+
+    @Override
+    public void flush() {
+        feedJpaRepository.flush();
+    }
+
 }

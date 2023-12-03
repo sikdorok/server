@@ -10,4 +10,8 @@ public interface FeedStore {
 
     void revokeUsers(UUID usersId);
 
+    void store(Feed mainFeed);
+
+    void flush();
+
 }

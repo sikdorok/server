@@ -32,7 +32,11 @@ public class FeedServiceImpl implements FeedService {
     @Override
     public void updateMain(UUID usersId, boolean isMain, LocalDateTime time) {
         Feed mainFeed = feedReader.findByUsersIdAndIsMainAndTime(usersId, isMain, time);
-        if (mainFeed != null) mainFeed.updateIsMainFalse();
+        if (mainFeed != null) {
+            mainFeed.updateIsMainFalse();
+            feedStore.store(mainFeed);
+            feedStore.flush();
+        }
     }
 
     @Override
