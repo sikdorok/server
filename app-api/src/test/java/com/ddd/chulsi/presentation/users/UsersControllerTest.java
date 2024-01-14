@@ -117,7 +117,7 @@ class UsersControllerTest extends ControllerTest {
                     fieldWithPath("data.usersInfo.oauthId").type(JsonFieldType.NUMBER).description("oauth 고유번호"),
                     fieldWithPath("data.usersInfo.nickname").type(JsonFieldType.STRING).description("닉네임"),
                     fieldWithPath("data.usersInfo.email").type(JsonFieldType.STRING).description("이메일"),
-                    fieldWithPath("data.usersInfo.isValidEmail").type(JsonFieldType.BOOLEAN).description("이메일 유효성")
+                    fieldWithPath("data.usersInfo.validEmail").type(JsonFieldType.BOOLEAN).description("이메일 유효성")
                 )
             ));
 
