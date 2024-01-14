@@ -114,7 +114,7 @@ public class FeedFacade {
         if (infoUpdateCommand.isMain()) {
             feedService.updateMain(usersId, true, infoUpdateCommand.time());
             feed.updateIsMainTrue();
-        }
+        } else feed.updateIsMainFalse();
 
         // 파일 삭제
         if (!CollectionUtils.isEmpty(infoUpdateCommand.deletePhotoTokens())) {

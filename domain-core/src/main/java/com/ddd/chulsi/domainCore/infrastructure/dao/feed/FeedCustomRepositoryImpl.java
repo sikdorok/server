@@ -1,6 +1,7 @@
 package com.ddd.chulsi.domainCore.infrastructure.dao.feed;
 
 import com.ddd.chulsi.domainCore.infrastructure.dao.shared.PagingRequest;
+import com.ddd.chulsi.domainCore.model.feed.Feed;
 import com.ddd.chulsi.domainCore.model.feed.FeedCommand;
 import com.ddd.chulsi.domainCore.model.feed.FeedInfo;
 import com.ddd.chulsi.domainCore.model.feed.QFeed;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
@@ -172,6 +174,18 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
                 Expressions.stringTemplate("DATE_FORMAT({0}, {1})", feed.time, "%Y-%m-%d").eq(date.toString())
             )
             .fetch();
+    }
+
+    @Override
+    public Feed findByUsersIdAndIsMainAndTime(UUID usersId, boolean isMain, LocalDateTime time) {
+        return queryFactory
+            .selectFrom(feed)
+            .where(
+                feed.usersId.eq(usersId),
+                feed.isMain.eq(isMain),
+                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", feed.time, "%Y-%m-%d").eq(time.toLocalDate().toString())
+            )
+            .fetchOne();
     }
 
     private BooleanExpression cursorDate(LocalDate cursorDate, String nextCursorDate) {

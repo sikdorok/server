@@ -26,7 +26,7 @@ public class FeedReaderImpl implements FeedReader {
 
     @Override
     public Feed findByUsersIdAndIsMainAndTime(UUID usersId, boolean isMain, LocalDateTime time) {
-        return feedJpaRepository.findByUsersIdAndIsMainAndTime(usersId, isMain, time).orElse(null);
+        return feedCustomRepository.findByUsersIdAndIsMainAndTime(usersId, isMain, time);
     }
 
     @Override
