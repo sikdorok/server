@@ -2,6 +2,7 @@ package com.ddd.chulsi.infrastructure.oauth;
 
 import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 public class OauthInfo {
 
@@ -58,11 +59,16 @@ public class OauthInfo {
         ) { }
     }
 
-    public record KakaoUserMeDTO (
-        DefinedCode oauthType,
-        long oauthId,
-        String nickname,
-        String email,
-        boolean isValidEmail
-    ) {}
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class KakaoUserMeDTO {
+        private DefinedCode oauthType;
+        private long oauthId;
+        private String nickname;
+        private String email;
+        private boolean isValidEmail;
+    }
 }

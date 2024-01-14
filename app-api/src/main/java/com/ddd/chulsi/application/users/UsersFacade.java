@@ -142,7 +142,7 @@ public class UsersFacade {
             if (email != null) {
                 Users duplicationCheckByEmail = usersService.findByEmail(email);
                 if (duplicationCheckByEmail != null) {
-                    isValidEmail = false;
+                    kakaoUserMeDTO.setValidEmail(false);
                     isRegistered = true;
                 }
             }
