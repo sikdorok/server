@@ -16,8 +16,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -25,6 +24,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -56,6 +56,7 @@ public class GlobalExceptionHandler {
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA);
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoHandlerFoundException.class)
     public ErrorResponse noHandlerFoundException(NoHandlerFoundException exception) {
         log.error("message : {} : {}", ErrorMessage.NOT_FOUND_URL, exception.getRequestURL());
@@ -63,11 +64,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ServerException.class)
-    public ErrorResponse handleServerException(ServerException exception) {
+    public ResponseEntity<ErrorResponse> handleServerException(ServerException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
-        return new ErrorResponse(exception.getCode(), exception.getMessage(), exception.getField());
+        return new ResponseEntity<>(new ErrorResponse(exception.getCode(), exception.getMessage(), exception.getField()), HttpStatusCode.valueOf(exception.getCode()));
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ErrorResponse methodArgumentNotValidException(HttpMessageNotReadableException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -92,6 +94,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(400, message, field);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestPartException.class)
     public ErrorResponse missingServletRequestPartException(MissingServletRequestPartException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -99,6 +102,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(400, ErrorMessage.BAD_REQUEST);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
     public ErrorResponse illegalArgumentException(IllegalArgumentException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -106,6 +110,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(400, ErrorMessage.BAD_REQUEST);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(JWTDecodeException.class)
     public ErrorResponse jwtDecodeException(JWTDecodeException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -113,6 +118,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(400, ErrorMessage.INVALID_JWT_TOKEN);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ErrorResponse maxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -126,6 +132,7 @@ public class GlobalExceptionHandler {
     /**
      * 요청 Method Exception
      */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ErrorResponse httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -133,6 +140,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(400, ErrorMessage.BAD_REQUEST);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ErrorResponse httpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -140,6 +148,7 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(400, ErrorMessage.BAD_REQUEST_METHOD);
     }
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(TokenExpiredException.class)
     public ErrorResponse tokenExpiredException(TokenExpiredException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -151,6 +160,7 @@ public class GlobalExceptionHandler {
      * Validation 실패 (RequestBody)
      * HttpStatus 417
      */
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ErrorResponse methodArgumentNotValidException(MethodArgumentNotValidException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -169,6 +179,7 @@ public class GlobalExceptionHandler {
      * Validation 실패 (RequestBody)
      * HttpStatus 417
      */
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     public ErrorResponse methodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -184,6 +195,7 @@ public class GlobalExceptionHandler {
      * Validation 실패 (ModelAttribute)
      * HttpStatus 417
      */
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
     @ExceptionHandler(BindException.class)
     public ErrorResponse bindException(BindException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -202,6 +214,7 @@ public class GlobalExceptionHandler {
      * Validation 실패 (RequestBody)
      * HttpStatus 417
      */
+    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
     @ExceptionHandler(InvalidDataAccessApiUsageException.class)
     public ErrorResponse invalidDataAccessApiUsageException(InvalidDataAccessApiUsageException exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
@@ -228,7 +241,7 @@ public class GlobalExceptionHandler {
      * SQL Error
      */
     @ExceptionHandler({ DataIntegrityViolationException.class, ConstraintViolationException.class, SQLIntegrityConstraintViolationException.class })
-    public ErrorResponse sqlException(Exception exception) {
+    public ResponseEntity<ErrorResponse> sqlException(Exception exception) {
         log.error(MESSAGE_KEY, exception.getMessage());
 
         int code = 500;
@@ -243,9 +256,10 @@ public class GlobalExceptionHandler {
             throwable = throwable.getCause();
         }
 
-        return new ErrorResponse(code, message);
+        return new ResponseEntity<>(new ErrorResponse(code, message), HttpStatusCode.valueOf(code));
     }
 
+    @ResponseStatus
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleException(Exception exception) {
         log.error(MESSAGE_KEY, exception.getMessage());

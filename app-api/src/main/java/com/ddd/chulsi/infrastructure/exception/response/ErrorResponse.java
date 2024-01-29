@@ -34,14 +34,14 @@ public class ErrorResponse {
     public static void of(HttpServletResponse response, HttpStatus httpStatus, String message) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.setStatus(200);
+        response.setStatus(httpStatus.value());
         response.getWriter().write(JsonUtils.convertObjectToJson(ErrorResponse.of(httpStatus, message)));
     }
 
     public static void of(HttpServletResponse response, HttpStatus httpStatus, String message, String field) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.setStatus(200);
+        response.setStatus(httpStatus.value());
         response.getWriter().write(JsonUtils.convertObjectToJson(ErrorResponse.of(httpStatus, message, field)));
     }
 
