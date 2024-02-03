@@ -32,4 +32,6 @@ public interface FeedService {
 
     List<DefinedCode> getOnlyTags(UUID usersId, LocalDate date);
 
+    boolean duplicateCheck(LocalDateTime time, DefinedCode tag, DefinedCode icon, String memo);
+
 }

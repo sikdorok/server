@@ -270,7 +270,7 @@ public class UsersFacade {
 
     @Transactional(readOnly = true)
     public Boolean emailCheck(String email) {
-        return usersService.duplicationCheckEmail(email);
+        return usersService.duplicationCheckEmailNonLock(email);
     }
 
     @Transactional(readOnly = true)

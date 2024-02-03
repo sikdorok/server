@@ -100,6 +100,11 @@ public class FeedServiceImpl implements FeedService {
         return feedReader.getOnlyTags(usersId, date);
     }
 
+    @Override
+    public boolean duplicateCheck(LocalDateTime time, DefinedCode tag, DefinedCode icon, String memo) {
+        return feedReader.duplicateCheck(time, tag, icon, memo);
+    }
+
     private void addPrevWeekly(UUID usersId, LocalDate date, List<FeedInfo.WeeklyFeed> originWeek) {
         int gap = 7 - originWeek.size();
         List<FeedInfo.Weekly> prevWeeklyInfo = feedReader.weeklyList(usersId, date.minusMonths(1));

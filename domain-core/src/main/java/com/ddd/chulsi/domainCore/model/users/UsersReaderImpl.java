@@ -11,6 +11,7 @@ import java.util.UUID;
 public class UsersReaderImpl implements UsersReader {
 
     private final UsersJpaRepository usersJpaRepository;
+    private final UsersJpaLockRepository usersJpaLockRepository;
 
     @Override
     public Users findByOauthTypeAndOauthId(DefinedCode oauthType, Long oauthId) {
@@ -29,12 +30,17 @@ public class UsersReaderImpl implements UsersReader {
 
     @Override
     public boolean duplicationCheckEmail(String email) {
-        return usersJpaRepository.findFirstByEmail(email).isPresent();
+        return usersJpaLockRepository.findFirstByEmail(email).isPresent();
     }
 
     @Override
     public Users findByEmail(String email) {
         return usersJpaRepository.findByEmail(email).orElse(null);
+    }
+
+    @Override
+    public boolean duplicationCheckEmailNonLock(String email) {
+        return usersJpaRepository.findFirstByEmail(email).isPresent();
     }
 
 }

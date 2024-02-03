@@ -11,6 +11,7 @@ import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
 import com.ddd.chulsi.domainCore.model.users.Users;
 import com.ddd.chulsi.infrastructure.aws.FileProvider;
 import com.ddd.chulsi.infrastructure.exception.BadRequestException;
+import com.ddd.chulsi.infrastructure.exception.ExistsException;
 import com.ddd.chulsi.infrastructure.jwt.JWTClaim;
 import com.ddd.chulsi.infrastructure.jwt.JWTProperties;
 import com.ddd.chulsi.infrastructure.jwt.JwtTokenUtil;
@@ -26,11 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -48,13 +51,20 @@ public class FeedFacade {
     private final PhotosService photosService;
     private final FeedMapper feedMapper;
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.REPEATABLE_READ)
     public UUID register(String token, FeedCommand.RegisterCommand registerCommand, MultipartFile file) {
         JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
 
         UUID usersId = jwtClaim.getUsersId();
 
         Users users = usersSpecification.findByUsersId(usersId);
+
+        duplicateCheck(
+            registerCommand.time(),
+            registerCommand.tag(),
+            registerCommand.icon(),
+            registerCommand.memo()
+        );
 
         // 대표 아이콘 처리 확인
         if (registerCommand.isMain())
@@ -66,6 +76,19 @@ public class FeedFacade {
         feedPhotoUpload(file, users, newFeed);
 
         return newFeed.getFeedId();
+    }
+
+    private void duplicateCheck(LocalDateTime time, DefinedCode tag, DefinedCode icon, String memo) {
+        // main 빼고 모든 데이터가 완전 동일한 것은 등록 불가
+        if (
+            feedService.duplicateCheck(
+                time,
+                tag,
+                icon,
+                memo
+            )
+        )
+            throw new ExistsException();
     }
 
     public FeedDTO.FeedInfoResponse info(String token, UUID feedId) {
@@ -105,6 +128,13 @@ public class FeedFacade {
         UUID usersId = jwtClaim.getUsersId();
 
         Users users = usersSpecification.findByUsersId(usersId);
+
+        duplicateCheck(
+            infoUpdateCommand.time(),
+            infoUpdateCommand.tag(),
+            infoUpdateCommand.icon(),
+            infoUpdateCommand.memo()
+        );
 
         Feed feed = feedSpecification.findByFeedIdAndIsMind(infoUpdateCommand.feedId(), usersId);
 

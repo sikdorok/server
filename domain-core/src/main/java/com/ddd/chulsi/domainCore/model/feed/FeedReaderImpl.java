@@ -62,4 +62,10 @@ public class FeedReaderImpl implements FeedReader {
     public List<DefinedCode> getOnlyTags(UUID usersId, LocalDate date) {
         return feedCustomRepository.getOnlyTags(usersId, date);
     }
+
+    @Override
+    public boolean duplicateCheck(LocalDateTime time, DefinedCode tag, DefinedCode icon, String memo) {
+        return feedJpaRepository.findByTimeAndTagAndIconAndMemo(time, tag, icon, memo).isPresent();
+    }
+
 }

@@ -1,6 +1,9 @@
 package com.ddd.chulsi.domainCore.model.feed;
 
+import com.ddd.chulsi.domainCore.model.shared.DefinedCode;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -20,5 +23,8 @@ public interface FeedJpaRepository extends JpaRepository<Feed, UUID> {
     @Modifying
     @Query(value = "DELETE FROM feed WHERE usersId = :usersId", nativeQuery = true)
     void revokeUsers(UUID usersId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<Feed> findByTimeAndTagAndIconAndMemo(LocalDateTime time, DefinedCode tag, DefinedCode icon, String memo);
 
 }

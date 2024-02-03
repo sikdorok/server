@@ -16,6 +16,8 @@ public interface UsersService {
 
     boolean duplicationCheckEmail(String email);
 
+    boolean duplicationCheckEmailNonLock(String email);
+
     Users findByEmail(String email);
 
     void revoke(Users users);

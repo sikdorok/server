@@ -39,6 +39,11 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
+    public boolean duplicationCheckEmailNonLock(String email) {
+        return usersReader.duplicationCheckEmailNonLock(email);
+    }
+
+    @Override
     public Users findByEmail(String email) {
         return usersReader.findByEmail(email);
     }
