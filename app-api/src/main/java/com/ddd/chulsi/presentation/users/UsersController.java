@@ -125,4 +125,21 @@ public class UsersController {
         return BaseResponse.ofSuccess(usersFacade.settings(token, version, deviceType));
     }
 
+    @GetMapping(value = "/profile", name = "프로필 관리")
+    public BaseResponse<UsersDTO.ProfileResponse> profile(
+        @AuthToken String token
+    ) {
+        return BaseResponse.ofSuccess(usersFacade.profile(token));
+    }
+
+    @PutMapping(value = "/profile", name = "프로필 관리 수정")
+    public BaseResponse<Void> profileUpdate(
+        @AuthToken String token,
+        @RequestBody @Valid UsersDTO.ProfileRequest profileRequest
+    ) {
+        UsersCommand.Profile initProfile = profileRequest.toCommand();
+        usersFacade.profileUpdate(token, initProfile);
+        return BaseResponse.ofSuccess();
+    }
+
 }

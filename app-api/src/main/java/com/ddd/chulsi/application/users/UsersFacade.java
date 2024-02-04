@@ -316,4 +316,23 @@ public class UsersFacade {
         );
     }
 
+    @Transactional(readOnly = true)
+    public UsersDTO.ProfileResponse profile(String token) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+
+        UUID usersId = jwtClaim.getUsersId();
+        Users users = usersSpecification.findByUsersId(usersId);
+
+        return new UsersDTO.ProfileResponse(
+            users.getName(),
+            users.getEmail()
+        );
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void profileUpdate(String token, UsersCommand.Profile profile) {
+        JWTClaim jwtClaim = jwtTokenUtil.checkAuth(token, properties);
+        usersSpecification.findByUsersId(jwtClaim.getUsersId()).updateNickName(profile.nickname());
+    }
+
 }

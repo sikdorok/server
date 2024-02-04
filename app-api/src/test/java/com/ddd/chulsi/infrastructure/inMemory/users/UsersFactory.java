@@ -71,4 +71,11 @@ public class UsersFactory {
         );
     }
 
+    public static UsersDTO.ProfileResponse givenProfileResponse() {
+        return new UsersDTO.ProfileResponse(
+            "닉네임",
+            "email@test.com"
+        );
+    }
+
 }

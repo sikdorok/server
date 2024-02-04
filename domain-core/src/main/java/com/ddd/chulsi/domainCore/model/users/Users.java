@@ -82,6 +82,10 @@ public class Users extends DateColumn {
         if (StringUtils.isNotBlank(refreshToken)) this.refreshToken = refreshToken;
     }
 
+    public void updateNickName(String nickname) {
+        if (StringUtils.isNotBlank(nickname)) this.name = nickname;
+    }
+
     // 로그아웃
     public void logout() {
         this.refreshToken = null;

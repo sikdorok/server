@@ -484,4 +484,66 @@ class UsersControllerTest extends ControllerTest {
 
     }
 
+    @Test
+    void 프로필_관리_조회() throws Exception {
+
+        given(usersFacade.profile(anyString())).willReturn(givenProfileResponse());
+
+        mockMvc.perform(
+                get("/users/profile")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
+
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("users/profile",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
+                    fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일")
+                )
+            ));
+
+    }
+
+    @Test
+    void 프로필_관리_수정() throws Exception {
+
+        doNothing().when(usersFacade).profileUpdate(anyString(), any(UsersCommand.Profile.class));
+
+        UsersDTO.ProfileRequest request = new UsersDTO.ProfileRequest("닉네임");
+
+        mockMvc.perform(
+                put("/users/profile")
+                    .content(objectMapper.writeValueAsString(request))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON).header(HttpHeaders.AUTHORIZATION, JwtTokenUtil.PREFIX + "AccessToken")
+            )
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("code").value(200))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andDo(document("users/profile-update",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임(이름)")
+                ),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("결과 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("결과 메세지"),
+                    fieldWithPath("data").type(JsonFieldType.NULL).description("결과 데이터")
+                )
+            ));
+
+        verify(usersFacade).profileUpdate(anyString(), any(UsersCommand.Profile.class));
+
+    }
+
 }

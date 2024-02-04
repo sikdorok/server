@@ -74,4 +74,12 @@ public class UsersCommand {
             return new PasswordLinkAlive(usersId, code);
         }
     }
+
+    public record Profile (
+        String nickname
+    ) {
+        public static Profile toCommand(String nickname) {
+            return new Profile(nickname);
+        }
+    }
 }

@@ -10,6 +10,9 @@ import com.ddd.chulsi.infrastructure.util.StringUtil;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -149,5 +152,19 @@ public class UsersDTO {
         String email,
         boolean isLatest
     ) {
+    }
+
+    public record ProfileResponse (
+        String nickname,
+        String email
+    ) {}
+
+    public record ProfileRequest (
+        @NotBlank
+        String nickname
+    ) {
+        public UsersCommand.Profile toCommand() {
+            return UsersCommand.Profile.toCommand(nickname);
+        }
     }
 }
