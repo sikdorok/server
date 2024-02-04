@@ -25,14 +25,17 @@ public class MailServiceImpl implements MailService {
 
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
-            String passwordResetUrl = "https://sikdorok.page.link/?link=https://www.sikdorok.com/reset?userid={usersId}&code={code}&apn=com.ddd.sikdorok";
+            String passwordResetUrl = "https://sikdorok.page.link/?link={link}&apn=com.ddd.sikdorok";
+            String link = "https://www.sikdorok.com/reset?userid={usersId}&code={code}";
 
             for (Users users : receiveList) {
                 // 0. 유저 정보 치환
-                passwordResetUrl = passwordResetUrl.replace("{usersId}", users.getUsersId().toString()).replace("{code}", redisCode);
+                link = link.replace("{usersId}", users.getUsersId().toString()).replace("{code}", redisCode);
 
                 // URL Encode
-                passwordResetUrl = URLEncoder.encode(passwordResetUrl, StandardCharsets.UTF_8);
+                link = URLEncoder.encode(link, StandardCharsets.UTF_8);
+
+                passwordResetUrl = passwordResetUrl.replace("{link}", link);
 
                 // 1. 메일 수신자 설정
                 messageHelper.setTo(users.getEmail());
