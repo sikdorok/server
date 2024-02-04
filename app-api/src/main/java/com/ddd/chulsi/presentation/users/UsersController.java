@@ -27,11 +27,10 @@ public class UsersController {
 
     @PostMapping(value = "/kakao/login", name = "카카오 로그인")
     public BaseResponse<UsersDTO.KakaoLoginResponse> kakaoLogin(
-        @RequestBody @Valid UsersDTO.OauthLoginRequest loginRequest,
-        HttpServletResponse response
+        @RequestBody @Valid UsersDTO.OauthLoginRequest loginRequest
     ) {
         UsersCommand.LoginCommand loginCommand = loginRequest.toCommand();
-        return BaseResponse.ofSuccess(usersFacade.kakaoLogin(loginCommand, response));
+        return BaseResponse.ofSuccess(usersFacade.kakaoLogin(loginCommand));
     }
 
     @PostMapping(value = "/logout", name = "로그아웃")
@@ -44,28 +43,25 @@ public class UsersController {
 
     @PostMapping(value = "/register", name = "회원가입")
     public BaseResponse<UsersDTO.LoginResponse> register(
-        @RequestBody @Valid UsersDTO.Register register,
-        HttpServletResponse response
+        @RequestBody @Valid UsersDTO.Register register
     ) {
         UsersCommand.RegisterCommand registerCommand = register.toCommand();
-        return BaseResponse.ofSuccess(usersFacade.register(registerCommand, response));
+        return BaseResponse.ofSuccess(usersFacade.register(registerCommand));
     }
 
     @PostMapping(value = "/login", name = "로그인")
     public BaseResponse<UsersDTO.LoginResponse> login(
-        @RequestBody @Valid UsersDTO.LoginRequest loginRequest,
-        HttpServletResponse response
+        @RequestBody @Valid UsersDTO.LoginRequest loginRequest
     ) {
         UsersCommand.UsersLogin loginCommand = loginRequest.toCommand();
-        return BaseResponse.ofSuccess(usersFacade.login(loginCommand, response));
+        return BaseResponse.ofSuccess(usersFacade.login(loginCommand));
     }
 
     @PostMapping(value = "/auto-login", name = "자동 로그인")
     public BaseResponse<UsersDTO.LoginResponse> autoLogin(
-        @AuthToken String token,
-        HttpServletResponse response
+        @AuthToken String token
     ) {
-        return BaseResponse.ofSuccess(usersFacade.autoLogin(token, response));
+        return BaseResponse.ofSuccess(usersFacade.autoLogin(token));
     }
 
     @PostMapping(value = "/password-find", name = "비밀번호 찾기")

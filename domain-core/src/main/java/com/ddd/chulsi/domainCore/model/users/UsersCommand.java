@@ -23,11 +23,6 @@ public class UsersCommand {
         }
     }
 
-    public record UsersRefreshTokenUpdateEvent (
-        UUID usersId,
-        String refreshToken
-    ) { }
-
     public record RegisterCommand (
         DefinedCode oauthType,
         Long oauthId,

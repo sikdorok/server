@@ -51,7 +51,7 @@ class UsersControllerTest extends ControllerTest {
     @Test
     void 카카오_로그인() throws Exception {
 
-        given(usersFacade.kakaoLogin(any(UsersCommand.LoginCommand.class), any(HttpServletResponse.class))).willReturn(givenKakaoLoginResponse());
+        given(usersFacade.kakaoLogin(any(UsersCommand.LoginCommand.class))).willReturn(givenKakaoLoginResponse());
 
         UsersDTO.OauthLoginRequest request = new UsersDTO.OauthLoginRequest("accessToken");
 
@@ -88,7 +88,7 @@ class UsersControllerTest extends ControllerTest {
     @Test
     void 카카오_로그인_회원가입_필요() throws Exception {
 
-        given(usersFacade.kakaoLogin(any(UsersCommand.LoginCommand.class), any(HttpServletResponse.class))).willReturn(givenKakaoLoginNeedSignUpResponse());
+        given(usersFacade.kakaoLogin(any(UsersCommand.LoginCommand.class))).willReturn(givenKakaoLoginNeedSignUpResponse());
 
         UsersDTO.OauthLoginRequest request = new UsersDTO.OauthLoginRequest("accessToken");
 
@@ -152,7 +152,7 @@ class UsersControllerTest extends ControllerTest {
     @Test
     void 회원가입() throws Exception {
 
-        given(usersFacade.register(any(UsersCommand.RegisterCommand.class), any(HttpServletResponse.class))).willReturn(givenLoginResponse());
+        given(usersFacade.register(any(UsersCommand.RegisterCommand.class))).willReturn(givenLoginResponse());
 
         UsersDTO.Register request = givenRegisterRequest();
 
@@ -194,7 +194,7 @@ class UsersControllerTest extends ControllerTest {
     @Test
     void 로그인() throws Exception {
 
-        given(usersFacade.login(any(UsersCommand.UsersLogin.class), any(HttpServletResponse.class))).willReturn(givenLoginResponse());
+        given(usersFacade.login(any(UsersCommand.UsersLogin.class))).willReturn(givenLoginResponse());
 
         UsersDTO.LoginRequest request = givenLoginRequest();
 
@@ -232,7 +232,7 @@ class UsersControllerTest extends ControllerTest {
     @Test
     void 자동_로그인() throws Exception {
 
-        given(usersFacade.autoLogin(anyString(), any(HttpServletResponse.class))).willReturn(givenLoginResponse());
+        given(usersFacade.autoLogin(anyString())).willReturn(givenLoginResponse());
 
         mockMvc.perform(
                 post("/users/auto-login")
@@ -257,7 +257,7 @@ class UsersControllerTest extends ControllerTest {
                 )
             ));
 
-        verify(usersFacade).autoLogin(anyString(), any(HttpServletResponse.class));
+        verify(usersFacade).autoLogin(anyString());
 
     }
 

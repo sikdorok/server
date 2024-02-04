@@ -57,16 +57,16 @@ public class UsersFacade {
     private final AppVersionService appVersionService;
 
     @Transactional(rollbackFor = Exception.class)
-    public UsersDTO.LoginResponse login(UsersCommand.UsersLogin usersLogin, HttpServletResponse response) {
+    public UsersDTO.LoginResponse login(UsersCommand.UsersLogin usersLogin) {
         Users users = usersService.findByEmailAndPassword(usersLogin.email(), usersLogin.password());
 
         if (users == null) throw new UserNotFoundException();
 
-        return usersLogin(new UsersInfo.UsersInfoLogin(users, null), response);
+        return usersLogin(users, null);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public UsersDTO.LoginResponse autoLogin(String token, HttpServletResponse response) {
+    public UsersDTO.LoginResponse autoLogin(String token) {
         JWTClaim jwtClaim = jwtTokenUtil.getClaims(token, properties, true);
 
         UUID usersId = jwtClaim.getUsersId();
@@ -78,10 +78,12 @@ public class UsersFacade {
         )
             throw new UserNotFoundException();
 
-        return usersLogin(new UsersInfo.UsersInfoLogin(users, null), response);
+        return usersLogin(users, null);
     }
 
-    public UsersDTO.LoginResponse usersLogin(UsersInfo.UsersInfoLogin usersInfoLogin, HttpServletResponse response) {
+    public UsersDTO.LoginResponse usersLogin(Users users, String oauthAccessToken) {
+        UsersInfo.UsersInfoLogin usersInfoLogin = new UsersInfo.UsersInfoLogin(users, oauthAccessToken);
+
         JWTClaim jwtClaim = JWTClaim.builder()
             .usersId(usersInfoLogin.getUsersId())
             .auth(usersInfoLogin.getAuth())
@@ -104,17 +106,10 @@ public class UsersFacade {
         // Refresh Token 유효시간을 가져온 후 Redis에 Refresh Token을 저장합니다.
         redisUtil.set("REFRESH_TOKEN:" + usersInfoLogin.getUsersId(), refreshToken, properties.getRefreshExpiresTime(), TimeUnit.MILLISECONDS);
 
-        eventPublisher.publishEvent(new UsersCommand.UsersRefreshTokenUpdateEvent(usersInfoLogin.getUsersId(), refreshToken));
+        users.updateRefreshToken(refreshToken);
+        users.updateLastLoginAt();
 
         return new UsersDTO.LoginResponse(true, usersInfoLogin);
-    }
-
-    @EventListener
-    @Transactional(rollbackFor = Exception.class)
-    public void updateRefreshToken(UsersCommand.UsersRefreshTokenUpdateEvent event) {
-        Users users = usersService.findByUsersId(event.usersId());
-        users.updateRefreshToken(event.refreshToken());
-        users.updateLastLoginAt();
     }
 
     public String kakaoAccessToken(String code) {
@@ -125,7 +120,7 @@ public class UsersFacade {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public UsersDTO.KakaoLoginResponse kakaoLogin(UsersCommand.LoginCommand loginCommand, HttpServletResponse response) {
+    public UsersDTO.KakaoLoginResponse kakaoLogin(UsersCommand.LoginCommand loginCommand) {
         OauthInfo.KakaoUserMe kakaoUserMe = oauthKakaoService.getUserName(loginCommand.accessToken());
 
         String nickname = kakaoUserMe.kakaoAccount().kakaoProfile().nickname();
@@ -157,7 +152,7 @@ public class UsersFacade {
             oauthToken.updateAccessToken(loginCommand.accessToken());
         }
 
-        UsersDTO.LoginResponse loginResponse = usersLogin(new UsersInfo.UsersInfoLogin(users, loginCommand.accessToken()), response);
+        UsersDTO.LoginResponse loginResponse = usersLogin(users, loginCommand.accessToken());
 
         return new UsersDTO.KakaoLoginResponse<>(
             true,
@@ -196,7 +191,7 @@ public class UsersFacade {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public UsersDTO.LoginResponse register(UsersCommand.RegisterCommand registerCommand, HttpServletResponse response) {
+    public UsersDTO.LoginResponse register(UsersCommand.RegisterCommand registerCommand) {
         // 이메일 중복검사
         if (usersService.duplicationCheckEmail(registerCommand.email()))
             throw new UserExistsException();
@@ -206,7 +201,7 @@ public class UsersFacade {
         Users users = usersService.store(insertUsers);
 
         // 로그인 처리
-        return usersLogin(new UsersInfo.UsersInfoLogin(users, null), response);
+        return usersLogin(users, null);
     }
 
     @Transactional(readOnly = true)
