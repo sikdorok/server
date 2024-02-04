@@ -8,6 +8,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -28,6 +30,9 @@ public class MailServiceImpl implements MailService {
             for (Users users : receiveList) {
                 // 0. 유저 정보 치환
                 passwordResetUrl = passwordResetUrl.replace("{usersId}", users.getUsersId().toString()).replace("{code}", redisCode);
+
+                // URL Encode
+                passwordResetUrl = URLEncoder.encode(passwordResetUrl, StandardCharsets.UTF_8);
 
                 // 1. 메일 수신자 설정
                 messageHelper.setTo(users.getEmail());
