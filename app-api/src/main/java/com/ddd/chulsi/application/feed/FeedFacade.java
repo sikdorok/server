@@ -129,13 +129,6 @@ public class FeedFacade {
 
         Users users = usersSpecification.findByUsersId(usersId);
 
-        duplicateCheck(
-            infoUpdateCommand.time(),
-            infoUpdateCommand.tag(),
-            infoUpdateCommand.icon(),
-            infoUpdateCommand.memo()
-        );
-
         Feed feed = feedSpecification.findByFeedIdAndIsMind(infoUpdateCommand.feedId(), usersId);
 
         feed.infoUpdate(infoUpdateCommand);
