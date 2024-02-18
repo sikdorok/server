@@ -15,7 +15,11 @@ public class AppVersionServiceImpl implements AppVersionService {
     public void register(AppVersionCommand.AppVersionRegister appVersionRegister) {
         AppVersion appVersion = appVersionReader.findByTypeAndMajorAndMinorAndPatch(appVersionRegister.type(), appVersionRegister.major(), appVersionRegister.minor(), appVersionRegister.patch());
         if (appVersion == null) appVersionStore.register(appVersionRegister.toEntity());
-        else appVersion.updateInfo(appVersionRegister.major(), appVersionRegister.minor(), appVersionRegister.patch());
+        else {
+            appVersion.updateInfo(appVersionRegister.major(), appVersionRegister.minor(), appVersionRegister.patch());
+            if (appVersionRegister.forceUpdateStatus()) appVersion.forceUpdateEnable();
+            else appVersion.forceUpdateDisable();
+        }
     }
 
     @Override

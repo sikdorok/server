@@ -52,4 +52,12 @@ public class AppVersion {
         this.minor = minor;
         this.patch = patch;
     }
+
+    public void forceUpdateEnable() {
+        this.forceUpdateStatus = true;
+    }
+
+    public void forceUpdateDisable() {
+        this.forceUpdateStatus = false;
+    }
 }
