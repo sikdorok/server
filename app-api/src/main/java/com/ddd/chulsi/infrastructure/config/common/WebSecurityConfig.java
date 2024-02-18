@@ -10,6 +10,7 @@ import com.ddd.chulsi.infrastructure.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -65,6 +66,7 @@ public class WebSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 토큰 기반 인증이므로 세션 미사용
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(PERMIT_LIST).permitAll()
+                .requestMatchers(HttpMethod.POST, "/app-version").hasAuthority(String.valueOf(DefinedCode.C000100001))
                 .requestMatchers(MANAGER_WHITELIST).hasAuthority(String.valueOf(DefinedCode.C000100001))
                 .anyRequest().permitAll() // 그외 나머지 요청은 누구나 접근 가능
             ) // 요청에 대한 사용권한 체크
