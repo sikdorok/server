@@ -104,7 +104,7 @@ public class UsersFacade {
         usersInfoLogin.setRefreshToken(refreshToken);
 
         // Refresh Token 유효시간을 가져온 후 Redis에 Refresh Token을 저장합니다.
-//        redisUtil.set("REFRESH_TOKEN:" + usersInfoLogin.getUsersId(), refreshToken, properties.getRefreshExpiresTime(), TimeUnit.MILLISECONDS);
+        redisUtil.set("REFRESH_TOKEN:" + usersInfoLogin.getUsersId(), refreshToken, properties.getRefreshExpiresTime(), TimeUnit.MILLISECONDS);
 
         users.updateRefreshToken(refreshToken);
         users.updateLastLoginAt();
