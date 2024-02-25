@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,6 +56,7 @@ public class S3Provider implements FileProvider {
         }
     }
 
+    @Async
     @Override
     public FileInfoDTO uploadFile(String path, MultipartFile uploadFile) {
         final ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -84,6 +86,7 @@ public class S3Provider implements FileProvider {
             .collect(Collectors.toList());
     }
 
+    @Async
     @Override
     public void deleteFile(String filePath) {
         if (filePath != null) {
@@ -93,6 +96,7 @@ public class S3Provider implements FileProvider {
         }
     }
 
+    @Async
     @Override
     public void deleteFiles(Set<String> filePaths) {
         if (filePaths != null && filePaths.size() > 0) {
