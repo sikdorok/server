@@ -14,19 +14,19 @@ public record FileInfoDTO(
     String ext,
     long size
 ) {
-    public Photos toPhotos(DefinedCode type, DefinedCode subType, UUID targetId, FileInfoDTO fileInfoDTO) {
+    public Photos toPhotos(DefinedCode type, DefinedCode subType, UUID targetId) {
         return Photos.builder()
             .type(type)
             .subType(subType)
             .token(UUID.randomUUID())
             .targetId(targetId)
-            .uploadPath(fileInfoDTO.uploadPath)
-            .uploadFileName(fileInfoDTO.uploadFileName)
-            .originFileName(fileInfoDTO.originFileName)
-            .uploadFullPath(fileInfoDTO.uploadFullPath)
-            .contentType(fileInfoDTO.contentType)
-            .ext(fileInfoDTO.ext)
-            .size(fileInfoDTO.size)
+            .uploadPath(uploadPath)
+            .uploadFileName(uploadFileName)
+            .originFileName(originFileName)
+            .uploadFullPath(uploadFullPath)
+            .contentType(contentType)
+            .ext(ext)
+            .size(size)
             .build();
     }
 }

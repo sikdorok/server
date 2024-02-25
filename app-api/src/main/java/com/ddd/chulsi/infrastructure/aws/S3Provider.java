@@ -17,9 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Component
@@ -58,7 +60,7 @@ public class S3Provider implements FileProvider {
 
     @Async
     @Override
-    public FileInfoDTO uploadFile(String path, MultipartFile uploadFile) {
+    public CompletableFuture<FileInfoDTO> uploadFile(String path, MultipartFile uploadFile) {
         final ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(uploadFile.getContentType());
         objectMetadata.setContentLength(uploadFile.getSize());
@@ -72,7 +74,7 @@ public class S3Provider implements FileProvider {
             amazonS3.putObject(new PutObjectRequest(bucketName, uploadPath + "/" + uploadFileName, uploadFile.getInputStream(), objectMetadata));
             final String uploadFullPath = endpoint + uploadPath + "/" + uploadFileName;
 
-            return new FileInfoDTO(uploadPath, uploadFileName, originFileName, uploadFullPath, contentType, ext, size);
+            return CompletableFuture.completedFuture(new FileInfoDTO(uploadPath, uploadFileName, originFileName, uploadFullPath, contentType, ext, size));
         } catch (IOException e) {
             e.printStackTrace();
             throw new FileUploadException();
@@ -80,7 +82,7 @@ public class S3Provider implements FileProvider {
     }
 
     @Override
-    public List<FileInfoDTO> uploadFiles(String path, List<MultipartFile> uploadFiles) {
+    public List<CompletableFuture<FileInfoDTO>> uploadFiles(String path, List<MultipartFile> uploadFiles) {
         return uploadFiles.stream()
             .map(file -> uploadFile(path, file))
             .collect(Collectors.toList());

@@ -35,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
@@ -164,7 +165,12 @@ public class FeedFacade {
                 return fileProvider.uploadFile("feed", files);
             })
             .ifPresent(fileInfoDTO -> {
-                Photos photos = fileInfoDTO.toPhotos(DefinedCode.C000600001, null, feed.getFeedId(), fileInfoDTO);
+                Photos photos;
+                try {
+                    photos = fileInfoDTO.get().toPhotos(DefinedCode.C000600001, null, feed.getFeedId());
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
                 photosService.register(photos);
                 users.photosLimitPlus();
             });
