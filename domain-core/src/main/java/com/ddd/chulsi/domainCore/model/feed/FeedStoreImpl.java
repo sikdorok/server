@@ -3,6 +3,7 @@ package com.ddd.chulsi.domainCore.model.feed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -34,6 +35,11 @@ public class FeedStoreImpl implements FeedStore {
     @Override
     public void flush() {
         feedJpaRepository.flush();
+    }
+
+    @Override
+    public void allDisableIsMain(UUID usersId, LocalDateTime time) {
+        feedJpaRepository.allDisableIsMain(usersId, time);
     }
 
 }

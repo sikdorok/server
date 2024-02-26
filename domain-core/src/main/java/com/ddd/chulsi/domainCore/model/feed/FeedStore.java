@@ -1,5 +1,6 @@
 package com.ddd.chulsi.domainCore.model.feed;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface FeedStore {
@@ -13,5 +14,7 @@ public interface FeedStore {
     void store(Feed mainFeed);
 
     void flush();
+
+    void allDisableIsMain(UUID usersId, LocalDateTime time);
 
 }

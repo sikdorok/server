@@ -25,11 +25,6 @@ public class FeedReaderImpl implements FeedReader {
     }
 
     @Override
-    public Feed findByUsersIdAndIsMainAndTime(UUID usersId, boolean isMain, LocalDateTime time) {
-        return feedCustomRepository.findByUsersIdAndIsMainAndTime(usersId, isMain, time);
-    }
-
-    @Override
     public List<FeedInfo.Weekly> weeklyList(UUID usersId, LocalDate date) {
         YearMonth yearMonth = YearMonth.of(date.getYear(), date.getMonth());
         LocalDate startDate = yearMonth.atDay(1);

@@ -24,6 +24,4 @@ public interface FeedCustomRepository {
 
     List<DefinedCode> getOnlyTags(UUID usersId, LocalDate date);
 
-    Feed findByUsersIdAndIsMainAndTime(UUID usersId, boolean isMain, LocalDateTime time);
-
 }

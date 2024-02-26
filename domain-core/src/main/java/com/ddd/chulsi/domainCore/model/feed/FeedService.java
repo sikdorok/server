@@ -12,10 +12,6 @@ public interface FeedService {
 
     Feed register(Feed insertFeed);
 
-    Feed findByFeedId(UUID feedId);
-
-    void updateMain(UUID usersId, boolean isMain, LocalDateTime time);
-
     void delete(Feed feed);
 
     List<FeedInfo.WeeklyCover> weeklyList(UUID usersId, LocalDate date);
@@ -33,5 +29,7 @@ public interface FeedService {
     List<DefinedCode> getOnlyTags(UUID usersId, LocalDate date);
 
     boolean duplicateCheck(LocalDateTime time, DefinedCode tag, DefinedCode icon, String memo);
+
+    void allDisableIsMain(UUID usersId, LocalDateTime time);
 
 }

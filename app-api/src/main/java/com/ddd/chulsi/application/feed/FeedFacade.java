@@ -92,6 +92,7 @@ public class FeedFacade {
             throw new ExistsException();
     }
 
+    @Transactional(readOnly = true)
     public FeedDTO.FeedInfoResponse info(String token, UUID feedId) {
         Feed feed = feedSpecification.findByFeedId(feedId);
 
@@ -136,7 +137,7 @@ public class FeedFacade {
 
         // 대표 아이콘 처리 확인
         if (infoUpdateCommand.isMain()) {
-            feedService.updateMain(usersId, true, infoUpdateCommand.time());
+            feedService.allDisableIsMain(usersId, infoUpdateCommand.time());
             feed.updateIsMainTrue();
         } else feed.updateIsMainFalse();
 

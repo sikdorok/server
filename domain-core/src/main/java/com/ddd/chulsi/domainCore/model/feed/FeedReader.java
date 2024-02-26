@@ -12,8 +12,6 @@ public interface FeedReader {
 
     Feed findByFeedId(UUID feedId);
 
-    Feed findByUsersIdAndIsMainAndTime(UUID usersId, boolean isMain, LocalDateTime time);
-
     List<FeedInfo.Weekly> weeklyList(UUID usersId, LocalDate date);
 
     Page<FeedInfo.HomeFeedItemDTO> findAllByUsersIdAndTime(UUID usersId, FeedCommand.ListCommand listCommand, DefinedCode initTag);

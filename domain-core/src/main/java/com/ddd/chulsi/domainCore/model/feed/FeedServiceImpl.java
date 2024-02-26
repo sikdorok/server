@@ -25,21 +25,6 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public Feed findByFeedId(UUID feedId) {
-        return feedReader.findByFeedId(feedId);
-    }
-
-    @Override
-    public void updateMain(UUID usersId, boolean isMain, LocalDateTime time) {
-        Feed mainFeed = feedReader.findByUsersIdAndIsMainAndTime(usersId, isMain, time);
-        if (mainFeed != null) {
-            mainFeed.updateIsMainFalse();
-            feedStore.store(mainFeed);
-            feedStore.flush();
-        }
-    }
-
-    @Override
     public void delete(Feed feed) {
         feedStore.delete(feed);
     }
@@ -103,6 +88,11 @@ public class FeedServiceImpl implements FeedService {
     @Override
     public boolean duplicateCheck(LocalDateTime time, DefinedCode tag, DefinedCode icon, String memo) {
         return feedReader.duplicateCheck(time, tag, icon, memo);
+    }
+
+    @Override
+    public void allDisableIsMain(UUID usersId, LocalDateTime time) {
+        feedStore.allDisableIsMain(usersId, time);
     }
 
     private void addPrevWeekly(UUID usersId, LocalDate date, List<FeedInfo.WeeklyFeed> originWeek) {

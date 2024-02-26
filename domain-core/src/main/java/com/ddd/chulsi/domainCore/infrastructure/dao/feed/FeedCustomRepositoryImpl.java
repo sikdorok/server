@@ -176,18 +176,6 @@ public class FeedCustomRepositoryImpl implements FeedCustomRepository {
             .fetch();
     }
 
-    @Override
-    public Feed findByUsersIdAndIsMainAndTime(UUID usersId, boolean isMain, LocalDateTime time) {
-        return queryFactory
-            .selectFrom(feed)
-            .where(
-                feed.usersId.eq(usersId),
-                feed.isMain.eq(isMain),
-                Expressions.stringTemplate("DATE_FORMAT({0}, {1})", feed.time, "%Y-%m-%d").eq(time.toLocalDate().toString())
-            )
-            .fetchOne();
-    }
-
     private BooleanExpression cursorDate(LocalDate cursorDate, String nextCursorDate) {
         // 처음 조회
         if (cursorDate == null) {
