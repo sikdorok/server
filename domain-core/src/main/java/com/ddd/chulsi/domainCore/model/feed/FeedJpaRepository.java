@@ -28,7 +28,7 @@ public interface FeedJpaRepository extends JpaRepository<Feed, UUID> {
     Optional<Feed> findByTimeAndTagAndIconAndMemo(LocalDateTime time, DefinedCode tag, DefinedCode icon, String memo);
 
     @Modifying
-    @Query(value = "UPDATE feed SET isMain = 0 WHERE usersId = :usersId AND time = DATE_FORMAT(:time, '%Y%-%m-%d')", nativeQuery = true)
+    @Query(value = "UPDATE feed SET isMain = 0 WHERE usersId = :usersId AND DATE_FORMAT(time, '%Y%-%m-%d') = DATE_FORMAT(:time, '%Y%-%m-%d')", nativeQuery = true)
     void allDisableIsMain(UUID usersId, LocalDateTime time);
 
 }
