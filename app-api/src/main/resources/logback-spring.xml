@@ -55,7 +55,7 @@
 
     <springProfile name="dev">
         <logger name="MySQL" level="INFO" />
-        <logger name="com.ddd.chulsi.infrastructure.aop.LoggerAspect" level="INFO">
+        <logger name="com.sikdorok.appapi.infrastructure.aop.LoggerAspect" level="INFO">
             <appender-ref ref="ApiLogFile" />
             <appender-ref ref="ApiErrorLogFile" />
         </logger>
@@ -66,7 +66,7 @@
 
     <springProfile name="prod">
         <logger name="MySQL" level="WARN" />
-        <logger name="com.ddd.chulsi.infrastructure.aop.LoggerAspect" level="INFO">
+        <logger name="com.sikdorok.appapi.infrastructure.aop.LoggerAspect" level="INFO">
             <appender-ref ref="ApiLogFile" />
             <appender-ref ref="ApiErrorLogFile" />
         </logger>

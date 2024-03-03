@@ -1,4 +1,4 @@
-rootProject.name = 'chulsi'
+rootProject.name = 'sikdorok'
 include 'app-api'
 include 'domain-core'
 include 'system-core'

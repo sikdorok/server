@@ -1,8 +1,8 @@
 // Domain
 
-war { enabled = true }
+jar { enabled = true }
 
-bootWar { enabled = true }
+bootJar { enabled = true }
 
 configurations {
     querydsl.extendsFrom compileClasspath

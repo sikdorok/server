@@ -13,5 +13,5 @@ ENV CONFIG_SERVER_ENCRYPT_KEY=$CONFIG_SERVER_ENCRYPT_KEY
 ENV CONFIG_SERVER_USERNAME=$CONFIG_SERVER_USERNAME
 ENV CONFIG_SERVER_PASSWORD=$CONFIG_SERVER_PASSWORD
 
-COPY ./build/libs/*.war chulsi.war
-CMD java -jar ./chulsi.war
+COPY ./build/libs/*.jar sikdorok.jar
+CMD java -jar ./sikdorok.jar

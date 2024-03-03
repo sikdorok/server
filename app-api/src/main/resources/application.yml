@@ -32,7 +32,7 @@ spring:
     properties:
       hibernate.connection.provider_disables_autocommit: false # ID 관련되어서 하이버네이트 속성에 따른 생성
       hibernate:
-        function_contributor: com.ddd.chulsi.infrastructure.config.datasource.MySQLContributor # 내장함수 사용을 위해 커스텀 파일로 등록
+        function_contributor: com.sikdorok.appapi.infrastructure.config.datasource.MySQLContributor # 내장함수 사용을 위해 커스텀 파일로 등록
         enable_lazy_load_no_trans: true
         format_sql: true # 하이버네이트 sql문 포맷 정렬 여부
       jdbc:
@@ -71,3 +71,10 @@ jwt:
 logging:
   level: # 로깅 레벨
     root: INFO # 로킹 레벨 설정
+
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true # 안먹힌다.. 망할 pet store...
+    path: /sikdorok/api-ui.html
+  api-docs:
+    path: /sikdorok/v3/api-docs
