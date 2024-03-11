@@ -1,5 +1,6 @@
 package com.sikdorok.appapi.application.feed;
 
+import com.sikdorok.appapi.infrastructure.aws.FileInfoDTO;
 import com.sikdorok.domaincore.model.feed.Feed;
 import com.sikdorok.domaincore.model.feed.FeedCommand;
 import com.sikdorok.domaincore.model.feed.FeedInfo;
@@ -21,6 +22,7 @@ import com.sikdorok.appapi.infrastructure.specification.users.UsersSpecification
 import com.sikdorok.system.CollectionUtils;
 import com.sikdorok.appapi.presentation.feed.dto.FeedDTO;
 import com.sikdorok.appapi.presentation.shared.response.dto.PagingDTO;
+import com.sikdorok.system.Utils;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -159,12 +162,17 @@ public class FeedFacade {
     }
 
     private void feedPhotoUpload(MultipartFile file, Feed feed) {
-        Optional.ofNullable(file)
-            .map(files -> fileProvider.uploadFile("feed", files))
-            .ifPresent(fileInfoDTO -> {
-                Photos photos = fileInfoDTO.toPhotos(DefinedCode.C000600001, null, feed.getFeedId());
-                photosService.register(photos);
-            });
+        if (!file.isEmpty()) {
+            long checkedSize = Utils.bytesToMegabytes(file.getSize());
+            if (checkedSize >= 10) {
+                log.error("Failed file size : {}", checkedSize);
+                throw new MaxUploadSizeExceededException(10);
+            }
+
+            FileInfoDTO fileInfoDTO = fileProvider.uploadFile("feed", file);
+            Photos photos = fileInfoDTO.toPhotos(DefinedCode.C000600001, null, feed.getFeedId());
+            photosService.register(photos);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -173,7 +181,7 @@ public class FeedFacade {
 
         UUID usersId = jwtClaim.getUsersId();
 
-        Users users = usersSpecification.findByUsersId(usersId);
+        usersSpecification.findByUsersId(usersId);
 
         Feed feed = feedSpecification.findByFeedIdAndIsMind(feedId, usersId);
 
@@ -184,7 +192,6 @@ public class FeedFacade {
             if (photos != null) {
                 fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
                 photosService.delete(photos);
-//                users.photosLimitMinus();
             }
         }));
 

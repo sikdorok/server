@@ -1,6 +1,7 @@
 package com.sikdorok.appapi.infrastructure.aws;
 
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.event.ProgressListener;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.transfer.TransferManager;
@@ -85,6 +86,8 @@ public class S3Provider implements FileProvider {
             } catch (AmazonClientException | InterruptedException e) {
                 log.error(e.getMessage());
             }
+
+            transferManager.shutdownNow();
 
             final String uploadFullPath = endpoint + uploadPath + "/" + uploadFileName;
 

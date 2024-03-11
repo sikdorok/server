@@ -8,6 +8,7 @@ import com.sikdorok.appapi.infrastructure.exception.BadRequestException;
 import com.sikdorok.appapi.infrastructure.exception.ServerException;
 import com.sikdorok.appapi.infrastructure.exception.message.ErrorMessage;
 import com.sikdorok.appapi.infrastructure.exception.response.ErrorResponse;
+import com.sikdorok.system.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -125,7 +126,7 @@ public class GlobalExceptionHandler {
 
         return new ErrorResponse(
             400,
-            "한번에 요청 가능한 파일 사이즈는 10MB를 초과할 수 없습니다."
+            "한번에 요청 가능한 파일 사이즈는 10 MB를 초과할 수 없습니다."
         );
     }
 

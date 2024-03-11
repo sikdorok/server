@@ -11,5 +11,9 @@ public class Utils {
         long secDiffTime = (afterTime - beforeTime); //두 시간에 차 계산
         System.out.printf("[%s] 수행시간 : %d ms\n", title, secDiffTime);
     }
+
+    public static long bytesToMegabytes(long bytes) {
+        return Math.round((double) bytes / (1024 * 1024));
+    }
     
 }
