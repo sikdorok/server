@@ -15,8 +15,15 @@ openapi3 {
     format = "json"
 }
 
+task copyDocument(type: Copy) {
+    delete("src/main/resources/static/swagger-ui/openapi3.json") // 기존 OAS 파일 삭제
+    from("$buildDir/api-spec/openapi3.json") // 복제할 OAS 파일 지정
+    into("$buildDir/resources/main/static/swagger-ui/.") // 타겟 디렉터리로 파일 복제
+    dependsOn("openapi3") // openapi3 Task가 먼저 실행되도록 설정
+}
+
 bootJar {
-    dependsOn("openapi3")
+    dependsOn copyDocument
 }
 
 dependencies {
