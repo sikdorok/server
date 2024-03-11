@@ -45,12 +45,7 @@ public class PolicyItemFacade {
         Optional.ofNullable(file)
             .map(fileItem -> fileProvider.uploadFile("policy", fileItem))
             .ifPresent(fileInfoDTO -> {
-                Photos photos;
-                try {
-                    photos = fileInfoDTO.get().toPhotos(DefinedCode.C000600002, registerCommand.type(), newPolicyItem.getPolicyItemId());
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
+                Photos photos = fileInfoDTO.toPhotos(DefinedCode.C000600002, registerCommand.type(), newPolicyItem.getPolicyItemId());
                 photosService.register(photos);
             });
     }
@@ -76,12 +71,7 @@ public class PolicyItemFacade {
         Optional.ofNullable(file)
             .map(fileItem -> fileProvider.uploadFile("policy", fileItem))
             .ifPresent(fileInfoDTO -> {
-                Photos photos;
-                try {
-                    photos = fileInfoDTO.get().toPhotos(DefinedCode.C000600002, infoUpdateCommand.type(), policyItem.getPolicyItemId());
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
+                Photos photos = fileInfoDTO.toPhotos(DefinedCode.C000600002, infoUpdateCommand.type(), policyItem.getPolicyItemId());
                 photosService.register(photos);
             });
     }

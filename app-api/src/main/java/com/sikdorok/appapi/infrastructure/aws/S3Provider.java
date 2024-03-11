@@ -1,13 +1,18 @@
 package com.sikdorok.appapi.infrastructure.aws;
 
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
+import com.amazonaws.services.s3.transfer.Upload;
 import com.amazonaws.util.IOUtils;
 import com.sikdorok.appapi.infrastructure.exception.FileGetFailedException;
 import com.sikdorok.appapi.infrastructure.exception.FileUploadException;
 import com.sikdorok.appapi.infrastructure.util.DateUtil;
 import com.sikdorok.appapi.infrastructure.util.FileUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -23,6 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class S3Provider implements FileProvider {
@@ -57,9 +63,8 @@ public class S3Provider implements FileProvider {
         }
     }
 
-    @Async
     @Override
-    public CompletableFuture<FileInfoDTO> uploadFile(String path, MultipartFile uploadFile) {
+    public FileInfoDTO uploadFile(String path, MultipartFile uploadFile) {
         final ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(uploadFile.getContentType());
         objectMetadata.setContentLength(uploadFile.getSize());
@@ -70,18 +75,28 @@ public class S3Provider implements FileProvider {
             final String contentType = uploadFile.getContentType();
             final String ext = FileUtil.getFileExt(uploadFile);
             final long size = uploadFile.getSize();
-            amazonS3.putObject(new PutObjectRequest(bucketName, uploadPath + "/" + uploadFileName, uploadFile.getInputStream(), objectMetadata));
+
+            TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(amazonS3).build();
+            PutObjectRequest request = new PutObjectRequest(bucketName, uploadPath + "/" + uploadFileName, uploadFile.getInputStream(), objectMetadata);
+            Upload upload =  transferManager.upload(request);
+
+            try {
+                upload.waitForCompletion();
+            } catch (AmazonClientException | InterruptedException e) {
+                log.error(e.getMessage());
+            }
+
             final String uploadFullPath = endpoint + uploadPath + "/" + uploadFileName;
 
-            return CompletableFuture.completedFuture(new FileInfoDTO(uploadPath, uploadFileName, originFileName, uploadFullPath, contentType, ext, size));
+            return new FileInfoDTO(uploadPath, uploadFileName, originFileName, uploadFullPath, contentType, ext, size);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             throw new FileUploadException();
         }
     }
 
     @Override
-    public List<CompletableFuture<FileInfoDTO>> uploadFiles(String path, List<MultipartFile> uploadFiles) {
+    public List<FileInfoDTO> uploadFiles(String path, List<MultipartFile> uploadFiles) {
         return uploadFiles.stream()
             .map(file -> uploadFile(path, file))
             .collect(Collectors.toList());
@@ -100,7 +115,7 @@ public class S3Provider implements FileProvider {
     @Async
     @Override
     public void deleteFiles(Set<String> filePaths) {
-        if (filePaths != null && filePaths.size() > 0) {
+        if (filePaths != null && !filePaths.isEmpty()) {
             final DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName);
             deleteObjectsRequest.setKeys(filePaths.stream()
                 .map(DeleteObjectsRequest.KeyVersion::new)

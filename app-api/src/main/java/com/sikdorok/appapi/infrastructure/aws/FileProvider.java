@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface FileProvider {
     Resource getResource(String filePath);
-    CompletableFuture<FileInfoDTO> uploadFile(String path, MultipartFile uploadFile);
-    List<CompletableFuture<FileInfoDTO>> uploadFiles(String path, List<MultipartFile> uploadFiles);
+    FileInfoDTO uploadFile(String path, MultipartFile uploadFile);
+    List<FileInfoDTO> uploadFiles(String path, List<MultipartFile> uploadFiles);
     void deleteFile(String filePath);
     void deleteFiles(Set<String> filePath);
 }

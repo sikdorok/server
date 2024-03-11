@@ -58,7 +58,7 @@ public class FeedFacade {
 
         UUID usersId = jwtClaim.getUsersId();
 
-        Users users = usersSpecification.findByUsersId(usersId);
+        usersSpecification.findByUsersId(usersId);
 
         duplicateCheck(
             registerCommand.time(),
@@ -74,7 +74,7 @@ public class FeedFacade {
         Feed insertFeed = registerCommand.toEntity(usersId);
         Feed newFeed = feedService.register(insertFeed);
 
-        feedPhotoUpload(file, users, newFeed);
+        feedPhotoUpload(file, newFeed);
 
         return newFeed.getFeedId();
     }
@@ -129,7 +129,7 @@ public class FeedFacade {
 
         UUID usersId = jwtClaim.getUsersId();
 
-        Users users = usersSpecification.findByUsersId(usersId);
+        usersSpecification.findByUsersId(usersId);
 
         Feed feed = feedSpecification.findByFeedIdAndIsMind(infoUpdateCommand.feedId(), usersId);
 
@@ -148,32 +148,22 @@ public class FeedFacade {
                 if (photos != null) {
                     fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
                     photosService.delete(photos);
-//                    users.photosLimitMinus();
                 }
             }));
         }
 
         // 파일 등록
-        feedPhotoUpload(file, users, feed);
+        feedPhotoUpload(file, feed);
 
         return feed.getFeedId();
     }
 
-    private void feedPhotoUpload(MultipartFile file, Users users, Feed feed) {
+    private void feedPhotoUpload(MultipartFile file, Feed feed) {
         Optional.ofNullable(file)
-            .map(files -> {
-//                if (users.getPhotosLimit() + 1 == 20) throw new BadRequestException("더 이상 사진을 등록할 수 없습니다.");
-                return fileProvider.uploadFile("feed", files);
-            })
+            .map(files -> fileProvider.uploadFile("feed", files))
             .ifPresent(fileInfoDTO -> {
-                Photos photos;
-                try {
-                    photos = fileInfoDTO.get().toPhotos(DefinedCode.C000600001, null, feed.getFeedId());
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
+                Photos photos = fileInfoDTO.toPhotos(DefinedCode.C000600001, null, feed.getFeedId());
                 photosService.register(photos);
-//                users.photosLimitPlus();
             });
     }
 

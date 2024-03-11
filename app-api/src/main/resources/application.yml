@@ -16,8 +16,8 @@ spring:
       password: ${CONFIG_SERVER_PASSWORD}
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 50MB
+      max-file-size: 5MB
+      max-request-size: 10MB
   jpa:
     database: mysql # 데이터베이스
     database-platform: org.hibernate.dialect.MySQLDialect # 데이터베이스 방언 설정, Hinbernate 가 MySQL에 맞게 쿼리문 생성
