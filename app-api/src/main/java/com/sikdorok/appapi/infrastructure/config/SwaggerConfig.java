@@ -27,7 +27,7 @@ public class SwaggerConfig {
         SecurityRequirement securityRequirement = new SecurityRequirement().addList("JWT");
 
         return new OpenAPI()
-            .servers(List.of(localhost(), develop()))
+            .servers(List.of(develop(), localhost()))
             .components(new Components().addSecuritySchemes("JWT", securityScheme))
             .security(Collections.singletonList(securityRequirement))
             .info(
