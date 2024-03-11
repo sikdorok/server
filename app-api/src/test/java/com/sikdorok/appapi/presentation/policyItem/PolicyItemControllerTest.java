@@ -1,5 +1,6 @@
 package com.sikdorok.appapi.presentation.policyItem;
 
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sikdorok.appapi.application.policyItem.PolicyItemFacade;
 import com.sikdorok.domaincore.model.policyItem.PolicyItemCommand;
@@ -17,11 +18,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
@@ -66,7 +71,7 @@ class PolicyItemControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("policy-item/info",
+            .andDo(MockMvcRestDocumentationWrapper.document("policy-item/info",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 pathParameters(
@@ -100,7 +105,7 @@ class PolicyItemControllerTest extends ControllerTest {
         MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(policyItemRegisterRequest).getBytes(StandardCharsets.UTF_8));
 
         mockMvc.perform(
-                multipart("/policy-item")
+                RestDocumentationRequestBuilders.multipart("/policy-item")
                     .file(file)
                     .file(request)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -111,7 +116,7 @@ class PolicyItemControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("policy-item/register",
+            .andDo(MockMvcRestDocumentationWrapper.document("policy-item/register",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),requestParts(
                     partWithName("request").description("요청값"),
@@ -142,8 +147,17 @@ class PolicyItemControllerTest extends ControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "profile.png", "multipart/form-data", "uploadFile".getBytes(StandardCharsets.UTF_8));
         MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(policyItemInfoUpdateRequest).getBytes(StandardCharsets.UTF_8));
 
+        MockMultipartHttpServletRequestBuilder builder =
+            RestDocumentationRequestBuilders.
+                multipart("/policy-item");
+
+        builder.with(builderRequest -> {
+            builderRequest.setMethod("PUT");
+            return builderRequest;
+        });
+
         mockMvc.perform(
-                multipart(HttpMethod.PUT,"/policy-item")
+                builder
                     .file(file)
                     .file(request)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -154,7 +168,7 @@ class PolicyItemControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("policy-item/info-update",
+            .andDo(MockMvcRestDocumentationWrapper.document("policy-item/info-update",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),requestParts(
                     partWithName("request").description("요청값"),
@@ -195,7 +209,7 @@ class PolicyItemControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("policy-item/delete",
+            .andDo(MockMvcRestDocumentationWrapper.document("policy-item/delete",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 pathParameters(

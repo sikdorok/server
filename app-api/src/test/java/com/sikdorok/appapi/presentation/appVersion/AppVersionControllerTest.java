@@ -1,5 +1,6 @@
 package com.sikdorok.appapi.presentation.appVersion;
 
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sikdorok.appapi.application.appVersion.AppVersionFacade;
 import com.sikdorok.domaincore.model.appVersion.AppVersionCommand;
@@ -52,7 +53,7 @@ class AppVersionControllerTest extends ControllerTest {
         AppVersionDTO.AppVersionRegisterRequest request = AppVersionFactory.givenAppVersionRegisterRequest();
 
         mockMvc.perform(
-                post("/app-version")
+                RestDocumentationRequestBuilders.post("/app-version")
                     .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -62,7 +63,7 @@ class AppVersionControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("app-version/register",
+            .andDo(MockMvcRestDocumentationWrapper.document("app-version/register",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -94,7 +95,7 @@ class AppVersionControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("app-version/latest",
+            .andDo(MockMvcRestDocumentationWrapper.document("app-version/latest",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 pathParameters(

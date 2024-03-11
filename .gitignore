@@ -38,3 +38,6 @@ out/
 
 ### logs ###
 logs/
+
+### openapi3 ###
+openapi3.json

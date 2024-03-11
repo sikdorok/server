@@ -1,5 +1,6 @@
 package com.sikdorok.appapi.presentation.feed;
 
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sikdorok.appapi.application.feed.FeedFacade;
 import com.sikdorok.domaincore.model.feed.FeedCommand;
@@ -19,9 +20,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
@@ -69,7 +72,7 @@ class FeedControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("feed/info",
+            .andDo(MockMvcRestDocumentationWrapper.document("feed/info",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 pathParameters(
@@ -108,7 +111,7 @@ class FeedControllerTest extends ControllerTest {
         MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(feedRegisterRequest).getBytes(StandardCharsets.UTF_8));
 
         mockMvc.perform(
-                multipart("/feed")
+                RestDocumentationRequestBuilders.multipart("/feed")
                     .file(file)
                     .file(request)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -120,7 +123,7 @@ class FeedControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("feed/register",
+            .andDo(MockMvcRestDocumentationWrapper.document("feed/register",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),requestParts(
                     partWithName("request").description("요청값"),
@@ -153,8 +156,17 @@ class FeedControllerTest extends ControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "profile.png", "multipart/form-data", "uploadFile".getBytes(StandardCharsets.UTF_8));
         MockMultipartFile request = new MockMultipartFile("request", null, "application/json", objectMapper.writeValueAsString(feedInfoUpdateRequest).getBytes(StandardCharsets.UTF_8));
 
+        MockMultipartHttpServletRequestBuilder builder =
+            RestDocumentationRequestBuilders.
+                multipart("/feed");
+
+        builder.with(builderRequest -> {
+            builderRequest.setMethod("PUT");
+            return builderRequest;
+        });
+
         mockMvc.perform(
-                multipart(HttpMethod.PUT,"/feed")
+                builder
                     .file(file)
                     .file(request)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -166,7 +178,7 @@ class FeedControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("feed/info-update",
+            .andDo(MockMvcRestDocumentationWrapper.document("feed/info-update",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),requestParts(
                     partWithName("request").description("요청값"),
@@ -210,7 +222,7 @@ class FeedControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("feed/delete",
+            .andDo(MockMvcRestDocumentationWrapper.document("feed/delete",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 pathParameters(

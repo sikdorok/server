@@ -1,5 +1,6 @@
 package com.sikdorok.appapi.presentation.home;
 
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.sikdorok.appapi.application.feed.FeedFacade;
 import com.sikdorok.domaincore.model.feed.FeedCommand;
 import com.sikdorok.domaincore.model.shared.DefinedCode;
@@ -57,7 +58,7 @@ class HomeControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("home/monthly",
+            .andDo(MockMvcRestDocumentationWrapper.document("home/monthly",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 queryParameters(
@@ -100,7 +101,7 @@ class HomeControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("home/list",
+            .andDo(MockMvcRestDocumentationWrapper.document("home/list",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 queryParameters(
@@ -155,7 +156,7 @@ class HomeControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentation.document("home/list-view",
+            .andDo(MockMvcRestDocumentationWrapper.document("home/list-view",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 queryParameters(
