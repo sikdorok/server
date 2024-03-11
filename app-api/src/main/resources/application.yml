@@ -16,7 +16,7 @@ spring:
       password: ${CONFIG_SERVER_PASSWORD}
   servlet:
     multipart:
-      max-file-size: 5MB
+      max-file-size: 10MB
       max-request-size: 10MB
   jpa:
     database: mysql # 데이터베이스

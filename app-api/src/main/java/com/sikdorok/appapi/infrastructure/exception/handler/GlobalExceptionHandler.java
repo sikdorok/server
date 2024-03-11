@@ -125,7 +125,7 @@ public class GlobalExceptionHandler {
 
         return new ErrorResponse(
             400,
-            "한번에 요청 가능한 파일 사이즈는 5MB를 초과할 수 없습니다."
+            "한번에 요청 가능한 파일 사이즈는 10MB를 초과할 수 없습니다."
         );
     }
 
