@@ -52,7 +52,8 @@ public class WebConfig extends WebMvcConfigurationSupport {
                 "/resources/**",
                 "/favicon.ico",
                 "/assets/**",
-                "/static/**"
+                "/static/**",
+                "/sikdorok/swagger-ui/**"
             )
             .addResourceLocations(
                 "classpath:/META-INF/resources/",
