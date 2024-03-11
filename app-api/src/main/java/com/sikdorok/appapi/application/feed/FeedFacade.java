@@ -148,7 +148,7 @@ public class FeedFacade {
                 if (photos != null) {
                     fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
                     photosService.delete(photos);
-                    users.photosLimitMinus();
+//                    users.photosLimitMinus();
                 }
             }));
         }
@@ -162,7 +162,7 @@ public class FeedFacade {
     private void feedPhotoUpload(MultipartFile file, Users users, Feed feed) {
         Optional.ofNullable(file)
             .map(files -> {
-                if (users.getPhotosLimit() + 1 == 20) throw new BadRequestException("더 이상 사진을 등록할 수 없습니다.");
+//                if (users.getPhotosLimit() + 1 == 20) throw new BadRequestException("더 이상 사진을 등록할 수 없습니다.");
                 return fileProvider.uploadFile("feed", files);
             })
             .ifPresent(fileInfoDTO -> {
@@ -173,7 +173,7 @@ public class FeedFacade {
                     throw new RuntimeException(e);
                 }
                 photosService.register(photos);
-                users.photosLimitPlus();
+//                users.photosLimitPlus();
             });
     }
 
@@ -194,7 +194,7 @@ public class FeedFacade {
             if (photos != null) {
                 fileProvider.deleteFile(photos.getUploadPath() + "/" + photos.getUploadFileName());
                 photosService.delete(photos);
-                users.photosLimitMinus();
+//                users.photosLimitMinus();
             }
         }));
 
