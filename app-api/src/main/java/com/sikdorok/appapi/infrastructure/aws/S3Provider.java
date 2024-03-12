@@ -69,8 +69,6 @@ public class S3Provider implements FileProvider {
         final ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(uploadFile.getContentType());
         objectMetadata.setContentLength(uploadFile.getSize());
-
-        TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(amazonS3).build();
         try {
             final String uploadPath = DEFAULT_UPLOAD_PATH + "/" + path;
             final String uploadFileName = createUploadFileName(uploadFile);
@@ -79,23 +77,13 @@ public class S3Provider implements FileProvider {
             final String ext = FileUtil.getFileExt(uploadFile);
             final long size = uploadFile.getSize();
 
-            PutObjectRequest request = new PutObjectRequest(bucketName, uploadPath + "/" + uploadFileName, uploadFile.getInputStream(), objectMetadata);
-            Upload upload =  transferManager.upload(request);
-
-            try {
-                upload.waitForCompletion();
-            } catch (AmazonClientException | InterruptedException e) {
-                log.error(e.getMessage());
-            }
-
+            amazonS3.putObject(new PutObjectRequest(bucketName, uploadPath + "/" + uploadFileName, uploadFile.getInputStream(), objectMetadata));
             final String uploadFullPath = endpoint + uploadPath + "/" + uploadFileName;
 
             return new FileInfoDTO(uploadPath, uploadFileName, originFileName, uploadFullPath, contentType, ext, size);
         } catch (IOException e) {
             log.error(e.getMessage());
             throw new FileUploadException();
-        } finally {
-            transferManager.shutdownNow();
         }
     }
 
