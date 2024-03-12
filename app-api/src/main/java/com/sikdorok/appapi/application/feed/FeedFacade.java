@@ -162,7 +162,7 @@ public class FeedFacade {
     }
 
     private void feedPhotoUpload(MultipartFile file, Feed feed) {
-        if (!file.isEmpty()) {
+        if (file != null && !file.isEmpty()) {
             long checkedSize = Utils.bytesToMegabytes(file.getSize());
             if (checkedSize >= 10) {
                 log.error("Failed file size : {}", checkedSize);
