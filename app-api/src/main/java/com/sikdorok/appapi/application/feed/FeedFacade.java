@@ -163,10 +163,9 @@ public class FeedFacade {
 
     private void feedPhotoUpload(MultipartFile file, Feed feed) {
         if (file != null && !file.isEmpty()) {
-            long checkedSize = Utils.bytesToMegabytes(file.getSize());
-            if (checkedSize >= 10) {
-                log.error("Failed file size : {}", checkedSize);
-                throw new MaxUploadSizeExceededException(10);
+            if (file.getSize() >= 10 * 1024 * 1024) {
+                log.error("Failed file size : {}", file.getSize());
+                throw new MaxUploadSizeExceededException(10 * 1024 * 1024);
             }
 
             FileInfoDTO fileInfoDTO = fileProvider.uploadFile("feed", file);
