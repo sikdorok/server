@@ -123,7 +123,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ErrorResponse maxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
         log.error(MESSAGE_KEY, 400, exception.getMessage());
-
+        exception.printStackTrace();
         return new ErrorResponse(
             400,
             "한번에 요청 가능한 파일 사이즈는 10 MB를 초과할 수 없습니다."
