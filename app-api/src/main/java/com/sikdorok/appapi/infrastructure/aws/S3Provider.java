@@ -81,7 +81,7 @@ public class S3Provider implements FileProvider {
             final String uploadFullPath = endpoint + uploadPath + "/" + uploadFileName;
 
             return new FileInfoDTO(uploadPath, uploadFileName, originFileName, uploadFullPath, contentType, ext, size);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
             throw new FileUploadException();
         }
