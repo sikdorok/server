@@ -1,22 +1,20 @@
 package com.sikdorok.appapi.presentation.feed;
 
-import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sikdorok.appapi.application.feed.FeedFacade;
-import com.sikdorok.domaincore.model.feed.FeedCommand;
-import com.sikdorok.domaincore.model.shared.DefinedCode;
 import com.sikdorok.appapi.infrastructure.format.DocumentOptionalGenerator;
 import com.sikdorok.appapi.infrastructure.inMemory.feed.FeedFactory;
 import com.sikdorok.appapi.infrastructure.jwt.JwtTokenUtil;
 import com.sikdorok.appapi.infrastructure.util.ApiDocumentUtils;
 import com.sikdorok.appapi.presentation.feed.dto.FeedDTO;
 import com.sikdorok.appapi.presentation.shared.ControllerTest;
+import com.sikdorok.domaincore.model.feed.FeedCommand;
+import com.sikdorok.domaincore.model.shared.DefinedCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
@@ -36,11 +34,17 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FeedController.class)
 class FeedControllerTest extends ControllerTest {
@@ -72,7 +76,7 @@ class FeedControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("feed/info",
+            .andDo(MockMvcRestDocumentation.document("feed/info",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 pathParameters(
@@ -123,7 +127,7 @@ class FeedControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("feed/register",
+            .andDo(MockMvcRestDocumentation.document("feed/register",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),requestParts(
                     partWithName("request").description("요청값"),
@@ -178,7 +182,7 @@ class FeedControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("feed/info-update",
+            .andDo(MockMvcRestDocumentation.document("feed/info-update",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),requestParts(
                     partWithName("request").description("요청값"),
@@ -222,7 +226,7 @@ class FeedControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("feed/delete",
+            .andDo(MockMvcRestDocumentation.document("feed/delete",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 pathParameters(

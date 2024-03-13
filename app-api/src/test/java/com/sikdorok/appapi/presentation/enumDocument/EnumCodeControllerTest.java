@@ -1,6 +1,5 @@
 package com.sikdorok.appapi.presentation.enumDocument;
 
-import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sikdorok.appapi.presentation.enumDocument.snippet.ApiResponseDto;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.PayloadSubsectionExtractor;
@@ -22,12 +22,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.beneathPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.snippet.Attributes.attributes;
 import static org.springframework.restdocs.snippet.Attributes.key;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,7 +56,7 @@ public class EnumCodeControllerTest extends ControllerTest {
         // 문서화 진행
         result.andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("enum-code/defined-code",
+            .andDo(MockMvcRestDocumentation.document("enum-code/defined-code",
                 customResponseFields("custom-response", beneathPath("data.definedCode").withSubsectionId("definedCode"),
                     attributes(key("title").value("코드 정의")),
                     enumConvertFieldDescriptor((enumDocs.getDefinedCode()))

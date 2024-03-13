@@ -1,16 +1,15 @@
 package com.sikdorok.appapi.presentation.users;
 
-import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sikdorok.appapi.application.users.UsersFacade;
-import com.sikdorok.domaincore.model.shared.DefinedCode;
-import com.sikdorok.domaincore.model.users.UsersCommand;
 import com.sikdorok.appapi.infrastructure.format.DocumentOptionalGenerator;
 import com.sikdorok.appapi.infrastructure.inMemory.users.UsersFactory;
 import com.sikdorok.appapi.infrastructure.jwt.JwtTokenUtil;
 import com.sikdorok.appapi.infrastructure.util.ApiDocumentUtils;
 import com.sikdorok.appapi.presentation.shared.ControllerTest;
 import com.sikdorok.appapi.presentation.users.dto.UsersDTO;
+import com.sikdorok.domaincore.model.shared.DefinedCode;
+import com.sikdorok.domaincore.model.users.UsersCommand;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,11 +30,15 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UsersController.class)
 class UsersControllerTest extends ControllerTest {
@@ -64,7 +67,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/kakao/login",
+            .andDo(MockMvcRestDocumentation.document("users/kakao/login",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -101,7 +104,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/kakao/login/need-sign-up",
+            .andDo(MockMvcRestDocumentation.document("users/kakao/login/need-sign-up",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -137,7 +140,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/logout",
+            .andDo(MockMvcRestDocumentation.document("users/logout",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 responseFields(
@@ -165,7 +168,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/register",
+            .andDo(MockMvcRestDocumentation.document("users/register",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -207,7 +210,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/login",
+            .andDo(MockMvcRestDocumentation.document("users/login",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -241,7 +244,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/auto-login",
+            .andDo(MockMvcRestDocumentation.document("users/auto-login",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 responseFields(
@@ -277,7 +280,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/password-find",
+            .andDo(MockMvcRestDocumentation.document("users/password-find",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -310,7 +313,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/password-link-alive",
+            .andDo(MockMvcRestDocumentation.document("users/password-link-alive",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -344,7 +347,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/password-reset",
+            .andDo(MockMvcRestDocumentation.document("users/password-reset",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -376,7 +379,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/email-check",
+            .andDo(MockMvcRestDocumentation.document("users/email-check",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 pathParameters(
@@ -409,7 +412,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/access-token",
+            .andDo(MockMvcRestDocumentation.document("users/access-token",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -438,7 +441,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/revoke",
+            .andDo(MockMvcRestDocumentation.document("users/revoke",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 responseFields(
@@ -464,7 +467,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/settings",
+            .andDo(MockMvcRestDocumentation.document("users/settings",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 queryParameters(
@@ -498,7 +501,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/profile",
+            .andDo(MockMvcRestDocumentation.document("users/profile",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 responseFields(
@@ -529,7 +532,7 @@ class UsersControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("users/profile-update",
+            .andDo(MockMvcRestDocumentation.document("users/profile-update",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(

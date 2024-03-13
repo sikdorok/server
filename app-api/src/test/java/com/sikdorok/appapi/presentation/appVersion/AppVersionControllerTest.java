@@ -1,16 +1,15 @@
 package com.sikdorok.appapi.presentation.appVersion;
 
-import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sikdorok.appapi.application.appVersion.AppVersionFacade;
-import com.sikdorok.domaincore.model.appVersion.AppVersionCommand;
-import com.sikdorok.domaincore.model.shared.DefinedCode;
 import com.sikdorok.appapi.infrastructure.format.DocumentOptionalGenerator;
 import com.sikdorok.appapi.infrastructure.inMemory.appVersion.AppVersionFactory;
 import com.sikdorok.appapi.infrastructure.jwt.JwtTokenUtil;
 import com.sikdorok.appapi.infrastructure.util.ApiDocumentUtils;
 import com.sikdorok.appapi.presentation.appVersion.dto.AppVersionDTO;
 import com.sikdorok.appapi.presentation.shared.ControllerTest;
+import com.sikdorok.domaincore.model.appVersion.AppVersionCommand;
+import com.sikdorok.domaincore.model.shared.DefinedCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,12 +26,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AppVersionController.class)
 class AppVersionControllerTest extends ControllerTest {
@@ -63,7 +65,7 @@ class AppVersionControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("app-version/register",
+            .andDo(MockMvcRestDocumentation.document("app-version/register",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 requestFields(
@@ -95,7 +97,7 @@ class AppVersionControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("app-version/latest",
+            .andDo(MockMvcRestDocumentation.document("app-version/latest",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 pathParameters(

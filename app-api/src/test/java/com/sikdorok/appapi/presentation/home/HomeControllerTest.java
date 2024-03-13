@@ -1,14 +1,13 @@
 package com.sikdorok.appapi.presentation.home;
 
-import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.sikdorok.appapi.application.feed.FeedFacade;
-import com.sikdorok.domaincore.model.feed.FeedCommand;
-import com.sikdorok.domaincore.model.shared.DefinedCode;
 import com.sikdorok.appapi.infrastructure.format.DocumentOptionalGenerator;
 import com.sikdorok.appapi.infrastructure.inMemory.feed.FeedFactory;
 import com.sikdorok.appapi.infrastructure.jwt.JwtTokenUtil;
 import com.sikdorok.appapi.infrastructure.util.ApiDocumentUtils;
 import com.sikdorok.appapi.presentation.shared.ControllerTest;
+import com.sikdorok.domaincore.model.feed.FeedCommand;
+import com.sikdorok.domaincore.model.shared.DefinedCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,7 +30,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(HomeController.class)
 class HomeControllerTest extends ControllerTest {
@@ -58,7 +59,7 @@ class HomeControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("home/monthly",
+            .andDo(MockMvcRestDocumentation.document("home/monthly",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 queryParameters(
@@ -101,7 +102,7 @@ class HomeControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("home/list",
+            .andDo(MockMvcRestDocumentation.document("home/list",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 queryParameters(
@@ -156,7 +157,7 @@ class HomeControllerTest extends ControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("code").value(200))
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(MockMvcRestDocumentationWrapper.document("home/list-view",
+            .andDo(MockMvcRestDocumentation.document("home/list-view",
                 ApiDocumentUtils.getDocumentRequest(),
                 ApiDocumentUtils.getDocumentResponse(),
                 queryParameters(
